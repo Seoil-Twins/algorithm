@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@tpyescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "root": true,
+  "ignorePatterns": ["node_modules/"],
+  "rules": {}
+}

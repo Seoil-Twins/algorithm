@@ -1,0 +1,69 @@
+html,
+body {
+  margin: 0;
+}
+
+body {
+  width: 100%;
+  min-height: 100vmin;
+  box-sizing: border-box;
+}
+
+/* 여백 초기화 */
+body,
+div,
+ul,
+li,
+dl,
+dd,
+dt,
+ol,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+fieldset,
+legend,
+p,
+select,
+table,
+th,
+td,
+tr,
+textarea,
+button,
+form,
+figure,
+figcaption {
+  margin: 0;
+  padding: 0;
+}
+
+/* a 링크 초기화 */
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+
+/* 폰트 스타일 초기화 */
+em,
+address {
+  font-style: normal;
+}
+
+/* 블릿기호 초기화 */
+ul,
+li,
+ol {
+  list-style: none;
+}
+
+/* 버튼초기화 */
+button {
+  border: 0;
+}
