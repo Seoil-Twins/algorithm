@@ -1,0 +1,91 @@
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+
+  .topBox {
+    position: relative;
+    display: flex;
+    margin-bottom: 20px;
+    padding: 14px 20px;
+    border-radius: 11px;
+    background-color: $white;
+
+    .brightImg {
+      position: absolute;
+      top: -30px;
+      left: -26px;
+    }
+
+    .imgBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 10px;
+      padding: 14px;
+      border-radius: 6px;
+      background-color: #fff4e5;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+    }
+
+    .emphasis {
+      margin-right: 5px;
+      color: $primaryColor;
+    }
+  }
+
+  .ft24 {
+    font-size: 24px;
+    margin-bottom: 60px;
+  }
+
+  .algorithmBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 24px;
+    border-radius: 8px;
+    color: $white;
+    background-color: $primaryColor;
+  }
+}
+
+.videoBox {
+  width: 100%;
+  height: 640px;
+  margin-bottom: 50px;
+
+  iframe {
+    border-radius: 12px;
+  }
+}
+
+.recommendAlgorithmBox {
+  width: 100%;
+
+  .topBox {
+    display: flex;
+    margin-bottom: 35px;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    .ft24 {
+      font-size: 24px;
+    }
+
+    .moreBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background-color: $white;
+    }
+  }
+}

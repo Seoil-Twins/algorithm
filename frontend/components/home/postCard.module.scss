@@ -1,0 +1,72 @@
+.cardBox {
+  display: grid;
+  column-gap: 20px;
+  row-gap: 35px;
+  grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+  grid-template-rows: repeat(2, 1fr);
+  margin-bottom: 50px;
+
+  .itemBox {
+    padding: 25px;
+    border-radius: 12px;
+    background-color: $white;
+
+    .imgBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 280px;
+      margin-bottom: 15px;
+      background-color: $lightBackground;
+    }
+
+    .tagSliderBox {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .title {
+      overflow: hidden;
+      padding-bottom: 15px;
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .infoBox {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: $grayText;
+    }
+
+    .moreBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 44px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background-color: $lightBackground;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .cardBox {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .cardBox {
+    grid-template-columns: 1fr;
+  }
+}
