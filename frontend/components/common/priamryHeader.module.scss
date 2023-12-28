@@ -1,0 +1,46 @@
+.headerBox {
+  position: sticky;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  min-height: $headerHeight;
+  margin-bottom: 50px;
+  background-color: $lightBackground;
+  z-index: 99;
+
+  .centerBox {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1280px;
+  }
+
+  .headerItem {
+    display: flex;
+    align-items: center;
+
+    .logoImg {
+      height: 40px;
+      margin-right: 30px;
+    }
+
+    .menuItemBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
+    }
+
+    .loginBtn {
+      background-color: $primaryColor;
+      color: $white;
+    }
+  }
+}
