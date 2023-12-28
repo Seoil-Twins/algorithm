@@ -3,12 +3,6 @@ body {
   margin: 0;
 }
 
-body {
-  width: 100%;
-  min-height: 100vmin;
-  box-sizing: border-box;
-}
-
 /* 여백 초기화 */
 body,
 div,
@@ -45,6 +39,7 @@ figcaption {
 /* a 링크 초기화 */
 a {
   text-decoration: none;
+  color: inherit;
 }
 a:hover {
   text-decoration: none;
@@ -66,4 +61,21 @@ ol {
 /* 버튼초기화 */
 button {
   border: 0;
+}
+
+iframe {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Custom Style */
+
+body {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vmin;
+  color: #222222;
+  background-color: $lightBackground;
 }

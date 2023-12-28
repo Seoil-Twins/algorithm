@@ -15,7 +15,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={notosansRegular.className}>{children}</body>
+      <body className={notosansRegular.className}>
+        <div style={{ maxWidth: 1280, margin: "auto" }}>{children}</div>
+      </body>
     </html>
   );
 }
