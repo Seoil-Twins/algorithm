@@ -15,7 +15,7 @@ export async function GET() {
   if (session.sessionId) {
     return NextResponse.json(session);
   } else {
-    return NextResponse.json(undefined);
+    return NextResponse.json({});
   }
 }
 
@@ -57,5 +57,5 @@ export async function DELETE() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   session.destroy();
 
-  return NextResponse.json(undefined);
+  return NextResponse.json({});
 }

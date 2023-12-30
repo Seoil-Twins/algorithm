@@ -150,11 +150,12 @@ const tagSlider = ({ tags }: PropsType) => {
         currentmoveBoxRef.removeEventListener("mouseleave", onMouseLeave);
         currentmoveBoxRef.removeEventListener("click", onClick);
       }
-
-      moveBoxRef.current!.removeEventListener("mousemove", onScrollMove);
-      moveBoxRef.current!.removeEventListener("touchmove", onScrollMove);
-      moveBoxRef.current!.removeEventListener("mouseup", onScrollEnd);
-      moveBoxRef.current!.removeEventListener("touchend", onScrollEnd);
+      if (moveBoxRef.current) {
+        moveBoxRef.current!.removeEventListener("mousemove", onScrollMove);
+        moveBoxRef.current!.removeEventListener("touchmove", onScrollMove);
+        moveBoxRef.current!.removeEventListener("mouseup", onScrollEnd);
+        moveBoxRef.current!.removeEventListener("touchend", onScrollEnd);
+      }
     };
   }, [moveBoxRef, onScrollStart, onScrollMove, onScrollEnd, onClick]);
 
