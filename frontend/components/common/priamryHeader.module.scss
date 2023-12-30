@@ -26,6 +26,19 @@
       margin-right: 30px;
     }
 
+    .alramImgBox {
+      margin-right: 30px;
+      cursor: pointer;
+    }
+
+    .profileBox {
+      cursor: pointer;
+
+      & > img {
+        border-radius: 100px;
+      }
+    }
+
     .menuItemBox {
       display: flex;
       justify-content: center;

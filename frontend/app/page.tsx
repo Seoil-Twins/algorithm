@@ -11,10 +11,19 @@ import Footer from "@/components/common/footer";
 import AlgorithmCard from "@/components/home/algorithmCard";
 import PostCard from "@/components/home/postCard";
 
+import { User } from "@/interfaces/user";
+import { getUser } from "@/api/user";
+import { getSessionId } from "@/utils/serverSideSession";
+
 const page = async () => {
+  const sessionId: string | undefined = await getSessionId();
+  const user: User | undefined = sessionId
+    ? await getUser(sessionId)
+    : undefined;
+
   return (
     <>
-      <PrimaryHeader />
+      <PrimaryHeader sessionId={sessionId} user={user} />
       <div className={styles.titleBox}>
         <div className={styles.topBox}>
           <Image
