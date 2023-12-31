@@ -13,11 +13,11 @@ import PostCard from "@/components/home/postCard";
 
 import { User } from "@/interfaces/user";
 import { getUser } from "@/api/user";
-import { getSessionId, validateSession } from "@/utils/serverSideSession";
+import { getSessionId } from "@/utils/serverSideSession";
 
 const page = async () => {
   const sessionId: string | undefined = await getSessionId();
-  const user: User | undefined = await validateSession(sessionId);
+  const user: User | undefined = await getUser(sessionId);
 
   return (
     <>

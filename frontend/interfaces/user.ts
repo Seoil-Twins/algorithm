@@ -10,6 +10,6 @@ export interface User {
   like_nofi: boolean;
   answer_nofi: boolean;
   event_nofi: boolean;
-  profile: string;
+  profile?: string;
   createdTime: string;
 }
