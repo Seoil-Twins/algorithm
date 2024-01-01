@@ -241,9 +241,11 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
           </Link>
           {menuItems.map((menu, idx) => {
             return (
-              <div className={styles.menuItemBox} key={idx} ref={menuRefs[idx]}>
-                <Link href={menu.link}>{menu.title}</Link>
-              </div>
+              <Link href={menu.link} key={idx}>
+                <div className={styles.menuItemBox} ref={menuRefs[idx]}>
+                  {menu.title}
+                </div>
+              </Link>
             );
           })}
         </div>
@@ -285,12 +287,14 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
           </div>
         ) : (
           <div className={styles.headerItem}>
-            <div className={styles.menuItemBox}>
-              <Link href="/sign">회원가입</Link>
-            </div>
-            <div className={`${styles.menuItemBox} ${styles.loginBtn}`}>
-              <Link href="/login">로그인</Link>
-            </div>
+            <Link href="/signup">
+              <div className={styles.menuItemBox}>회원가입</div>
+            </Link>
+            <Link href="/login">
+              <div className={`${styles.menuItemBox} ${styles.loginBtn}`}>
+                로그인
+              </div>
+            </Link>
           </div>
         )}
       </div>

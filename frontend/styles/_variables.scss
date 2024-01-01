@@ -19,3 +19,7 @@ $darkBackground: #1d202a;
 
 /* Width, Height */
 $headerHeight: 84px;
+@mixin dynamicImg() {
+  width: 100%;
+  height: auto;
+}

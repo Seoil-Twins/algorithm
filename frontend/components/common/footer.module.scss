@@ -14,6 +14,7 @@
       flex: 1;
 
       .logoBox {
+        max-width: 54px;
         margin-bottom: 40px;
       }
 
@@ -62,6 +63,10 @@
           padding: 8px;
           border-radius: 8px;
           background-color: $lightBackground;
+
+          & img {
+            display: block;
+          }
 
           &:not(&:last-child) {
             margin-right: 10px;

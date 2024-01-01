@@ -98,14 +98,18 @@ const postCard = async () => {
                     width={0}
                     height={0}
                     style={{ width: "100%", height: "100%" }}
+                    className="dynamicImg"
                   />
                 ) : (
-                  <Image
-                    src="/svgs/no_image.svg"
-                    alt="이미지 없음"
-                    width={64}
-                    height={64}
-                  />
+                  <div className={styles.nonImgBox}>
+                    <Image
+                      src="/svgs/no_image.svg"
+                      alt="이미지 없음"
+                      sizes="100vw"
+                      width={0}
+                      height={0}
+                    />
+                  </div>
                 )}
               </div>
             </Link>

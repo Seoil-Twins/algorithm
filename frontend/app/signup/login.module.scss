@@ -1,0 +1,16 @@
+.loginBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+
+  .introBox {
+    width: 31.25rem;
+    margin-right: 7.5rem;
+
+    .title {
+      margin-bottom: 5rem;
+      font-size: 1.75rem;
+    }
+  }
+}

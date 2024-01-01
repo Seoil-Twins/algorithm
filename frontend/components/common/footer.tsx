@@ -13,8 +13,9 @@ const footer = () => {
             <Image
               src="/svgs/logo.svg"
               alt="로고 이미지"
-              width={54}
-              height={54}
+              sizes="100vw"
+              width={0}
+              height={0}
             />
           </div>
           <div>
