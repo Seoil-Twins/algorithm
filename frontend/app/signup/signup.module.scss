@@ -2,11 +2,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   height: 100%;
 
   .introBox {
     width: 31.25rem;
     margin-right: 7.5rem;
+
+    & > img {
+      @include dynamicImg;
+    }
 
     .title {
       margin-bottom: 5rem;

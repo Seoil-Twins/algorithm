@@ -74,7 +74,7 @@ body {
   position: relative;
   box-sizing: border-box;
   width: 100%;
-  min-height: 100vmin;
+  min-height: 100dvh;
   padding-bottom: 50px;
   color: #222222;
   background-color: $lightBackground;
@@ -98,4 +98,22 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #fcfcfd inset !important;
+}
+
+.mainCenterBox {
+  max-width: 80rem;
+  margin: auto;
+  padding: 50px 0;
+}
+
+@include tablet {
+  .mainCenterBox {
+    padding: 50px $padding-tablet;
+  }
+}
+
+@include mobile {
+  .mainCenterBox {
+    padding: 50px $padding-mobile;
+  }
 }

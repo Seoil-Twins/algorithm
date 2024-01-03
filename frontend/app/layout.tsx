@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 
 import "./globals.scss";
+
 import { notosansRegular } from "@/styles/_font";
+
+import Navigation from "@/components/common/navigation";
+import Footer from "@/components/common/footer";
 
 export const metadata: Metadata = {
   title: "Algorithm",
@@ -15,8 +19,10 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={notosansRegular.className}>
-        <div style={{ maxWidth: "80rem", margin: "auto" }}>{children}</div>
+      <body className={`${notosansRegular.className}`}>
+        <Navigation />
+        <div className="mainCenterBox">{children}</div>
+        <Footer />
       </body>
     </html>
   );

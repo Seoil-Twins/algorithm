@@ -1,15 +1,13 @@
-import Link from "next/link";
 import Image from "next/image";
-import styles from "./login.module.scss";
 
+import styles from "./signup.module.scss";
 import { notosansBold } from "@/styles/_font";
-import PriamryHeader from "@/components/common/priamryHeader";
+
 import LoginForm from "@/components/login/loginForm";
 
 const page = () => {
   return (
     <>
-      <PriamryHeader />
       <div className={styles.loginBox}>
         <div className={styles.introBox}>
           <div className={`${styles.title} ${notosansBold.className}`}>

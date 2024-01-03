@@ -4,7 +4,6 @@
   row-gap: 35px;
   grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
   grid-template-rows: repeat(2, 1fr);
-  margin-bottom: 50px;
 
   .itemBox {
     padding: 25px;
@@ -21,7 +20,7 @@
       background-color: $lightBackground;
 
       img {
-        @include dynamicImg();
+        @include dynamicImg;
       }
     }
 
@@ -69,13 +68,13 @@
   }
 }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
+@include tablet {
   .cardBox {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-@media screen and (max-width: 768px) {
+@include mobile {
   .title {
     text-wrap: wrap !important;
   }

@@ -4,14 +4,13 @@ import React from "react";
 import styles from "./notFound.module.scss";
 import { notosansBold } from "@/styles/_font";
 
-import PrimaryHeader from "@/components/common/priamryHeader";
+import PrimaryHeader from "@/components/common/navbar";
 import Footer from "@/components/common/footer";
 
 const notFound = async () => {
   return (
     <>
       <div className={styles.notFound}>
-        <PrimaryHeader />
         <div className={`${styles.ft22} ${notosansBold.className}`}>
           다시 한 번 확인해 주세요 !
         </div>
@@ -33,7 +32,6 @@ const notFound = async () => {
           alt="페이지를 찾을 수 없습니다."
         />
       </div>
-      <Footer />
     </>
   );
 };

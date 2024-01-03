@@ -1,21 +1,31 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  RefObject,
+  createRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 
-import styles from "./priamryHeader.module.scss";
+import styles from "./navbar.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { User } from "@/interfaces/user";
 import { Alram } from "@/interfaces/alram";
+import { User } from "@/interfaces/user";
 
-import useSession from "@/utils/clientSideSession";
+import { getUser } from "@/api/user";
+import { SessionResponse } from "@/app/api/sessionConfig";
 
-export type headerProps = {
-  user?: User;
-  sessionId?: string;
+import { MenuItems } from "./navigation";
+
+type NavbarProps = {
+  menuItems: MenuItems[];
+  sessionInfo: SessionResponse;
 };
 
 const fetchAlrams = async () => {
@@ -111,39 +121,22 @@ const fetchAlrams = async () => {
   return alrams;
 };
 
-const priamryHeader = ({ user, sessionId }: headerProps) => {
-  const session = useSession();
+const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
+  const { session, isLoading, logout } = sessionInfo;
   const router = useRouter();
   const path: string = usePathname();
-  const menuItems = [
-    {
-      title: "메인",
-      link: "/",
-    },
-    {
-      title: "문제",
-      link: "/algorithm",
-    },
-    {
-      title: "게시판",
-      link: "/board",
-    },
-    {
-      title: "랭킹",
-      link: "/ranking",
-    },
-  ];
 
   const alramModalRef = useRef<HTMLDivElement>(null);
   const alramImgRef = useRef<HTMLDivElement>(null);
   const profileImgRef = useRef<HTMLDivElement>(null);
   const profileModalRef = useRef<HTMLDivElement>(null);
-  const homeRef = useRef<HTMLDivElement>(null);
-  const algorithmRef = useRef<HTMLDivElement>(null);
-  const boardRef = useRef<HTMLDivElement>(null);
-  const rankingRef = useRef<HTMLDivElement>(null);
-  const menuRefs = [homeRef, algorithmRef, boardRef, rankingRef];
+  const menuRefs = useRef<RefObject<HTMLDivElement>[]>(
+    menuItems.map(() => createRef()),
+  );
 
+  const [cnt, setCnt] = useState<number>(0);
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+  const [user, setUser] = useState<User | undefined>(undefined);
   const [isOpenAlramModal, setIsOpenAlramModal] = useState<boolean>(false);
   const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
   const [alrams, setAlrams] = useState<Alram[]>([]);
@@ -188,25 +181,33 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
     setIsOpenProfileModal((prev) => !prev);
   }, [isOpenProfileModal]);
 
-  const moveMypage = useCallback(() => {
-    router.push("/mypage");
-  }, []);
-
-  const onLogout = useCallback(async () => {
-    await session.logout();
-    router.refresh();
+  const handleLogout = useCallback(async () => {
+    await logout();
   }, [user, sessionId]);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      setSessionId(session.sessionId);
+      const user = await getUser(session.sessionId);
+      setUser(user);
+    };
+
+    fetchUser();
+  }, [session.sessionId]);
+
+  useEffect(() => {
+    setCnt((prev) => prev + 1);
+
     menuItems.map((menu, idx) => {
-      const ele = menuRefs[idx].current!;
+      const ele = menuRefs.current[idx];
+      if (!ele.current) return;
 
       if (menu.link == path) {
-        ele.style.backgroundColor = "#EFEFEF";
-        ele.style.color = "#ff9500";
+        ele.current.style.backgroundColor = "#EFEFEF";
+        ele.current.style.color = "#ff9500";
       } else {
-        ele.style.backgroundColor = "transparent";
-        ele.style.color = "#222222";
+        ele.current.style.backgroundColor = "transparent";
+        ele.current.style.color = "#222222";
       }
     });
   }, [path]);
@@ -228,8 +229,8 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
   }, []);
 
   return (
-    <header className={styles.headerBox}>
-      <div className={styles.centerBox}>
+    <div className={styles.centerBox}>
+      <div className={styles.content}>
         <div className={styles.headerItem}>
           <Link className={styles.logoImg} href="/">
             <Image
@@ -239,62 +240,66 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
               alt="로고 이미지"
             />
           </Link>
-          {menuItems.map((menu, idx) => {
+          {menuItems.map((menu: MenuItems, idx: number) => {
             return (
               <Link href={menu.link} key={idx}>
-                <div className={styles.menuItemBox} ref={menuRefs[idx]}>
+                <div className={styles.menuItemBox} ref={menuRefs.current[idx]}>
                   {menu.title}
                 </div>
               </Link>
             );
           })}
         </div>
-        {sessionId && user ? (
-          <div className={styles.headerItem}>
-            <div
-              className={styles.alramImgBox}
-              onClick={openAlramModal}
-              ref={alramImgRef}
-            >
-              <Image
-                src="/svgs/alram.svg"
-                alt="알람 아이콘"
-                width={30}
-                height={30}
-              />
-            </div>
-            <div
-              className={styles.profileBox}
-              ref={profileImgRef}
-              onClick={openProfileModal}
-            >
-              {user.profile ? (
-                <img
-                  src={user.profile}
-                  alt="유저 아이콘"
-                  width={38}
-                  height={38}
-                />
-              ) : (
-                <Image
-                  src="/svgs/user_profile_default.svg"
-                  alt="유저 아이콘"
-                  width={38}
-                  height={38}
-                />
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className={styles.headerItem}>
-            <Link href="/signup">
-              <div className={styles.menuItemBox}>회원가입</div>
-            </Link>
-            <Link href="/login">
-              <div className={`${styles.menuItemBox} ${styles.loginBtn}`}>
-                로그인
+        {!isLoading && (
+          <div>
+            {sessionId && user ? (
+              <div className={styles.headerItem}>
+                <div
+                  className={styles.alramImgBox}
+                  onClick={openAlramModal}
+                  ref={alramImgRef}
+                >
+                  <Image
+                    src="/svgs/alram.svg"
+                    alt="알람 아이콘"
+                    width={30}
+                    height={30}
+                  />
+                </div>
+                <div
+                  className={styles.profileBox}
+                  ref={profileImgRef}
+                  onClick={openProfileModal}
+                >
+                  {user.profile ? (
+                    <img
+                      src={user.profile}
+                      alt="유저 아이콘"
+                      width={38}
+                      height={38}
+                    />
+                  ) : (
+                    <Image
+                      src="/svgs/user_profile_default.svg"
+                      alt="유저 아이콘"
+                      width={38}
+                      height={38}
+                    />
+                  )}
+                </div>
               </div>
-            </Link>
+            ) : (
+              <div className={styles.headerItem}>
+                <Link href="/signup">
+                  <div className={styles.menuItemBox}>회원가입</div>
+                </Link>
+                <Link href="/login">
+                  <div className={`${styles.menuItemBox} ${styles.loginBtn}`}>
+                    로그인
+                  </div>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -342,17 +347,19 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
               </div>
             </div>
             <div className={styles.btnBox}>
-              <div className={styles.btn} onClick={moveMypage}>
-                <Image
-                  src="/svgs/mypage_menu.svg"
-                  alt="마이페이지"
-                  width={20}
-                  height={20}
-                  className={styles.img}
-                />
-                마이페이지
-              </div>
-              <div className={styles.btn} onClick={onLogout}>
+              <Link href="/mypage">
+                <div className={styles.btn}>
+                  <Image
+                    src="/svgs/mypage_menu.svg"
+                    alt="마이페이지"
+                    width={20}
+                    height={20}
+                    className={styles.img}
+                  />
+                  마이페이지
+                </div>
+              </Link>
+              <div className={styles.btn} onClick={handleLogout}>
                 <Image
                   src="/svgs/logout.svg"
                   alt="로그아웃"
@@ -410,8 +417,8 @@ const priamryHeader = ({ user, sessionId }: headerProps) => {
           </div>
         )}
       </div>
-    </header>
+    </div>
   );
 };
 
-export default priamryHeader;
+export default Navbar;

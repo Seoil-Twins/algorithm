@@ -6,22 +6,12 @@ import styles from "./page.module.scss";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import PrimaryHeader from "@/components/common/priamryHeader";
-import Footer from "@/components/common/footer";
 import AlgorithmCard from "@/components/home/algorithmCard";
 import PostCard from "@/components/home/postCard";
 
-import { User } from "@/interfaces/user";
-import { getUser } from "@/api/user";
-import { getSessionId } from "@/utils/serverSideSession";
-
 const page = async () => {
-  const sessionId: string | undefined = await getSessionId();
-  const user: User | undefined = await getUser(sessionId);
-
   return (
     <>
-      <PrimaryHeader sessionId={sessionId} user={user} />
       <div className={styles.titleBox}>
         <div className={styles.topBox}>
           <Image
@@ -82,7 +72,6 @@ const page = async () => {
         </div>
       </div>
       <PostCard />
-      <Footer />
     </>
   );
 };
