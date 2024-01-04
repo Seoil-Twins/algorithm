@@ -1,4 +1,4 @@
-.loginBox {
+.signupBox {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -17,5 +17,15 @@
       margin-bottom: 5rem;
       font-size: 1.75rem;
     }
+  }
+}
+
+@media (max-width: 1212px) {
+  .signupBox {
+    justify-content: center;
+  }
+
+  .introBox {
+    margin-right: 0rem !important;
   }
 }

@@ -1,4 +1,4 @@
-.inputBox {
+.inputContainer {
   .title {
     margin-bottom: 15px;
   }
@@ -7,8 +7,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 30rem;
-    padding-right: 14px;
     border-radius: 10px;
     border: 1px solid #f1f1f3;
     background-color: #fcfcfd;
@@ -22,7 +20,6 @@
     .input {
       width: 100%;
       height: 100%;
-      padding: 14px;
       border-radius: 10px;
       border: none;
       outline: none;
@@ -42,5 +39,26 @@
   .errorMsg {
     color: $red;
     font-size: 14px;
+  }
+}
+
+@include desktop {
+  .inputBox {
+    width: 30rem;
+    padding: 14px;
+  }
+}
+
+@include tablet {
+  .inputBox {
+    width: 30rem;
+    padding: 14px;
+  }
+}
+
+@include mobile {
+  .inputBox {
+    width: auto !important;
+    padding: 12px;
   }
 }

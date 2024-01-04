@@ -1,14 +1,17 @@
 "use client";
 
-import Input from "@/components/common/input";
-import styles from "./loginForm.module.scss";
-import { notosansBold, notosansMedium } from "@/styles/_font";
 import { useCallback, useState } from "react";
-import Link from "next/link";
-import useSession from "@/utils/clientSideSession";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-const loginForm = () => {
+import { notosansBold, notosansMedium } from "@/styles/_font";
+import styles from "./signupForm.module.scss";
+
+import Input from "@/components/common/input";
+
+import useSession from "@/utils/clientSideSession";
+
+const SignupForm = () => {
   const router = useRouter();
   const session = useSession();
 
@@ -187,4 +190,4 @@ const loginForm = () => {
   );
 };
 
-export default loginForm;
+export default SignupForm;

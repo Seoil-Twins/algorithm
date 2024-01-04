@@ -3,12 +3,12 @@ import Image from "next/image";
 import styles from "./signup.module.scss";
 import { notosansBold } from "@/styles/_font";
 
-import LoginForm from "@/components/login/loginForm";
+import SignupForm from "@/components/signup/signupForm";
 
 const page = () => {
   return (
     <>
-      <div className={styles.loginBox}>
+      <div className={styles.signupBox}>
         <div className={styles.introBox}>
           <div className={`${styles.title} ${notosansBold.className}`}>
             지금 회원가입 해서
@@ -22,7 +22,7 @@ const page = () => {
             height={0}
           />
         </div>
-        <LoginForm />
+        <SignupForm />
       </div>
     </>
   );

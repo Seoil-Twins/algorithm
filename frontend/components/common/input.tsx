@@ -45,7 +45,7 @@ const input = (props: InputType) => {
   }, []);
 
   return (
-    <div className={styles.inputBox}>
+    <div className={styles.inputContainer}>
       {props.title && (
         <div className={`${styles.title} ${notosansMedium.className}`}>
           {props.title}
