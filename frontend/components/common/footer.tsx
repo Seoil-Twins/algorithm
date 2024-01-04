@@ -4,7 +4,7 @@ import Link from "next/link";
 import styles from "./footer.module.scss";
 import { notosansMedium } from "@/styles/_font";
 
-const footer = () => {
+const Footer = () => {
   return (
     <div className={styles.footer}>
       <div className={styles.centerBox}>
@@ -104,4 +104,4 @@ const footer = () => {
   );
 };
 
-export default footer;
+export default Footer;

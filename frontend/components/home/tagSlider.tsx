@@ -8,7 +8,7 @@ type PropsType = {
   tags: string[];
 };
 
-const tagSlider = ({ tags }: PropsType) => {
+const TagSlider = ({ tags }: PropsType) => {
   // useState를 사용하면 값이 변경될 때마다 re-rendering이 일어나기 때문에
   // useRef로 관리
   const moveBoxRef = useRef<HTMLDivElement>(null);
@@ -181,4 +181,4 @@ const tagSlider = ({ tags }: PropsType) => {
   );
 };
 
-export default tagSlider;
+export default TagSlider;

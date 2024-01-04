@@ -16,7 +16,7 @@ type InputType = {
   onChange?: Function;
 };
 
-const input = (props: InputType) => {
+const Input = (props: InputType) => {
   const [value, setValue] = useState<any>(props.defaultValue || "");
   const [type, setType] = useState<HTMLInputTypeAttribute>(
     props.type || "text",
@@ -85,4 +85,4 @@ const input = (props: InputType) => {
   );
 };
 
-export default input;
+export default Input;

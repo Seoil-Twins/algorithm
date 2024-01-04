@@ -147,7 +147,7 @@ const fetchRecommendAlgorithm = async () => {
   return response;
 };
 
-const algorithmCard = async () => {
+const AlgorithmCard = async () => {
   const recommendAlgorithms: Algorithm[] = await fetchRecommendAlgorithm();
 
   return (
@@ -185,4 +185,4 @@ const algorithmCard = async () => {
   );
 };
 
-export default algorithmCard;
+export default AlgorithmCard;

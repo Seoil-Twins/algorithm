@@ -81,7 +81,7 @@ const fetchRecommendPosts = async () => {
   return result;
 };
 
-const postCard = async () => {
+const PostCard = async () => {
   const recommendPosts = await fetchRecommendPosts();
 
   return (
@@ -131,4 +131,4 @@ const postCard = async () => {
   );
 };
 
-export default postCard;
+export default PostCard;

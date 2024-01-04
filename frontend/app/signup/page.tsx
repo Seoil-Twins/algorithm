@@ -5,7 +5,7 @@ import { notosansBold } from "@/styles/_font";
 
 import SignupForm from "@/components/signup/signupForm";
 
-const page = () => {
+const Signup = () => {
   return (
     <>
       <div className={styles.signupBox}>
@@ -28,4 +28,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Signup;
