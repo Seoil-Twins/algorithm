@@ -65,11 +65,22 @@ const Navigation = () => {
   /**
    * 회원가입, 로그인 시 클라이언트 컴포넌트는 재렌더링이 일어나지 않음.
    * 그렇기에, 이벤트를 만들어서 강제로 발생하게 만듦
+   *
+   * next-auth에서 refetching the sesion 부분을 참고하였습니다.
+   * https://next-auth.js.org/getting-started/client#refetching-the-session
    */
   useEffect(() => {
-    const event = new Event("visibilitychange");
-    document.dispatchEvent(event);
-  }, [pathname]);
+    const reRendering = () => {
+      const event = new Event("visibilitychange");
+      document.dispatchEvent(event);
+    };
+
+    document.addEventListener("sessionUpdate", reRendering);
+
+    return () => {
+      document.removeEventListener("sessionUpdate", reRendering);
+    };
+  }, []);
 
   return (
     <header className={styles.headerBox}>

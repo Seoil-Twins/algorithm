@@ -100,8 +100,13 @@ const loginForm = () => {
 
     // 회원가입 API 호출 및 처리 로직
     await session.login("1234");
-    router.replace("/");
+
+    // client re-rendering event
+    const event = new Event("sessionUpdate");
+    document.dispatchEvent(event);
+
     router.refresh();
+    router.replace("/");
   }, [nickname, email, password, confirmPassword, isCheck]);
 
   return (
