@@ -12,7 +12,7 @@ type InputType = {
   placeholder?: string;
   defaultValue?: string;
   isError?: boolean;
-  errorMsg: string;
+  errorMsg?: string;
   onChange?: Function;
 };
 

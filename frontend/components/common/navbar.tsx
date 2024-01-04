@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import styles from "./navbar.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
@@ -123,7 +123,6 @@ const fetchAlrams = async () => {
 
 const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
   const { session, isLoading, logout } = sessionInfo;
-  const router = useRouter();
   const path: string = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -134,8 +133,6 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
     menuItems.map(() => createRef()),
   );
 
-  const [cnt, setCnt] = useState<number>(0);
-  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [isOpenAlramModal, setIsOpenAlramModal] = useState<boolean>(false);
   const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
@@ -183,11 +180,10 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
 
   const handleLogout = useCallback(async () => {
     await logout();
-  }, [user, sessionId]);
+  }, [user, session.sessionId]);
 
   useEffect(() => {
     const fetchUser = async () => {
-      setSessionId(session.sessionId);
       const user = await getUser(session.sessionId);
       setUser(user);
     };
@@ -196,8 +192,6 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
   }, [session.sessionId]);
 
   useEffect(() => {
-    setCnt((prev) => prev + 1);
-
     menuItems.map((menu, idx) => {
       const ele = menuRefs.current[idx];
       if (!ele.current) return;
@@ -252,7 +246,7 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
         </div>
         {!isLoading && (
           <div>
-            {sessionId && user ? (
+            {session.sessionId && user ? (
               <div className={styles.headerItem}>
                 <div
                   className={styles.alramImgBox}

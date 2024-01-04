@@ -37,18 +37,18 @@ function doLogout(url: string) {
 }
 
 export default function useSession() {
-  const { data: session, isLoading } = useSWR(
-    sessionApiRoute,
-    fetchJson<SessionData>,
-    {
-      fallbackData: { sessionId: undefined },
-    },
-  );
+  const {
+    data: session,
+    isLoading,
+    mutate,
+  } = useSWR(sessionApiRoute, fetchJson<SessionData>, {
+    fallbackData: { sessionId: undefined },
+  });
 
   const { trigger: login } = useSWRMutation(sessionApiRoute, doLogin, {
     revalidate: false,
   });
   const { trigger: logout } = useSWRMutation(sessionApiRoute, doLogout);
 
-  return { session, logout, login, isLoading };
+  return { session, logout, login, mutate, isLoading };
 }
