@@ -3,12 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 import { SessionData, sessionOptions } from "./app/api/sessionConfig";
+import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 
 export default async function middleware(req: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
-  const path = req.nextUrl.pathname;
+  const pathname = req.nextUrl.pathname;
 
-  if ((path === "/login" || path === "/signup") && session.sessionId) {
+  const hasSessionButUnAuthPath =
+    NO_AUTH_PATHS.includes(pathname) && session.sessionId;
+  const noSessionButAuthPath =
+    AUTH_PATHS.includes(pathname) && !session.sessionId;
+
+  if (hasSessionButUnAuthPath || noSessionButAuthPath) {
     const url = req.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
@@ -18,5 +24,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/signup"],
+  matcher: ["/", ...NO_AUTH_PATHS, ...AUTH_PATHS],
 };

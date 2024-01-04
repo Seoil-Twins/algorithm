@@ -8,21 +8,18 @@ import React, {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import styles from "./sidebar.module.scss";
 import { MenuItems } from "./navigation";
-
-import { SessionResponse } from "@/app/api/sessionConfig";
+import { useAuth } from "@/providers/AuthProvider";
 
 type SidebarProps = {
   menuItems: MenuItems[];
-  sessionInfo: SessionResponse;
 };
 
-const Sidebar = ({ menuItems, sessionInfo }: SidebarProps) => {
-  const { session, isLoading, logout } = sessionInfo;
-  const router = useRouter();
+const Sidebar = ({ menuItems }: SidebarProps) => {
+  const { session, isLoading, logout } = useAuth()!;
   const path = usePathname();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);

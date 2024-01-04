@@ -1,4 +1,5 @@
 import { SessionOptions } from "iron-session";
+import { KeyedMutator } from "swr";
 import { TriggerWithArgs, TriggerWithoutArgs } from "swr/mutation";
 
 export interface SessionData {
@@ -9,6 +10,7 @@ export interface SessionResponse {
   session: SessionData;
   logout: TriggerWithoutArgs<SessionData, any, "/api/auth", never>;
   login: TriggerWithArgs<SessionData, any, "/api/auth", string>;
+  mutate: KeyedMutator<SessionData>;
   isLoading: false;
 }
 

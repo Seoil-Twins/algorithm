@@ -22,10 +22,10 @@ import { getUser } from "@/api/user";
 import { SessionResponse } from "@/app/api/sessionConfig";
 
 import { MenuItems } from "./navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 type NavbarProps = {
   menuItems: MenuItems[];
-  sessionInfo: SessionResponse;
 };
 
 const fetchAlrams = async () => {
@@ -121,8 +121,8 @@ const fetchAlrams = async () => {
   return alrams;
 };
 
-const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
-  const { session, isLoading, logout } = sessionInfo;
+const Navbar = ({ menuItems }: NavbarProps) => {
+  const { session, isLoading, logout } = useAuth()!;
   const path: string = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -179,7 +179,7 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
   }, [isOpenProfileModal]);
 
   const handleLogout = useCallback(async () => {
-    await logout();
+    logout();
   }, [user, session.sessionId]);
 
   useEffect(() => {
@@ -341,7 +341,7 @@ const Navbar = ({ menuItems, sessionInfo }: NavbarProps) => {
               </div>
             </div>
             <div className={styles.btnBox}>
-              <Link href="/mypage">
+              <Link href="/mypage" onClick={() => setIsOpenProfileModal(false)}>
                 <div className={styles.btn}>
                   <Image
                     src="/svgs/mypage_menu.svg"

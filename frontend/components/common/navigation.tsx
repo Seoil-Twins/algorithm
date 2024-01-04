@@ -2,10 +2,12 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { usePathname, useRouter } from "next/navigation";
 
 import styles from "./navigation.module.scss";
 
-import useSession from "@/utils/clientSideSession";
+import { AUTH_PATHS } from "@/constants";
+import { useAuth } from "@/providers/AuthProvider";
 
 const DynamicNavbar = dynamic(() => import("./navbar"), { ssr: false });
 const DynamicSidebar = dynamic(() => import("./sidebar"), { ssr: false });
@@ -35,7 +37,9 @@ const Navigation = () => {
     },
   ];
 
-  const session = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { session } = useAuth()!;
 
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -60,32 +64,22 @@ const Navigation = () => {
   }, []);
 
   /**
-   * 회원가입, 로그인 시 클라이언트 컴포넌트는 재렌더링이 일어나지 않음.
-   * 그렇기에, 세션을 강제로 다시 가져옴
-   * Listener들은 sessionUpdate 이벤트를 등록하고,
-   * Emiter들은 해당 이벤트를 dispatch 하면 됩니다.
-   *
-   * next-auth에서 refetching the sesion 부분을 참고하였습니다.
-   * https://next-auth.js.org/getting-started/client#refetching-the-session
+   * 브라우저 뒤로 가기를 하면 캐시된 페이지를 보여주기 때문에
+   * middleware가 작동하지가 않음.
+   * 그렇기 때문에 페이지 이동마다 session을 체크해야 함.
    */
   useEffect(() => {
-    const updateSession = () => {
-      session.mutate();
-    };
-
-    document.addEventListener("sessionUpdate", updateSession);
-
-    return () => {
-      document.removeEventListener("sessionUpdate", updateSession);
-    };
-  }, []);
+    if (!session.sessionId && AUTH_PATHS.includes(pathname)) {
+      router.replace("/");
+    }
+  }, [session.sessionId, pathname]);
 
   return (
     <header className={styles.headerBox}>
       {isMobile ? (
-        <DynamicSidebar menuItems={menuItems} sessionInfo={session} />
+        <DynamicSidebar menuItems={menuItems} />
       ) : (
-        <DynamicNavbar menuItems={menuItems} sessionInfo={session} />
+        <DynamicNavbar menuItems={menuItems} />
       )}
     </header>
   );
