@@ -4,13 +4,13 @@ import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
-import styles from "./loginForm.module.scss";
+import styles from "./login.module.scss";
 
 import Input from "@/components/common/input";
 
 import useSession from "@/utils/clientSideSession";
 
-const LoginForm = () => {
+const Login = () => {
   const router = useRouter();
   const session = useSession();
 
@@ -126,4 +126,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default Login;

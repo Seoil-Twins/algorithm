@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
-import styles from "./signupForm.module.scss";
+import styles from "./Signup.module.scss";
 
 import Input from "@/components/common/input";
 
 import useSession from "@/utils/clientSideSession";
 
-const SignupForm = () => {
+const Signup = () => {
   const router = useRouter();
   const session = useSession();
 
@@ -190,4 +190,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default Signup;

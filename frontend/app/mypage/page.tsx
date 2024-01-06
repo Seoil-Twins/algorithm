@@ -1,9 +1,13 @@
-import { getSessionId } from "@/utils/serverSideSession";
+import Link from "next/link";
 
 const Mypage = async () => {
-  const sessionId = await getSessionId();
-
-  return <div>hi? {sessionId}</div>;
+  return (
+    <div>
+      <Link href="/mypage?test=test1" shallow>
+        하이?
+      </Link>
+    </div>
+  );
 };
 
 export default Mypage;
