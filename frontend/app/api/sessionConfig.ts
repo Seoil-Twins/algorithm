@@ -11,7 +11,7 @@ export interface SessionResponse {
   logout: TriggerWithoutArgs<SessionData, any, "/api/auth", never>;
   login: TriggerWithArgs<SessionData, any, "/api/auth", string>;
   mutate: KeyedMutator<SessionData>;
-  isLoading: false;
+  isLoading: boolean;
 }
 
 export const sessionOptions: SessionOptions = {

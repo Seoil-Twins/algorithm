@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
@@ -72,10 +78,9 @@ iframe {
 /* Custom Style */
 body {
   position: relative;
-  box-sizing: border-box;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
-  padding-bottom: 50px;
   color: #222222;
   background-color: $lightBackground;
 }
@@ -101,9 +106,16 @@ select:-webkit-autofill:focus {
 }
 
 .mainCenterBox {
+  flex: 1;
+  width: 100%;
   max-width: 80rem;
-  margin: auto;
   padding: 50px 0;
+}
+
+@include desktop {
+  .mainCenterBox {
+    margin: 0 auto;
+  }
 }
 
 @include tablet {

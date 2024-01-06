@@ -1,0 +1,14 @@
+.content {
+  .title {
+    margin-bottom: 15px;
+    font-size: 18px;
+  }
+
+  .item {
+    margin-bottom: 25px;
+    padding: 1.5625rem 2.8125rem;
+    border-radius: 10px;
+    border: 1px solid $blueBorder;
+    background-color: $white;
+  }
+}

@@ -179,6 +179,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   }, [isOpenProfileModal]);
 
   const handleLogout = useCallback(async () => {
+    setIsOpenProfileModal(false);
     logout();
   }, [user, session.sessionId]);
 
@@ -341,7 +342,10 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
             </div>
             <div className={styles.btnBox}>
-              <Link href="/mypage" onClick={() => setIsOpenProfileModal(false)}>
+              <Link
+                href="/account"
+                onClick={() => setIsOpenProfileModal(false)}
+              >
                 <div className={styles.btn}>
                   <Image
                     src="/svgs/mypage_menu.svg"

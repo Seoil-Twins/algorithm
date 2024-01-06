@@ -14,6 +14,7 @@ export default async function middleware(req: NextRequest) {
   const noSessionButAuthPath =
     AUTH_PATHS.includes(pathname) && !session.sessionId;
 
+  // 잘못된 권한으로 접근할 시 홈으로 리다이렉션
   if (hasSessionButUnAuthPath || noSessionButAuthPath) {
     const url = req.nextUrl.clone();
     url.pathname = "/";

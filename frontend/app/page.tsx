@@ -31,7 +31,7 @@ const page = async () => {
           </div>
           <div className={`${notosansMedium.className} ${styles.title}`}>
             <span className={styles.emphasis}>알고리즘</span>
-            간단하게 공부하세요!
+            <span>간단하게 공부하세요!</span>
           </div>
         </div>
         <div className={`${notosansMedium.className} ${styles.ft24}`}>

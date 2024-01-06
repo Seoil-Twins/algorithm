@@ -2,8 +2,6 @@
   display: grid;
   column-gap: 20px;
   row-gap: 35px;
-  grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
-  grid-template-rows: repeat(2, 1fr);
 
   .itemBox {
     padding: 25px;
@@ -40,7 +38,6 @@
       overflow: hidden;
       width: 100%;
       padding-bottom: 15px;
-      text-wrap: nowrap;
       text-overflow: ellipsis;
     }
 
@@ -68,18 +65,33 @@
   }
 }
 
+@include desktop {
+  .cardBox {
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+
+  .title {
+    white-space: nowrap;
+  }
+}
+
 @include tablet {
   .cardBox {
     grid-template-columns: 1fr 1fr;
   }
+
+  .title {
+    white-space: wrap;
+  }
 }
 
 @include mobile {
-  .title {
-    text-wrap: wrap !important;
-  }
-
   .cardBox {
     grid-template-columns: 1fr;
+  }
+
+  .title {
+    white-space: wrap;
   }
 }

@@ -1,0 +1,26 @@
+.mypage {
+  display: flex;
+  flex-wrap: wrap;
+
+  .content {
+    flex: 1;
+  }
+}
+
+@include desktop {
+  .content {
+    margin-left: 50px;
+  }
+}
+
+@include tablet {
+  .content {
+    margin-left: 50px;
+  }
+}
+
+@include mobile {
+  .content {
+    margin-left: 0;
+  }
+}

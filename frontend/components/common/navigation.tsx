@@ -39,7 +39,7 @@ const Navigation = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const { session } = useAuth()!;
+  const { session, isLoading } = useAuth()!;
 
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -69,7 +69,7 @@ const Navigation = () => {
    * 그렇기 때문에 페이지 이동마다 session을 체크해야 함.
    */
   useEffect(() => {
-    if (!session.sessionId && AUTH_PATHS.includes(pathname)) {
+    if (!isLoading && !session.sessionId && AUTH_PATHS.includes(pathname)) {
       router.replace("/");
     }
   }, [session.sessionId, pathname]);

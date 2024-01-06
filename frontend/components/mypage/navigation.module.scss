@@ -1,0 +1,42 @@
+.navigation {
+  height: fit-content;
+  padding: 1.5625rem 0.9375rem;
+  border-radius: 8px;
+  border: 1px solid $blueBorder;
+  background-color: $white;
+
+  .title {
+    margin-bottom: 0.9375rem;
+    font-size: 0.875rem;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    padding: 0.625rem;
+    border-radius: 5px;
+
+    .menuIcon {
+      margin-right: 10px;
+    }
+  }
+}
+
+@include desktop {
+  .navigation {
+    width: 270px;
+  }
+}
+
+@include tablet {
+  .navigation {
+    width: 270px;
+  }
+}
+
+@include mobile {
+  .navigation {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+}

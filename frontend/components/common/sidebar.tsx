@@ -28,7 +28,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   );
 
   const customMenuItems: MenuItems[] = session.sessionId
-    ? [...menuItems, { title: "마이페이지", link: "/mypage" }]
+    ? [...menuItems, { title: "마이페이지", link: "/account" }]
     : [...menuItems];
 
   const toggleModal = useCallback(() => {
