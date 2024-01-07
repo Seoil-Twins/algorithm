@@ -11,7 +11,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import styles from "./sidebar.module.scss";
+
 import { MenuItems } from "./navigation";
+
 import { useAuth } from "@/providers/AuthProvider";
 
 type SidebarProps = {

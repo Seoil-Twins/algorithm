@@ -1,2 +1,61 @@
-.title {
+.form {
+  display: grid;
+  grid-template-rows: auto-fill 1fr;
+  row-gap: 15px;
+  width: 100%;
+
+  .profile {
+    position: relative;
+    margin-bottom: 15px;
+    justify-self: center;
+
+    .profileImg {
+      border-radius: 100px;
+      box-shadow: 1px 1px 2px $blueBorder;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      width: 0;
+      height: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+    }
+
+    .edit {
+      position: absolute;
+      bottom: 8px;
+      right: 5px;
+      height: 25px;
+      border-radius: 100px;
+      box-shadow: 1px 1px 3px $darkBackground;
+      cursor: pointer;
+    }
+  }
+
+  .btnBox {
+    display: flex;
+    justify-content: right;
+
+    .btn {
+      padding: 0.625rem 2.1875rem;
+      border-radius: 8px;
+
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
+    }
+
+    .update {
+      border: 1px solid $primaryColor;
+      color: $primaryColor;
+    }
+
+    .cancel {
+      border: 1px solid $grayText;
+      color: $grayText;
+    }
+  }
 }

@@ -20,7 +20,7 @@ async function fetchJson<JSON = unknown>(
       "content-type": "application/json",
     },
     ...init,
-  }).then((res) => res.json());
+  }).then(async (res) => res.json());
 }
 
 function doLogin(url: string, { arg }: { arg: string }) {
@@ -40,6 +40,7 @@ export default function useSession() {
   const {
     data: session,
     isLoading,
+    isValidating,
     mutate,
   } = useSWR(sessionApiRoute, fetchJson<SessionData>, {
     fallbackData: { sessionId: undefined },
@@ -50,5 +51,5 @@ export default function useSession() {
   });
   const { trigger: logout } = useSWRMutation(sessionApiRoute, doLogout);
 
-  return { session, logout, login, mutate, isLoading };
+  return { session, isLoading, isValidating, logout, login, mutate };
 }

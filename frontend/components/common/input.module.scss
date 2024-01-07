@@ -1,6 +1,33 @@
 .inputContainer {
-  .title {
+  width: 100%;
+
+  .topBox {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     margin-bottom: 15px;
+
+    .title {
+      margin-right: 15px;
+    }
+
+    .verified {
+      display: flex;
+      align-items: center;
+    }
+
+    .verifiedText {
+      margin-left: 5px;
+      font-size: 14px;
+    }
+
+    .valid {
+      color: #1cca00;
+    }
+
+    .invalid {
+      color: $red;
+    }
   }
 
   .inputBox {
@@ -43,14 +70,14 @@
 
 @include desktop {
   .inputBox {
-    width: 30rem;
+    min-width: 30rem;
     padding: 14px;
   }
 }
 
 @include tablet {
   .inputBox {
-    width: 30rem;
+    min-width: 30rem;
     padding: 14px;
   }
 }

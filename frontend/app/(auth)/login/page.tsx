@@ -8,54 +8,90 @@ import styles from "./login.module.scss";
 
 import Input from "@/components/common/input";
 
-import useSession from "@/utils/clientSideSession";
+import {
+  ValidationError,
+  validationEmail,
+  validationPassword,
+} from "@/utils/validation";
+
+import { useAuth } from "@/providers/AuthProvider";
+
+interface Login {
+  email?: string;
+  password?: string;
+}
+
+type LoginKeys = keyof Login;
+
+type LoginError = {
+  [key in LoginKeys]: ValidationError;
+};
 
 const Login = () => {
   const router = useRouter();
-  const session = useSession();
+  const { login } = useAuth()!;
 
-  const [email, setEmail] = useState<string>("");
-  const [isErrorEmail, setIsErrorEmail] = useState<boolean>(false);
-  const [errMsgEmail, setErrMsgEmail] = useState<string>("");
-
-  const [password, setPassword] = useState<string>("");
-  const [isErrorPassword, setIsErrorPassword] = useState<boolean>(false);
+  const [loginInfo, setLoginInfo] = useState<Login>({
+    email: "",
+    password: "",
+  });
+  const [errorInfo, setErrorInfo] = useState<LoginError>({
+    email: {
+      errMsg: "",
+      isError: false,
+    },
+    password: {
+      errMsg: "올바른 비밀번호 형식이 아닙니다.",
+      isError: false,
+    },
+  });
 
   const [isFailedLogin, setIsfailedLogin] = useState<boolean>(false);
 
-  const handleChangeEmail = useCallback((changedValue: string) => {
-    setEmail(changedValue);
-  }, []);
+  const handleSignupInfo = useCallback(
+    (changedValue: string, name: LoginKeys) => {
+      setLoginInfo((prev) => {
+        const newSignupInfo: Login = {
+          ...prev,
+          [name]: changedValue,
+        };
 
-  const handleChangePassword = useCallback((changedValue: string) => {
-    setPassword(changedValue);
-  }, []);
+        return newSignupInfo;
+      });
+    },
+    [loginInfo],
+  );
 
   const validation = useCallback(() => {
     let isValid = true;
+    let newErrorInfo = {
+      ...errorInfo,
+    };
+    const changeErrorInfo = (
+      name: LoginKeys,
+      isError: boolean,
+      errMsg?: string,
+    ) => {
+      newErrorInfo = {
+        ...newErrorInfo,
+        [name]: {
+          isError,
+          errMsg: errMsg ? errMsg : errorInfo[name].errMsg,
+        },
+      };
 
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const isValidEmail = emailRegex.test(email);
-    if (!isValidEmail) {
-      setIsErrorEmail(true);
-      setErrMsgEmail("유효하지 않은 이메일입니다.");
-      isValid = false;
-    } else {
-      setIsErrorEmail(false);
-    }
+      if (isError) isValid = false;
+    };
 
-    const passwordRegex =
-      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
-    const isValidPassword = passwordRegex.test(password);
-    if (!isValidPassword) {
-      setIsErrorPassword(true);
-      isValid = false;
-    } else {
-      setIsErrorPassword(false);
-    }
+    const isEmailValid = validationEmail(loginInfo.email);
+    changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
 
+    const isPasswordValid = validationPassword(loginInfo.password);
+    changeErrorInfo("password", isPasswordValid.isError);
+
+    setErrorInfo(newErrorInfo);
     return isValid;
-  }, [email, password]);
+  }, [loginInfo.email, loginInfo.password]);
 
   const handleClickSignup = useCallback(async () => {
     const isValid = validation();
@@ -73,15 +109,15 @@ const Login = () => {
     // if (response.statusCode === 400) {
     //   setIsfailedLogin(true);
     // }
-    await session.login("1234");
+    await login("1234");
 
     // // client re-rendering event
-    const event = new Event("sessionUpdate");
+    const event = new Event("update");
     document.dispatchEvent(event);
 
     router.refresh();
     router.replace("/");
-  }, [email, password]);
+  }, [loginInfo]);
 
   return (
     <form className={styles.formBox}>
@@ -96,9 +132,11 @@ const Login = () => {
           type="email"
           title="이메일"
           placeholder="이메일 입력"
-          isError={isErrorEmail}
-          errorMsg={errMsgEmail}
-          onChange={handleChangeEmail}
+          isError={errorInfo.email.isError}
+          errorMsg={errorInfo.email.errMsg}
+          onChange={(changedValue: string) =>
+            handleSignupInfo(changedValue, "email")
+          }
         />
       </div>
       <div className={styles.mb20}>
@@ -106,9 +144,12 @@ const Login = () => {
           type="password"
           title="비밀번호"
           placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
-          isError={isErrorPassword}
-          errorMsg="올바른 비밀번호 형식이 아닙니다."
-          onChange={handleChangePassword}
+          isError={errorInfo.password.isError}
+          errorMsg={errorInfo.password.errMsg}
+          onChange={(changedValue: string) =>
+            handleSignupInfo(changedValue, "password")
+          }
+          usePasswordToggle
         />
       </div>
       {isFailedLogin && (

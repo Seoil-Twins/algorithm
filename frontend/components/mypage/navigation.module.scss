@@ -30,7 +30,8 @@
 
 @include tablet {
   .navigation {
-    width: 270px;
+    width: 100%;
+    margin-bottom: 15px;
   }
 }
 

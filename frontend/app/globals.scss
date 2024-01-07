@@ -93,6 +93,22 @@ input {
   }
 }
 
+input[type="button"] {
+  border: 0;
+  background-color: inherit;
+  cursor: pointer;
+}
+
+button {
+  overflow: visible;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: inherit;
+  cursor: pointer;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
