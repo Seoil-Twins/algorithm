@@ -4,11 +4,7 @@ import React, { HTMLInputTypeAttribute, useCallback, useState } from "react";
 import Image from "next/image";
 
 import styles from "./input.module.scss";
-import { notosansBold, notosansMedium } from "@/styles/_font";
-
-type EmailVerificationStatusProps = {
-  isVerified?: boolean;
-};
+import { notosansMedium } from "@/styles/_font";
 
 type PasswordVisibilityToggleProps = {
   isVisible?: boolean;
@@ -30,49 +26,9 @@ type InputProps = {
   title?: string;
   defaultValue?: string;
   usePasswordToggle?: boolean;
-  useEmailVerified?: boolean;
   isError?: boolean;
   errorMsg?: string;
-} & EmailVerificationStatusProps &
-  BaseInputWithoutValueProps;
-
-const EmailVerificationStatus = ({
-  isVerified,
-}: EmailVerificationStatusProps) => {
-  return (
-    <>
-      {isVerified ? (
-        <>
-          <div
-            className={`${styles.valid} ${styles.verified} ${notosansBold.className}`}
-          >
-            <Image
-              src={"/svgs/valid_check.svg"}
-              alt="이메일 인증 아이콘"
-              width={16}
-              height={16}
-            />
-            <span className={styles.verifiedText}>이메일 인증</span>
-          </div>
-        </>
-      ) : (
-        <>
-          <div
-            className={`${styles.invalid} ${styles.verified} ${notosansBold.className}`}
-          >
-            <Image
-              src={"/svgs/invalid_check.svg"}
-              alt="이메일 미인증 아이콘"
-              width={16}
-              height={16}
-            />
-            <span className={styles.verifiedText}>이메일 미인증</span>
-          </div>
-        </>
-      )}
-    </>
-  );
-};
+} & BaseInputWithoutValueProps;
 
 const PasswordVisibilityToogle = ({
   isVisible,
@@ -120,8 +76,6 @@ const Input = ({
   length,
   disabled = false,
   usePasswordToggle = false,
-  useEmailVerified = false,
-  isVerified = false,
   isError = false,
   errorMsg = "",
   onChange,
@@ -154,9 +108,6 @@ const Input = ({
           <div className={`${styles.title} ${notosansMedium.className}`}>
             {title}
           </div>
-          {inputType === "email" && useEmailVerified && (
-            <EmailVerificationStatus isVerified={isVerified} />
-          )}
         </div>
       )}
       <div className={`${styles.inputBox} ${isError ? styles.error : null}`}>

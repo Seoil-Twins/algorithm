@@ -35,6 +35,42 @@
     }
   }
 
+  .flexBox {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .codeBtn {
+    margin-left: 5px;
+    padding: 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .verifyBtn {
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 6px;
+  }
+
+  .verifiedBtn {
+    border: 0 !important;
+    background-color: #47bd35;
+    color: $white !important;
+    cursor: default;
+  }
+
+  .activeBtn {
+    border: 1px solid $primaryColor;
+    color: $primaryColor;
+  }
+
+  .disabledBtn {
+    border: 1px solid $grayText;
+    color: $grayText;
+    cursor: default;
+  }
+
   .btnBox {
     display: flex;
     justify-content: right;

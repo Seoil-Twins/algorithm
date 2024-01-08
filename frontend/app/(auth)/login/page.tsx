@@ -16,15 +16,17 @@ import {
 
 import { useAuth } from "@/providers/AuthProvider";
 
-interface Login {
+interface LoginProperty {
   email?: string;
   password?: string;
 }
 
-type LoginKeys = keyof Login;
+type LoginKeys = keyof LoginProperty;
 
-type LoginError = {
-  [key in LoginKeys]: ValidationError;
+type Login = {
+  [key in LoginKeys]: {
+    value: LoginProperty[key];
+  } & ValidationError;
 };
 
 const Login = () => {
@@ -32,31 +34,32 @@ const Login = () => {
   const { login, mutate } = useAuth()!;
 
   const [loginInfo, setLoginInfo] = useState<Login>({
-    email: "",
-    password: "",
-  });
-  const [errorInfo, setErrorInfo] = useState<LoginError>({
     email: {
-      errMsg: "",
+      value: "",
       isError: false,
+      errMsg: "",
     },
     password: {
-      errMsg: "올바른 비밀번호 형식이 아닙니다.",
+      value: "",
       isError: false,
+      errMsg: "올바른 비밀번호 형식이 아닙니다.",
     },
   });
 
   const [isFailedLogin, setIsfailedLogin] = useState<boolean>(false);
 
-  const handleSignupInfo = useCallback(
+  const handleLoginInfo = useCallback(
     (changedValue: string, name: LoginKeys) => {
-      setLoginInfo((prev) => {
-        const newSignupInfo: Login = {
-          ...prev,
-          [name]: changedValue,
-        };
+      setLoginInfo((prev: Login) => {
+        const { [name]: updatedField, ...rest } = prev;
 
-        return newSignupInfo;
+        return {
+          ...rest,
+          [name]: {
+            ...updatedField,
+            value: changedValue,
+          },
+        } as Login;
       });
     },
     [loginInfo],
@@ -64,34 +67,37 @@ const Login = () => {
 
   const validation = useCallback(() => {
     let isValid = true;
-    let newErrorInfo = {
-      ...errorInfo,
+    let newLoginInfo: Login = {
+      ...loginInfo,
     };
     const changeErrorInfo = (
       name: LoginKeys,
       isError: boolean,
       errMsg?: string,
     ) => {
-      newErrorInfo = {
-        ...newErrorInfo,
+      const { [name]: updatedField } = newLoginInfo;
+
+      newLoginInfo = {
+        ...newLoginInfo,
         [name]: {
+          ...updatedField,
           isError,
-          errMsg: errMsg ? errMsg : errorInfo[name].errMsg,
+          errMsg: errMsg ? errMsg : loginInfo[name].errMsg,
         },
       };
 
       if (isError) isValid = false;
     };
 
-    const isEmailValid = validationEmail(loginInfo.email);
+    const isEmailValid = validationEmail(loginInfo.email.value);
     changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
 
-    const isPasswordValid = validationPassword(loginInfo.password);
+    const isPasswordValid = validationPassword(loginInfo.password.value);
     changeErrorInfo("password", isPasswordValid.isError);
 
-    setErrorInfo(newErrorInfo);
+    setLoginInfo(newLoginInfo);
     return isValid;
-  }, [loginInfo.email, loginInfo.password]);
+  }, [loginInfo]);
 
   const handleClickLogin = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -134,10 +140,10 @@ const Login = () => {
           type="email"
           title="이메일"
           placeholder="이메일 입력"
-          isError={errorInfo.email.isError}
-          errorMsg={errorInfo.email.errMsg}
+          isError={loginInfo.email.isError}
+          errorMsg={loginInfo.email.errMsg}
           onChange={(changedValue: string) =>
-            handleSignupInfo(changedValue, "email")
+            handleLoginInfo(changedValue, "email")
           }
         />
       </div>
@@ -146,10 +152,10 @@ const Login = () => {
           type="password"
           title="비밀번호"
           placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
-          isError={errorInfo.password.isError}
-          errorMsg={errorInfo.password.errMsg}
+          isError={loginInfo.password.isError}
+          errorMsg={loginInfo.password.errMsg}
           onChange={(changedValue: string) =>
-            handleSignupInfo(changedValue, "password")
+            handleLoginInfo(changedValue, "password")
           }
           usePasswordToggle
         />
@@ -160,7 +166,7 @@ const Login = () => {
         </div>
       )}
       <button
-        type="button"
+        type="submit"
         className={`${styles.button} ${notosansBold.className}`}
       >
         로그인

@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 import styles from "./account.module.scss";
@@ -18,42 +18,57 @@ import {
   validationNickname,
 } from "@/utils/validation";
 
-interface UserProfile {
+interface UserProfileProperty {
   nickname?: string;
   email?: string;
+  verifyCode?: string;
 }
 
-type UserProfileKeys = keyof UserProfile;
+type UserProfileKeys = keyof UserProfileProperty;
 
-type UserProfileError = {
-  [key in UserProfileKeys]: ValidationError;
+type UserProfile = {
+  [key in UserProfileKeys]: {
+    value: UserProfileProperty[key];
+    disabled?: boolean;
+  } & ValidationError;
 };
 
 const Account = () => {
   const { user, mutate } = useAuth()!;
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
-    email: user?.email,
-    nickname: user?.nickname,
-  });
-  const [errorInfo, setErrorInfo] = useState<UserProfileError>({
     email: {
-      errMsg: "",
+      value: user?.email,
       isError: false,
+      errMsg: "",
+      disabled: false,
     },
     nickname: {
-      errMsg: "",
+      value: user?.nickname,
       isError: false,
+      errMsg: "",
+    },
+    verifyCode: {
+      value: "",
+      errMsg: "인증 번호가 맞지 않습니다.",
+      isError: false,
+      disabled: true,
     },
   });
+  const [isVerified, setIsVerified] = useState<boolean>(false);
 
   const handleProfileInfo = useCallback(
     (changedValue: string, name: UserProfileKeys) => {
-      setProfileInfo((prev) => {
+      setProfileInfo((prev: UserProfile) => {
+        const { [name]: updatedField, ...rest } = prev;
+
         return {
-          ...prev,
-          [name]: changedValue,
-        };
+          ...rest,
+          [name]: {
+            ...updatedField,
+            value: changedValue,
+          },
+        } as UserProfile;
       });
     },
     [profileInfo],
@@ -61,17 +76,21 @@ const Account = () => {
 
   const validationProfile = useCallback(() => {
     let isValid = true;
-    let newErrorInfo = {
-      ...errorInfo,
+    let newProfileInfo: UserProfile = {
+      ...profileInfo,
     };
+
     const changeErrorInfo = (
       name: UserProfileKeys,
       isError: boolean,
       errMsg?: string,
     ) => {
-      newErrorInfo = {
-        ...newErrorInfo,
+      const { [name]: updatedField } = profileInfo;
+
+      newProfileInfo = {
+        ...newProfileInfo,
         [name]: {
+          ...updatedField,
           isError,
           errMsg,
         },
@@ -80,19 +99,22 @@ const Account = () => {
       if (isError) isValid = false;
     };
 
-    const isNicknameValid = validationNickname(profileInfo.nickname);
+    const isNicknameValid = validationNickname(profileInfo.nickname.value);
     changeErrorInfo(
       "nickname",
       isNicknameValid.isError,
       isNicknameValid.errMsg,
     );
 
-    const isEmailValid = validationEmail(profileInfo.email);
+    const isEmailValid = validationEmail(profileInfo.email.value);
     changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
 
-    setErrorInfo(newErrorInfo);
+    if (!isVerified && user?.email != profileInfo.email.value)
+      changeErrorInfo("verifyCode", true, "인증이 필요합니다.");
+
+    setProfileInfo(newProfileInfo);
     return isValid;
-  }, [profileInfo.nickname, profileInfo.email]);
+  }, [profileInfo]);
 
   const handleSubmitProfile = useCallback(
     async (event: React.FormEvent) => {
@@ -102,12 +124,32 @@ const Account = () => {
       if (!isValid) return;
 
       const response = await updateProfileUser(
-        profileInfo.nickname!,
-        profileInfo.email!,
+        profileInfo.nickname.value!,
+        profileInfo.email.value!,
       );
 
       if (response.statusCode === 204) {
         await mutate();
+        setIsVerified(false);
+        setProfileInfo((prev: UserProfile) => {
+          const {
+            ["email"]: emailField,
+            ["verifyCode"]: verifyCodeField,
+            ...rest
+          } = prev;
+
+          return {
+            ...rest,
+            email: {
+              ...emailField,
+              disabled: false,
+            },
+            verifyCode: {
+              ...verifyCodeField,
+              disabled: true,
+            },
+          } as UserProfile;
+        });
       } else {
         alert("에러 발생");
       }
@@ -134,6 +176,52 @@ const Account = () => {
     [user?.profile],
   );
 
+  const sendVerifyCode = useCallback(() => {
+    if (!profileInfo.verifyCode.disabled || isVerified) return;
+    else if (user?.email === profileInfo.email.value) return;
+
+    // 이메일 전송 API 구현
+    const {
+      ["email"]: emailField,
+      ["verifyCode"]: verifyCodeField,
+      ...prev
+    } = profileInfo;
+
+    setProfileInfo({
+      ...prev,
+      email: {
+        ...emailField,
+        disabled: true,
+      },
+      verifyCode: {
+        ...verifyCodeField,
+        disabled: false,
+      },
+    });
+  }, [profileInfo]);
+
+  const checkVerifyCode = useCallback(() => {
+    if (profileInfo.verifyCode.disabled || isVerified) return;
+
+    let isError = false;
+    const { ["verifyCode"]: verifyCodeField, ...prev } = profileInfo;
+
+    if (profileInfo.verifyCode.value === "1234") {
+      setIsVerified(true);
+    } else {
+      isError = true;
+    }
+
+    setProfileInfo({
+      ...prev,
+      verifyCode: {
+        ...verifyCodeField,
+        isError,
+        errMsg: "인증 번호가 맞지 않습니다.",
+      },
+    });
+  }, [profileInfo]);
+
   const handleUpdateBtn = useCallback(() => {
     setIsProfileDisabled((prev) => {
       return !prev;
@@ -143,9 +231,24 @@ const Account = () => {
   useEffect(() => {
     if (!user) return;
 
-    setProfileInfo({
-      nickname: user.nickname,
-      email: user.email,
+    setProfileInfo((prev) => {
+      const {
+        ["nickname"]: nicknameField,
+        ["email"]: emailField,
+        ...rest
+      } = prev;
+
+      return {
+        ...rest,
+        nickname: {
+          ...nicknameField,
+          value: user.nickname,
+        },
+        email: {
+          ...emailField,
+          value: user.email,
+        },
+      };
     });
   }, [user]);
 
@@ -188,25 +291,78 @@ const Account = () => {
                 title="닉네임"
                 defaultValue={user.nickname}
                 disabled={isProfileDisabled}
-                isError={errorInfo.nickname.isError}
-                errorMsg={errorInfo.nickname.errMsg}
+                isError={profileInfo.nickname.isError}
+                errorMsg={profileInfo.nickname.errMsg}
                 onChange={(changedValue: string) =>
                   handleProfileInfo(changedValue, "nickname")
                 }
               />
-              <Input
-                title="이메일"
-                type="email"
-                defaultValue={user.email}
-                disabled={isProfileDisabled}
-                isError={errorInfo.email.isError}
-                errorMsg={errorInfo.email.errMsg}
-                useEmailVerified
-                isVerified={user.emailVerified}
-                onChange={(changedValue: string) =>
-                  handleProfileInfo(changedValue, "email")
-                }
-              />
+              {isProfileDisabled && !isVerified ? (
+                <Input
+                  title="이메일"
+                  type="email"
+                  defaultValue={user.email}
+                  disabled={profileInfo.email.disabled}
+                  isError={profileInfo.email.isError}
+                  errorMsg={profileInfo.email.errMsg}
+                  onChange={(changedValue: string) =>
+                    handleProfileInfo(changedValue, "email")
+                  }
+                />
+              ) : (
+                <>
+                  <div className={styles.flexBox}>
+                    <Input
+                      title="이메일"
+                      type="email"
+                      defaultValue={user.email}
+                      disabled={isProfileDisabled}
+                      isError={profileInfo.email.isError}
+                      errorMsg={profileInfo.email.errMsg}
+                      onChange={(changedValue: string) =>
+                        handleProfileInfo(changedValue, "email")
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={`
+            ${
+              profileInfo.email.disabled ? styles.disabledBtn : styles.activeBtn
+            }
+            ${styles.codeBtn}
+          `}
+                      onClick={sendVerifyCode}
+                    >
+                      인증 번호 발송
+                    </button>
+                  </div>
+                  <div>
+                    <Input
+                      placeholder="인증 번호 입력"
+                      length={6}
+                      disabled={profileInfo.verifyCode.disabled}
+                      isError={profileInfo.verifyCode.isError}
+                      errorMsg={profileInfo.verifyCode.errMsg}
+                      onChange={(changedValue: string) =>
+                        handleProfileInfo(changedValue, "verifyCode")
+                      }
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className={`${
+                      profileInfo.verifyCode.disabled
+                        ? styles.disabledBtn
+                        : styles.activeBtn
+                    }
+                    ${isVerified && styles.verifiedBtn}
+                    ${styles.verifyBtn}`}
+                    onClick={checkVerifyCode}
+                  >
+                    {isVerified ? "인증 완료" : "인증 번호 확인"}
+                  </button>
+                </>
+              )}
               <div className={styles.btnBox}>
                 {isProfileDisabled ? (
                   <input
@@ -233,7 +389,6 @@ const Account = () => {
               </div>
             </form>
           </Content>
-          <Content title="비밀번호">div</Content>
           <Content title="계정 연동">하이 ㅋㅋ</Content>
           <Content title="계정 삭제">하이 ㅋㅋ</Content>
         </>

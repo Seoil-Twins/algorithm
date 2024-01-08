@@ -39,7 +39,7 @@ const Signup = () => {
   const router = useRouter();
   const { login, mutate } = useAuth()!;
 
-  const [inputInfo, setInputInfo] = useState<Signup>({
+  const [signupInfo, setSignupInfo] = useState<Signup>({
     nickname: {
       value: "",
       errMsg: "",
@@ -74,7 +74,7 @@ const Signup = () => {
 
   const handleSignupInfo = useCallback(
     (changedValue: string, name: SignupKeys) => {
-      setInputInfo((prev: Signup) => {
+      setSignupInfo((prev: Signup) => {
         const { [name]: updatedField, ...rest } = prev;
 
         return {
@@ -86,21 +86,20 @@ const Signup = () => {
         } as Signup;
       });
     },
-    [inputInfo],
+    [signupInfo],
   );
 
   const sendVerifyCode = useCallback(() => {
-    if (!inputInfo.verifyCode.disabled || isVerified) return;
-    console.log("send");
+    if (!signupInfo.verifyCode.disabled || isVerified) return;
 
     // 이메일 전송 API 구현
     const {
       ["email"]: emailField,
       ["verifyCode"]: verifyCodeField,
       ...prev
-    } = inputInfo;
+    } = signupInfo;
 
-    setInputInfo({
+    setSignupInfo({
       ...prev,
       email: {
         ...emailField,
@@ -111,22 +110,21 @@ const Signup = () => {
         disabled: false,
       },
     });
-  }, [inputInfo]);
+  }, [signupInfo]);
 
   const checkVerifyCode = useCallback(() => {
-    if (inputInfo.verifyCode.disabled || isVerified) return;
-    console.log("check");
+    if (signupInfo.verifyCode.disabled || isVerified) return;
 
     let isError = false;
-    const { ["verifyCode"]: verifyCodeField, ...prev } = inputInfo;
+    const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
 
-    if (inputInfo.verifyCode.value === "1234") {
+    if (signupInfo.verifyCode.value === "1234") {
       setIsVerified(true);
     } else {
       isError = true;
     }
 
-    setInputInfo({
+    setSignupInfo({
       ...prev,
       verifyCode: {
         ...verifyCodeField,
@@ -134,7 +132,7 @@ const Signup = () => {
         errMsg: "인증 번호가 맞지 않습니다.",
       },
     });
-  }, [inputInfo]);
+  }, [signupInfo]);
 
   const handleClickCheckBox = useCallback(() => {
     setIsCheck((prev) => !prev);
@@ -142,8 +140,8 @@ const Signup = () => {
 
   const validation = useCallback(() => {
     let isValid = true;
-    let newInputInfo: Signup = {
-      ...inputInfo,
+    let newSignupInfo: Signup = {
+      ...signupInfo,
     };
 
     const changeErrorInfo = (
@@ -151,42 +149,42 @@ const Signup = () => {
       isError: boolean,
       errMsg?: string,
     ) => {
-      const { [name]: updatedField } = newInputInfo;
+      const { [name]: updatedField } = newSignupInfo;
 
-      newInputInfo = {
-        ...newInputInfo,
+      newSignupInfo = {
+        ...newSignupInfo,
         [name]: {
           ...updatedField,
           isError,
-          errMsg: errMsg ? errMsg : inputInfo[name].errMsg,
+          errMsg: errMsg ? errMsg : signupInfo[name].errMsg,
         },
       };
 
       if (isError) isValid = false;
     };
 
-    const isNicknameValid = validationNickname(inputInfo.nickname.value);
+    const isNicknameValid = validationNickname(signupInfo.nickname.value);
     changeErrorInfo(
       "nickname",
       isNicknameValid.isError,
       isNicknameValid.errMsg,
     );
 
-    const isEmailValid = validationEmail(inputInfo.email.value);
+    const isEmailValid = validationEmail(signupInfo.email.value);
     changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
 
-    const isPasswordValid = validationPassword(inputInfo.password.value);
+    const isPasswordValid = validationPassword(signupInfo.password.value);
     changeErrorInfo("password", isPasswordValid.isError);
 
-    if (inputInfo.password.value !== inputInfo.confirmPassword.value)
+    if (signupInfo.password.value !== signupInfo.confirmPassword.value)
       changeErrorInfo("confirmPassword", true);
     else changeErrorInfo("confirmPassword", false);
 
     if (!isVerified) changeErrorInfo("verifyCode", true, "인증이 필요합니다.");
 
-    setInputInfo(newInputInfo);
+    setSignupInfo(newSignupInfo);
     return isValid;
-  }, [inputInfo, isVerified]);
+  }, [signupInfo, isVerified]);
 
   const handleClickSignup = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -206,7 +204,7 @@ const Signup = () => {
       router.refresh();
       router.replace("/");
     },
-    [inputInfo, isCheck, isVerified],
+    [signupInfo, isCheck, isVerified],
   );
 
   return (
@@ -222,8 +220,8 @@ const Signup = () => {
           type="text"
           title="닉네임"
           placeholder="닉네임 입력"
-          isError={inputInfo.nickname.isError}
-          errorMsg={inputInfo.nickname.errMsg}
+          isError={signupInfo.nickname.isError}
+          errorMsg={signupInfo.nickname.errMsg}
           onChange={(changedValue: string) =>
             handleSignupInfo(changedValue, "nickname")
           }
@@ -235,9 +233,9 @@ const Signup = () => {
             type="email"
             title="이메일"
             placeholder="이메일 입력"
-            disabled={inputInfo.email.disabled}
-            isError={inputInfo.email.isError}
-            errorMsg={inputInfo.email.errMsg}
+            disabled={signupInfo.email.disabled}
+            isError={signupInfo.email.isError}
+            errorMsg={signupInfo.email.errMsg}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "email")
             }
@@ -245,7 +243,7 @@ const Signup = () => {
           <button
             type="button"
             className={`
-            ${inputInfo.email.disabled ? styles.disabledBtn : styles.activeBtn}
+            ${signupInfo.email.disabled ? styles.disabledBtn : styles.activeBtn}
             ${styles.codeBtn}
           `}
             onClick={sendVerifyCode}
@@ -257,9 +255,9 @@ const Signup = () => {
           <Input
             placeholder="인증 번호 입력"
             length={6}
-            disabled={inputInfo.verifyCode.disabled}
-            isError={inputInfo.verifyCode.isError}
-            errorMsg={inputInfo.verifyCode.errMsg}
+            disabled={signupInfo.verifyCode.disabled}
+            isError={signupInfo.verifyCode.isError}
+            errorMsg={signupInfo.verifyCode.errMsg}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "verifyCode")
             }
@@ -269,7 +267,7 @@ const Signup = () => {
           type="button"
           className={`
             ${
-              inputInfo.verifyCode.disabled
+              signupInfo.verifyCode.disabled
                 ? styles.disabledBtn
                 : styles.activeBtn
             }
@@ -287,8 +285,8 @@ const Signup = () => {
             type="password"
             title="비밀번호"
             placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
-            isError={inputInfo.password.isError}
-            errorMsg={inputInfo.password.errMsg}
+            isError={signupInfo.password.isError}
+            errorMsg={signupInfo.password.errMsg}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "password")
             }
@@ -298,8 +296,8 @@ const Signup = () => {
         <Input
           type="password"
           placeholder="비밀번호 확인 입력"
-          isError={inputInfo.confirmPassword.isError}
-          errorMsg={inputInfo.confirmPassword.errMsg}
+          isError={signupInfo.confirmPassword.isError}
+          errorMsg={signupInfo.confirmPassword.errMsg}
           onChange={(changedValue: string) =>
             handleSignupInfo(changedValue, "confirmPassword")
           }
