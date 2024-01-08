@@ -1,11 +1,46 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier"],
   "extends": [
     "next/core-web-vitals",
-    "plugin:@tpyescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
+    "eslint:recommended",
     "prettier"
   ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "env": {
+    "node": true,
+    "browser": true
+  },
   "root": true,
-  "ignorePatterns": ["node_modules/"],
-  "rules": {}
+  "ignorePatterns": ["node_modules/", "tsconfig.json"],
+  "rules": {
+    "no-console": "error",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ],
+    "@typescript-eslint/no-explicit-any": "off"
+  }
 }

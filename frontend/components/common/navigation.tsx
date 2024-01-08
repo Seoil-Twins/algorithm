@@ -52,7 +52,7 @@ const Navigation = () => {
     } else {
       setIsMobile(false);
     }
-  }, [isMobile]);
+  }, []);
 
   useEffect(() => {
     checkScreenSize();
@@ -61,7 +61,7 @@ const Navigation = () => {
     return () => {
       window.removeEventListener("resize", checkScreenSize);
     };
-  }, []);
+  }, [checkScreenSize]);
 
   /**
    * 브라우저 뒤로 가기를 하면 캐시된 페이지를 보여주기 때문에
@@ -72,7 +72,7 @@ const Navigation = () => {
     if (!isLoading && !session.sessionId && AUTH_PATHS.includes(pathname)) {
       router.replace("/");
     }
-  }, [session.sessionId, pathname]);
+  }, [session.sessionId, pathname, isLoading, router]);
 
   return (
     <header className={styles.headerBox}>

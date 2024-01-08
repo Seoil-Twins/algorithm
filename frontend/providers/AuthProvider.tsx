@@ -1,9 +1,5 @@
 "use client";
 
-import { getUser } from "@/api/user";
-import { SessionResponse } from "@/app/api/sessionConfig";
-import { User } from "@/interfaces/user";
-import useSession from "@/utils/clientSideSession";
 import React, {
   ReactNode,
   createContext,
@@ -12,6 +8,11 @@ import React, {
   useEffect,
   useState,
 } from "react";
+
+import { getUser } from "@/api/user";
+import { SessionResponse } from "@/app/api/sessionConfig";
+import { User } from "@/interfaces/user";
+import useSession from "@/utils/clientSideSession";
 
 type AuthProviderContext = {
   user?: User;
@@ -24,23 +25,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useSession();
   const [user, setUser] = useState<User | undefined>(undefined);
 
-  const logoutSession = async () => {
-    await logout();
-    await mutate();
-  };
-
   const fetchUser = useCallback(async () => {
     if (isLoading || isValidating) return;
 
     const user = await getUser(session.sessionId);
     setUser(user);
-  }, [isValidating, isLoading]);
+  }, [isLoading, isValidating, session.sessionId]);
 
   useEffect(() => {
     if (session.sessionId) {
       fetchUser();
     }
-  }, [session.sessionId, isValidating]);
+  }, [session.sessionId, isValidating, fetchUser]);
 
   return (
     <AuthContext.Provider

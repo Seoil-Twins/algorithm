@@ -1,3 +1,5 @@
+import React from "react";
+
 import Navigation from "@/components/mypage/navigation";
 
 import styles from "./mypage.module.scss";

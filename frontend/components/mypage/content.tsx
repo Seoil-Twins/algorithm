@@ -1,4 +1,7 @@
+import React from "react";
+
 import { notosansBold } from "@/styles/_font";
+
 import styles from "./content.module.scss";
 
 type ContentProps = {

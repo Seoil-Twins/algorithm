@@ -59,7 +59,7 @@ const fetchRecommendPosts = async () => {
       createdTime: "2023-12-25 12:25:25",
     },
     {
-      boardId: 2234,
+      boardId: 2239,
       userId: 1,
       username: "닉네임1",
       title: "님들 산타가 언제 쉬는지 암?",
@@ -68,7 +68,7 @@ const fetchRecommendPosts = async () => {
       createdTime: "2023-12-25 12:25:25",
     },
     {
-      boardId: 2234,
+      boardId: 2235,
       userId: 1,
       username: "닉네임1",
       title: "님들 산타가 언제 쉬는지 암?",
@@ -88,7 +88,7 @@ const PostCard = async () => {
     <div className={styles.cardBox}>
       {recommendPosts.map((post: Board) => {
         return (
-          <div className={styles.itemBox}>
+          <div className={styles.itemBox} key={post.boardId}>
             <Link href={`/board/${post.boardId}`}>
               <div className={styles.imgBox}>
                 {post.images ? (

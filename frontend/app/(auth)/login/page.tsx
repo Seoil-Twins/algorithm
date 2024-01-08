@@ -29,6 +29,7 @@ type Login = {
   } & ValidationError;
 };
 
+// eslint-disable-next-line no-redeclare
 const Login = () => {
   const router = useRouter();
   const { login, mutate } = useAuth()!;

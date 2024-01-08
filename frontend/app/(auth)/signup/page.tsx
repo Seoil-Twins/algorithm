@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -35,6 +35,7 @@ type Signup = {
   } & ValidationError;
 };
 
+// eslint-disable-next-line no-redeclare
 const Signup = () => {
   const router = useRouter();
   const { login, mutate } = useAuth()!;
@@ -86,7 +87,7 @@ const Signup = () => {
         } as Signup;
       });
     },
-    [signupInfo],
+    [],
   );
 
   const sendVerifyCode = useCallback(() => {
@@ -110,7 +111,7 @@ const Signup = () => {
         disabled: false,
       },
     });
-  }, [signupInfo]);
+  }, [isVerified, signupInfo]);
 
   const checkVerifyCode = useCallback(() => {
     if (signupInfo.verifyCode.disabled || isVerified) return;
@@ -132,7 +133,7 @@ const Signup = () => {
         errMsg: "인증 번호가 맞지 않습니다.",
       },
     });
-  }, [signupInfo]);
+  }, [isVerified, signupInfo]);
 
   const handleClickCheckBox = useCallback(() => {
     setIsCheck((prev) => !prev);
@@ -204,7 +205,7 @@ const Signup = () => {
       router.refresh();
       router.replace("/");
     },
-    [signupInfo, isCheck, isVerified],
+    [validation, login, mutate, isCheck, router],
   );
 
   return (

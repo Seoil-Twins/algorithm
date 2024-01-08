@@ -19,13 +19,6 @@ const TagSlider = ({ tags }: PropsType) => {
   const nowX = useRef<number>(0);
   const endX = useRef<number>(0);
 
-  const bindEvents = useCallback(() => {
-    moveBoxRef.current!.addEventListener("mousedown", onScrollStart);
-    moveBoxRef.current!.addEventListener("touchstart", onScrollStart);
-    moveBoxRef.current!.addEventListener("mouseleave", onMouseLeave);
-    moveBoxRef.current!.addEventListener("click", onClick);
-  }, [moveBoxRef]);
-
   const updateMoveBoxWidths = useCallback(() => {
     scrollWidth.current = moveBoxRef.current?.scrollWidth ?? 0;
     clientWidth.current = moveBoxRef.current?.clientWidth ?? 0;
@@ -64,6 +57,12 @@ const TagSlider = ({ tags }: PropsType) => {
     [startX, endX],
   );
 
+  const onMouseLeave = useCallback(() => {
+    // 마우스가 moveBox 영역을 벗어나면 mouseup 이벤트를 강제 트리거
+    onScrollEnd(new MouseEvent("mouseup"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onScrollStart = useCallback(
     (e: TouchEvent | MouseEvent) => {
       startX.current = getClientX(e);
@@ -73,6 +72,7 @@ const TagSlider = ({ tags }: PropsType) => {
       moveBoxRef.current!.addEventListener("mouseup", onScrollEnd);
       moveBoxRef.current!.addEventListener("touchend", onScrollEnd);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [getClientX, getLeft],
   );
 
@@ -81,7 +81,7 @@ const TagSlider = ({ tags }: PropsType) => {
       nowX.current = getClientX(e);
       setLeft(moveBoxX.current + nowX.current - startX.current);
     },
-    [moveBoxRef, nowX, startX],
+    [getClientX, setLeft],
   );
 
   const onScrollEnd = useCallback(
@@ -115,22 +115,24 @@ const TagSlider = ({ tags }: PropsType) => {
         moveBoxRef.current!.style.transition = "";
       }, 300);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      moveBoxRef,
-      moveBoxX,
-      endX,
-      clientWidth,
-      scrollWidth,
       getClientX,
       getLeft,
+      onScrollStart,
+      onScrollMove,
+      onMouseLeave,
+      onClick,
       setLeft,
     ],
   );
 
-  const onMouseLeave = useCallback(() => {
-    // 마우스가 moveBox 영역을 벗어나면 mouseup 이벤트를 강제 트리거
-    onScrollEnd(new MouseEvent("mouseup"));
-  }, []);
+  const bindEvents = useCallback(() => {
+    moveBoxRef.current!.addEventListener("mousedown", onScrollStart);
+    moveBoxRef.current!.addEventListener("touchstart", onScrollStart);
+    moveBoxRef.current!.addEventListener("mouseleave", onMouseLeave);
+    moveBoxRef.current!.addEventListener("click", onClick);
+  }, [onClick, onMouseLeave, onScrollStart]);
 
   useEffect(() => {
     const currentmoveBoxRef = moveBoxRef.current;
@@ -154,10 +156,19 @@ const TagSlider = ({ tags }: PropsType) => {
         moveBoxRef.current!.removeEventListener("mousemove", onScrollMove);
         moveBoxRef.current!.removeEventListener("touchmove", onScrollMove);
         moveBoxRef.current!.removeEventListener("mouseup", onScrollEnd);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         moveBoxRef.current!.removeEventListener("touchend", onScrollEnd);
       }
     };
-  }, [moveBoxRef, onScrollStart, onScrollMove, onScrollEnd, onClick]);
+  }, [
+    moveBoxRef,
+    onScrollStart,
+    onScrollMove,
+    onScrollEnd,
+    onClick,
+    bindEvents,
+    onMouseLeave,
+  ]);
 
   useEffect(() => {
     updateMoveBoxWidths();

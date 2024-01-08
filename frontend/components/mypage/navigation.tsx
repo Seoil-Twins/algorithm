@@ -35,7 +35,7 @@ const Navigation = () => {
 
   useEffect(() => {
     activeMenuItem();
-  }, [pathname]);
+  }, [activeMenuItem, pathname]);
 
   return (
     <div className={styles.navigation}>

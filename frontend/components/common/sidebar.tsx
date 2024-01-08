@@ -3,6 +3,7 @@ import React, {
   createRef,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -29,9 +30,11 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     menuItems.map(() => createRef()),
   );
 
-  const customMenuItems: MenuItems[] = session.sessionId
-    ? [...menuItems, { title: "마이페이지", link: "/account" }]
-    : [...menuItems];
+  const customMenuItems: MenuItems[] = useMemo(() => {
+    return session.sessionId
+      ? [...menuItems, { title: "마이페이지", link: "/account" }]
+      : [...menuItems];
+  }, [menuItems, session.sessionId]);
 
   const toggleModal = useCallback(() => {
     setIsOpen((prev) => {
@@ -45,7 +48,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
 
       return curVal;
     });
-  }, [isOpen]);
+  }, []);
 
   const handleLogout = useCallback(async () => {
     await logout();
@@ -69,7 +72,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
         ele.current.style.color = "#222222";
       }
     });
-  }, [isOpen, menuRefs.current, path]);
+  }, [customMenuItems, isOpen, path]);
 
   return (
     <div className={styles.centerBox}>

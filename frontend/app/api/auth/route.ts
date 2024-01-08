@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "../sessionConfig";
 
-const enviroment = process.env.ENVIROMENT;
-const API_URL =
-  enviroment === "product"
-    ? process.env.API_URL_PRODUCT
-    : process.env.API_URL_DEVELOPMENT;
+// const enviroment = process.env.ENVIROMENT;
+// const API_URL =
+//   enviroment === "product"
+//     ? process.env.API_URL_PRODUCT
+//     : process.env.API_URL_DEVELOPMENT;
 
 export async function GET() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
@@ -19,7 +19,7 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const API_URL = "https://jsonplaceholder.typicode.com/users";
 
   try {

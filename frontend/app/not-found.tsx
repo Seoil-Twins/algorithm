@@ -4,9 +4,6 @@ import React from "react";
 import styles from "./notFound.module.scss";
 import { notosansBold } from "@/styles/_font";
 
-import PrimaryHeader from "@/components/common/navbar";
-import Footer from "@/components/common/footer";
-
 const notFound = async () => {
   return (
     <>

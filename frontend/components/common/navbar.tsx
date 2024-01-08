@@ -137,7 +137,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   const [isOpenProfileModal, setIsOpenProfileModal] = useState<boolean>(false);
   const [alrams, setAlrams] = useState<Alram[]>([]);
 
-  const onAlramClick = (event: MouseEvent) => {
+  const onAlramClick = useCallback((event: MouseEvent) => {
     const insideOther = alramModalRef.current?.contains(event.target as Node);
     const insideProfileImg = alramImgRef.current?.contains(
       event.target as Node,
@@ -149,9 +149,9 @@ const Navbar = ({ menuItems }: NavbarProps) => {
 
     setIsOpenAlramModal(false);
     document.body.removeEventListener("click", onAlramClick);
-  };
+  }, []);
 
-  const onProfileClick = (event: MouseEvent) => {
+  const onProfileClick = useCallback((event: MouseEvent) => {
     const insideOther = profileModalRef.current?.contains(event.target as Node);
     const insideProfileImg = profileImgRef.current?.contains(
       event.target as Node,
@@ -163,24 +163,28 @@ const Navbar = ({ menuItems }: NavbarProps) => {
 
     setIsOpenProfileModal(false);
     document.body.removeEventListener("click", onProfileClick);
-  };
+  }, []);
 
   const openAlramModal = useCallback(() => {
+    document.body.removeEventListener("click", onProfileClick);
     document.body.addEventListener("click", onAlramClick);
+
     setIsOpenProfileModal(false);
     setIsOpenAlramModal((prev) => !prev);
-  }, [isOpenAlramModal]);
+  }, [onAlramClick, onProfileClick]);
 
   const openProfileModal = useCallback(() => {
+    document.body.removeEventListener("click", onAlramClick);
     document.body.addEventListener("click", onProfileClick);
+
     setIsOpenAlramModal(false);
     setIsOpenProfileModal((prev) => !prev);
-  }, [isOpenProfileModal]);
+  }, [onAlramClick, onProfileClick]);
 
   const handleLogout = useCallback(async () => {
     setIsOpenProfileModal(false);
     logout();
-  }, [user, session.sessionId]);
+  }, [logout]);
 
   useEffect(() => {
     menuItems.map((menu, idx) => {
@@ -195,23 +199,23 @@ const Navbar = ({ menuItems }: NavbarProps) => {
         ele.current.style.color = "#222222";
       }
     });
-  }, [path]);
+  }, [menuItems, path]);
+
+  const callFetchAlrams = useCallback(async () => {
+    const fetchedAlrams = await fetchAlrams();
+    const newAlrams = [...alrams, ...fetchedAlrams];
+
+    setAlrams(newAlrams);
+  }, [alrams]);
 
   useEffect(() => {
-    const callFetchAlrams = async () => {
-      const fetchedAlrams = await fetchAlrams();
-      let newAlrams = [...alrams, ...fetchedAlrams];
-
-      setAlrams(newAlrams);
-    };
-
     callFetchAlrams();
 
     return () => {
       document.body.removeEventListener("click", onProfileClick);
       document.body.removeEventListener("click", onAlramClick);
     };
-  }, []);
+  }, [onAlramClick, onProfileClick]);
 
   return (
     <div className={styles.centerBox}>
@@ -257,6 +261,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   onClick={openProfileModal}
                 >
                   {user.profile ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={user.profile}
                       alt="유저 아이콘"
@@ -297,6 +302,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
               <div className={styles.imgBox}>
                 {user.profile ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={user.profile}
                     alt="유저 아이콘"

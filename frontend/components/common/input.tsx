@@ -17,6 +17,7 @@ type BaseInputProps = {
   value?: string;
   disabled?: boolean;
   length?: number;
+  // eslint-disable-next-line no-unused-vars
   onChange: (value: string) => void;
 };
 
@@ -84,10 +85,13 @@ const Input = ({
   const [inputType, setInputType] = useState<HTMLInputTypeAttribute>(type);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
-  const handleChange = useCallback((changedValue: string) => {
-    setValue(changedValue);
-    onChange?.(changedValue);
-  }, []);
+  const handleChange = useCallback(
+    (changedValue: string) => {
+      setValue(changedValue);
+      onChange?.(changedValue);
+    },
+    [onChange],
+  );
 
   const handleClickHideOrShow = useCallback(() => {
     setIsVisible((prev) => {
@@ -99,7 +103,7 @@ const Input = ({
 
       return !prev;
     });
-  }, [inputType, isVisible]);
+  }, []);
 
   return (
     <div className={styles.inputContainer}>

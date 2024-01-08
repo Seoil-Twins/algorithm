@@ -154,7 +154,7 @@ const AlgorithmCard = async () => {
     <div className={styles.cardBox}>
       {recommendAlgorithms.map((algorithm: Algorithm) => {
         return (
-          <div className={styles.itemBox}>
+          <div className={styles.itemBox} key={algorithm.algorithmId}>
             <div className={`${styles.id} ${notosansBold.className}`}>
               {algorithm.algorithmId}
             </div>
