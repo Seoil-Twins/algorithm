@@ -20,6 +20,7 @@ type BaseInputProps = {
   placeholder?: string;
   value?: string;
   disabled?: boolean;
+  length?: number;
   onChange: (value: string) => void;
 };
 
@@ -94,6 +95,7 @@ const BaseInput = ({
   value,
   onChange,
   disabled,
+  length,
 }: BaseInputProps) => {
   return (
     <input
@@ -105,6 +107,7 @@ const BaseInput = ({
       }
       disabled={disabled}
       className={styles.input}
+      maxLength={length}
     />
   );
 };
@@ -114,6 +117,7 @@ const Input = ({
   type = "text",
   placeholder = "",
   defaultValue = "",
+  length,
   disabled = false,
   usePasswordToggle = false,
   useEmailVerified = false,
@@ -162,6 +166,7 @@ const Input = ({
           onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled}
+          length={length}
         />
         {type === "password" && usePasswordToggle && (
           <PasswordVisibilityToogle

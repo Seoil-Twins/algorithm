@@ -29,7 +29,7 @@ type LoginError = {
 
 const Login = () => {
   const router = useRouter();
-  const { login } = useAuth()!;
+  const { login, mutate } = useAuth()!;
 
   const [loginInfo, setLoginInfo] = useState<Login>({
     email: "",
@@ -93,34 +93,36 @@ const Login = () => {
     return isValid;
   }, [loginInfo.email, loginInfo.password]);
 
-  const handleClickSignup = useCallback(async () => {
-    const isValid = validation();
-    if (!isValid) {
-      setIsfailedLogin(false);
-      return;
-    }
+  const handleClickLogin = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    // 로그인 API 호출 및 처리 로직
-    // 로그인 실패
-    // const response = {
-    //   statusCode: 400,
-    // };
+      const isValid = validation();
+      if (!isValid) {
+        setIsfailedLogin(false);
+        return;
+      }
 
-    // if (response.statusCode === 400) {
-    //   setIsfailedLogin(true);
-    // }
-    await login("1234");
+      // 로그인 API 호출 및 처리 로직
+      // 로그인 실패
+      // const response = {
+      //   statusCode: 400,
+      // };
 
-    // // client re-rendering event
-    const event = new Event("update");
-    document.dispatchEvent(event);
+      // if (response.statusCode === 400) {
+      //   setIsfailedLogin(true);
+      // }
+      await login("1234");
+      await mutate();
 
-    router.refresh();
-    router.replace("/");
-  }, [loginInfo]);
+      router.refresh();
+      router.replace("/");
+    },
+    [loginInfo],
+  );
 
   return (
-    <form className={styles.formBox}>
+    <form className={styles.formBox} onSubmit={handleClickLogin}>
       <div className={`${styles.title} ${notosansMedium.className}`}>
         로그인
       </div>
@@ -157,12 +159,12 @@ const Login = () => {
           이메일 또는 비밀번호를 다시 확인하세요.
         </div>
       )}
-      <input
+      <button
         type="button"
-        value="로그인"
         className={`${styles.button} ${notosansBold.className}`}
-        onClick={handleClickSignup}
-      />
+      >
+        로그인
+      </button>
     </form>
   );
 };

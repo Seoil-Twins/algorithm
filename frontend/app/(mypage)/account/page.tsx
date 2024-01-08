@@ -30,7 +30,7 @@ type UserProfileError = {
 };
 
 const Account = () => {
-  const { user } = useAuth()!;
+  const { user, mutate } = useAuth()!;
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
     email: user?.email,
@@ -107,8 +107,7 @@ const Account = () => {
       );
 
       if (response.statusCode === 204) {
-        const event = new Event("update");
-        document.dispatchEvent(event);
+        await mutate();
       } else {
         alert("에러 발생");
       }
@@ -127,8 +126,7 @@ const Account = () => {
       const response = await updateProfileImg(profile);
 
       if (response.statusCode === 204) {
-        const event = new Event("update");
-        document.dispatchEvent(event);
+        await mutate();
       } else {
         alert("에러 발생");
       }
