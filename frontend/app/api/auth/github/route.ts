@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;
 
-  const cloenUrl = nextUrl.clone();
-  cloenUrl.pathname = "/account";
-  cloenUrl.search = "";
+  const cloneUrl = nextUrl.clone();
+  cloneUrl.pathname = "/account";
+  cloneUrl.search = "";
 
   const urlSearchParams = new URLSearchParams(nextUrl.search);
   const params = Object.fromEntries(urlSearchParams.entries());
@@ -15,7 +15,7 @@ export const GET = async (req: NextRequest) => {
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   if (!code || !clientId || !clientSecret)
-    return NextResponse.redirect(cloenUrl);
+    return NextResponse.redirect(cloneUrl);
 
   const baseUrl = "https://github.com/login/oauth/access_token";
   const config = {
@@ -32,11 +32,11 @@ export const GET = async (req: NextRequest) => {
       Accept: "application/json",
     },
   });
-  if (response.status >= 400) return NextResponse.redirect(cloenUrl);
+  if (response.status >= 400) return NextResponse.redirect(cloneUrl);
 
   const data = await response.json();
   const accessToken = data.access_token;
-  if (!accessToken) return NextResponse.redirect(cloenUrl);
+  if (!accessToken) return NextResponse.redirect(cloneUrl);
 
   const userUrl = "https://api.github.com";
   const userData = await (
@@ -46,7 +46,7 @@ export const GET = async (req: NextRequest) => {
       },
     })
   ).json();
-  if (!userData) return NextResponse.redirect(cloenUrl);
+  if (!userData) return NextResponse.redirect(cloneUrl);
 
   /**
    {
@@ -106,5 +106,5 @@ export const GET = async (req: NextRequest) => {
   // linking API 호출
   console.log(linkingData);
 
-  return NextResponse.redirect(cloenUrl);
+  return NextResponse.redirect(cloneUrl);
 };

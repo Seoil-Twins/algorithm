@@ -27,15 +27,29 @@ const SnsAccount = () => {
       scope: "user:email read:user",
     };
     const params = new URLSearchParams(config);
-    const githubURL = `${baseUrl}?${params.toString()}`;
+    const githubUrl = `${baseUrl}?${params.toString()}`;
 
     // gihub Login 주소로 이동
-    router.replace(githubURL);
+    router.replace(githubUrl);
   }, [router]);
 
   const handleGoogle = useCallback(() => {
-    console.log("google");
-  }, []);
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_CODE_REDIRECT_URI;
+    if (!clientId || !redirectUri) return;
+
+    const baseUrl = "http://accounts.google.com/o/oauth2/v2/auth";
+    const config = {
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      response_type: "code",
+      scope: "email profile",
+    };
+    const params = new URLSearchParams(config);
+    const googleUrl = `${baseUrl}?${params.toString()}`;
+
+    router.push(googleUrl);
+  }, [router]);
 
   const handleNaver = useCallback(() => {
     console.log("naver");
