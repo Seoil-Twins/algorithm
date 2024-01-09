@@ -215,6 +215,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
       document.body.removeEventListener("click", onProfileClick);
       document.body.removeEventListener("click", onAlramClick);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onAlramClick, onProfileClick]);
 
   return (

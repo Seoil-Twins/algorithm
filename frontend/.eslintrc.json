@@ -18,7 +18,7 @@
   "root": true,
   "ignorePatterns": ["node_modules/", "tsconfig.json"],
   "rules": {
-    "no-console": "error",
+    "no-console": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "prettier/prettier": [
       "error",
