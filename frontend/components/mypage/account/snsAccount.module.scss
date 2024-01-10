@@ -11,14 +11,16 @@
   }
 
   .linkingBtn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 35px;
-    border-radius: 8px;
-    border: 1px solid $primaryColor;
-    color: $primaryColor;
+    @include activeBtn;
   }
+
+  .disabledBtn {
+    @include disabledBtn;
+  }
+}
+
+.loading {
+  @include loading(352px);
 }
 
 @include mobile {

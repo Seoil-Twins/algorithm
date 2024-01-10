@@ -9,31 +9,32 @@ export const GET = async (req: NextRequest) => {
   const urlSearchParams = new URLSearchParams(nextUrl.search);
   const params = Object.fromEntries(urlSearchParams.entries());
   const code = params.code;
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_CODE_REDIRECT_URI;
+  const state = params.state;
+  const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
+  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  const redirectUri = process.env.NEXT_PUBLIC_NAVER_CODE_REDIRECT_URI;
 
-  if (!code || !clientId || !clientSecret || !redirectUri)
+  if (!code || !state || !clientId || !clientSecret || !redirectUri)
     return NextResponse.redirect(cloneUrl);
 
-  const tokenBaseUrl = "https://oauth2.googleapis.com/token";
+  const tokenBaseUrl = "https://nid.naver.com/oauth2.0/token";
   const config = {
-    code,
+    grant_type: "authorization_code",
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: redirectUri,
-    grant_type: "authorization_code",
+    code,
+    state,
   };
+  const tokenParams = new URLSearchParams(config);
 
-  const response = await fetch(tokenBaseUrl, {
-    method: "POST",
-    body: JSON.stringify(config),
+  const response = await fetch(`${tokenBaseUrl}?${tokenParams}`, {
+    method: "GET",
   });
   const data = await response.json();
   const accessToken = data.access_token;
   if (!accessToken) return NextResponse.redirect(cloneUrl);
 
-  const userUrl = "https://www.googleapis.com/userinfo/v2/me";
+  const userUrl = "https://openapi.naver.com/v1/nid/me";
   const userData = await (
     await fetch(userUrl, {
       headers: {
@@ -43,22 +44,11 @@ export const GET = async (req: NextRequest) => {
   ).json();
   if (!userData) return NextResponse.redirect(cloneUrl);
 
-  /**
-    {
-      id: '113714605051498155953',
-      email: 'kseungyong20@gmail.com',
-      verified_email: true,
-      name: '김승용',
-      given_name: '승용',
-      family_name: '김',
-      picture: 'https://lh3.googleusercontent.com/a/ACg8ocJRhihvl-4IxZMHTFmvOY5t_1hte4JzY4Z2Rcy0BrAU=s96-c',
-      locale: 'ko'
-    }
-   */
+  // https://developers.naver.com/docs/login/devguide/devguide.md#3-4-5-%EC%A0%91%EA%B7%BC-%ED%86%A0%ED%81%B0%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%ED%94%84%EB%A1%9C%ED%95%84-api-%ED%98%B8%EC%B6%9C%ED%95%98%EA%B8%B0
   const linkingData = {
-    snsId: "1002",
-    id: userData.id,
-    domain: userData.email,
+    snsId: "1003",
+    id: userData.response.id,
+    domain: userData.response.email,
   };
 
   // linking API 호출

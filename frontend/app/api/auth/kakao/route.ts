@@ -9,56 +9,49 @@ export const GET = async (req: NextRequest) => {
   const urlSearchParams = new URLSearchParams(nextUrl.search);
   const params = Object.fromEntries(urlSearchParams.entries());
   const code = params.code;
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_CODE_REDIRECT_URI;
+  const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+  const clientSecret = process.env.KAKAO_CLIENT_SECRET;
+  const redirectUri = process.env.NEXT_PUBLIC_KAKAO_CODE_REDIRECT_URI;
 
   if (!code || !clientId || !clientSecret || !redirectUri)
     return NextResponse.redirect(cloneUrl);
 
-  const tokenBaseUrl = "https://oauth2.googleapis.com/token";
+  const tokenBaseUrl = "https://kauth.kakao.com/oauth/token";
   const config = {
-    code,
+    grant_type: "authorization_code",
     client_id: clientId,
     client_secret: clientSecret,
     redirect_uri: redirectUri,
-    grant_type: "authorization_code",
+    code,
   };
 
-  const response = await fetch(tokenBaseUrl, {
+  const response = await fetch(`${tokenBaseUrl}`, {
     method: "POST",
-    body: JSON.stringify(config),
+    body: new URLSearchParams(config),
+    headers: {
+      "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+    },
   });
   const data = await response.json();
   const accessToken = data.access_token;
   if (!accessToken) return NextResponse.redirect(cloneUrl);
 
-  const userUrl = "https://www.googleapis.com/userinfo/v2/me";
+  const userUrl = "https://kapi.kakao.com/v2/user/me";
   const userData = await (
     await fetch(userUrl, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
       },
     })
   ).json();
   if (!userData) return NextResponse.redirect(cloneUrl);
 
-  /**
-    {
-      id: '113714605051498155953',
-      email: 'kseungyong20@gmail.com',
-      verified_email: true,
-      name: '김승용',
-      given_name: '승용',
-      family_name: '김',
-      picture: 'https://lh3.googleusercontent.com/a/ACg8ocJRhihvl-4IxZMHTFmvOY5t_1hte4JzY4Z2Rcy0BrAU=s96-c',
-      locale: 'ko'
-    }
-   */
   const linkingData = {
-    snsId: "1002",
+    snsId: "1004",
     id: userData.id,
-    domain: userData.email,
+    // Kakao email 정책 변경으로 인해 비즈니스 앱 등록해야 가져올 수 있습니다.
+    // domain: userData.response.email,
   };
 
   // linking API 호출

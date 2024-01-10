@@ -278,7 +278,7 @@ const UserProfileForm = () => {
 
   return (
     <>
-      {user && (
+      {user ? (
         <form className={styles.form} onSubmit={handleSubmitProfile}>
           <div className={styles.profile}>
             <label htmlFor="profile">
@@ -392,19 +392,19 @@ const UserProfileForm = () => {
                 type="button"
                 value="수정"
                 onClick={handleUpdateBtn}
-                className={`${styles.btn} ${styles.update} ${notosansBold.className}`}
+                className={`${styles.update} ${notosansBold.className}`}
               />
             ) : (
               <>
                 <input
                   type="button"
-                  className={`${styles.btn} ${styles.cancel} ${notosansBold.className}`}
+                  className={`${styles.cancel} ${notosansBold.className}`}
                   value="취소"
                   onClick={handleCancel}
                 />
                 <button
                   type="submit"
-                  className={`${styles.btn} ${styles.update} ${notosansBold.className}`}
+                  className={`${styles.update} ${notosansBold.className}`}
                 >
                   수정
                 </button>
@@ -412,6 +412,8 @@ const UserProfileForm = () => {
             )}
           </div>
         </form>
+      ) : (
+        <div className={styles.loading} />
       )}
     </>
   );

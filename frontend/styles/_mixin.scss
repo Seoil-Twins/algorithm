@@ -30,3 +30,26 @@
 @mixin tablet-padding {
   padding: 0 $padding-tablet;
 }
+
+@mixin btn {
+  padding: 10px 35px;
+  border-radius: 8px;
+}
+
+@mixin loading($height) {
+  min-height: $height;
+}
+
+@mixin activeBtn {
+  @include btn;
+  border: 1px solid $primaryColor;
+  color: $primaryColor;
+  cursor: pointer;
+}
+
+@mixin disabledBtn {
+  @include btn;
+  border: 1px solid $grayText;
+  color: $grayText;
+  cursor: default;
+}

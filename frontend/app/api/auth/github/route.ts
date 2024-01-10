@@ -38,9 +38,9 @@ export const GET = async (req: NextRequest) => {
   const accessToken = data.access_token;
   if (!accessToken) return NextResponse.redirect(cloneUrl);
 
-  const userUrl = "https://api.github.com";
+  const userUrl = "https://api.github.com/user";
   const userData = await (
-    await fetch(`${userUrl}/user`, {
+    await fetch(userUrl, {
       headers: {
         Authorization: `token ${accessToken}`,
       },

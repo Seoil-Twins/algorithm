@@ -63,3 +63,17 @@ export const updateProfileImg = async (profile: File) => {
     updateUser,
   };
 };
+
+export const getUserSNSInfo = async () => {
+  return {
+    userId: 1,
+    links: [
+      {
+        linkId: 1,
+        linkKind: "1001",
+        domain: "https://github.com/dbstjdqls14",
+        createdTime: "2023-12-12 12:12:12",
+      },
+    ],
+  };
+};

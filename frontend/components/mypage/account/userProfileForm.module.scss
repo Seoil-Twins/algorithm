@@ -75,23 +75,17 @@
     display: flex;
     justify-content: right;
 
-    .btn {
-      padding: 0.625rem 2.1875rem;
-      border-radius: 8px;
-
-      &:not(:last-child) {
-        margin-right: 8px;
-      }
-    }
-
     .update {
-      border: 1px solid $primaryColor;
-      color: $primaryColor;
+      @include activeBtn;
     }
 
     .cancel {
-      border: 1px solid $grayText;
-      color: $grayText;
+      @include disabledBtn;
+      margin-right: 8px;
     }
   }
+}
+
+.loading {
+  @include loading(430px);
 }
