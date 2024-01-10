@@ -12,3 +12,15 @@
     background-color: $white;
   }
 }
+
+@include tablet {
+  .item {
+    padding: calc($padding-mobile + 10px) !important;
+  }
+}
+
+@include mobile {
+  .item {
+    padding: calc($padding-mobile + 5px) !important;
+  }
+}

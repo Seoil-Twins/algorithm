@@ -1,0 +1,48 @@
+.form {
+  display: grid;
+  row-gap: 15px;
+  grid-template-rows: repeat(auto-fill, 1fr);
+  font-size: 14px;
+  color: #656567;
+
+  .terms {
+    color: $blueDark;
+    text-decoration: underline;
+  }
+
+  .submit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    .alignCenter {
+      display: flex;
+      align-items: center;
+
+      .checkBox {
+        @include checkBox(20px, 14px);
+      }
+    }
+
+    label {
+      padding-left: 10px;
+      cursor: pointer;
+    }
+
+    .delete {
+      @include warningBtn;
+      border-width: 2px;
+    }
+  }
+}
+
+@include mobile {
+  .alignCenter {
+    margin-bottom: 10px;
+  }
+
+  .delete {
+    width: 100%;
+  }
+}

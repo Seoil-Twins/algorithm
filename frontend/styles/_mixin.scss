@@ -53,3 +53,15 @@
   color: $grayText;
   cursor: default;
 }
+
+@mixin warningBtn {
+  @include btn;
+  border: 1px solid $red;
+  color: $red;
+}
+
+@mixin checkBox($checkBoxSize, $checkImgSize) {
+  width: $checkBoxSize;
+  height: $checkBoxSize;
+  background-size: $checkImgSize;
+}

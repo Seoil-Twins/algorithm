@@ -38,7 +38,7 @@ const Navigation = () => {
   }, [activeMenuItem, pathname]);
 
   return (
-    <div className={styles.navigation}>
+    <aside className={styles.navigation}>
       <div className={styles.title}>내 정보 관리</div>
       <Link href="/account">
         <div className={styles.item} ref={accountRef}>
@@ -76,7 +76,7 @@ const Navigation = () => {
           알림
         </div>
       </Link>
-    </div>
+    </aside>
   );
 };
 
