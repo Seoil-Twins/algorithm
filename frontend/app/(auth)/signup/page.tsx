@@ -306,25 +306,28 @@ const Signup = () => {
         />
       </div>
       <div className={styles.termsBox} onClick={handleClickCheckBox}>
-        <div
-          className={`${styles.checkBox} ${
-            isCheck ? styles.active : styles.none
-          }`}
-        ></div>
-        <div>
-          <Link
-            href="/terms-of-use"
-            style={{ textDecoration: "underline" }}
-            replace
-          >
-            이용약관
-          </Link>
-          과{" "}
-          <Link href="/privacy-policy" style={{ textDecoration: "underline" }}>
-            개인정보처리방침
-          </Link>{" "}
+        <input
+          type="checkbox"
+          id="terms"
+          className={styles.checkBox}
+          onChange={handleClickCheckBox}
+        />
+        <Link
+          href="/terms-of-use"
+          style={{ textDecoration: "underline" }}
+          replace
+        >
+          이용약관
+        </Link>
+        <label htmlFor="terms" className={styles.pr5}>
+          과
+        </label>
+        <Link href="/privacy-policy" style={{ textDecoration: "underline" }}>
+          개인정보처리방침
+        </Link>
+        <label htmlFor="terms" className={styles.pl5}>
           동의합니다.
-        </div>
+        </label>
       </div>
       <button
         type="submit"

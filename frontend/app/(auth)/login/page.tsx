@@ -63,7 +63,7 @@ const Login = () => {
         } as Login;
       });
     },
-    [loginInfo],
+    [],
   );
 
   const validation = useCallback(() => {
@@ -125,7 +125,7 @@ const Login = () => {
       router.refresh();
       router.replace("/");
     },
-    [loginInfo],
+    [router, login, mutate, validation],
   );
 
   return (

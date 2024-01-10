@@ -50,14 +50,7 @@ const Withdrawal = () => {
       </p>
       <div className={styles.submit}>
         <div className={styles.alignCenter}>
-          <input
-            type="checkbox"
-            id="withdrawal"
-            className={`${styles.checkBox} ${
-              isCheck ? styles.active : styles.none
-            }`}
-            onClick={handleIsCheck}
-          />
+          <input type="checkbox" id="withdrawal" onClick={handleIsCheck} />
           <label htmlFor="withdrawal">
             계정 삭제에 관한 정책을 읽었으며, 이에 동의합니다.
           </label>
