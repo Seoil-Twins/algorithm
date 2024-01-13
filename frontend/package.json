@@ -16,7 +16,8 @@
     "react": "^18",
     "react-dom": "^18",
     "swr": "^2.2.4",
-    "typescript-plugin-css-modules": "^5.0.2"
+    "typescript-plugin-css-modules": "^5.0.2",
+    "use-debounce": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

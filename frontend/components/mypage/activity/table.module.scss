@@ -1,0 +1,125 @@
+.table {
+  display: grid;
+  row-gap: 10px;
+  grid-template-rows: auto;
+
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+
+    .kind {
+      grid-column-start: 1;
+      grid-column-end: 5;
+      display: flex;
+      align-items: flex-end;
+      height: auto;
+      color: #b4b4bf;
+      font-size: 0.75rem;
+    }
+
+    .title {
+      overflow: hidden;
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .imgBox {
+      grid-column-start: 4;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      font-size: 0.875rem;
+
+      img {
+        margin-right: 5px;
+      }
+
+      .mr10 {
+        margin-right: 10px;
+      }
+    }
+
+    .content {
+      overflow: hidden;
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+      font-size: 0.875rem;
+      color: $grayText;
+    }
+
+    .createdTime {
+      grid-column-start: 4;
+      display: flex;
+      justify-content: flex-end;
+      font-size: 0.875rem;
+      color: $grayText;
+    }
+  }
+}
+
+@include desktop {
+  .container {
+    grid-template-rows: auto 1fr 1fr;
+
+    .title {
+      grid-column-start: 1;
+      grid-column-end: 4;
+    }
+
+    .content {
+      grid-column-start: 1;
+      grid-column-end: 4;
+      margin-right: 60px;
+    }
+  }
+}
+
+@include tablet {
+  .container {
+    grid-template-rows: auto 1fr 1fr;
+
+    .title {
+      grid-column-start: 1;
+      grid-column-end: 4;
+    }
+
+    .content {
+      grid-column-start: 1;
+      grid-column-end: 4;
+      margin-right: 60px;
+    }
+  }
+}
+
+@include mobile {
+  .container {
+    row-gap: 3px;
+    grid-template-rows: auto 1fr 1fr 1fr 1fr;
+
+    .title {
+      grid-column-start: 1;
+      grid-column-end: 5;
+    }
+
+    .content {
+      grid-column-start: 1;
+      grid-column-end: 5;
+      grid-row-start: 3;
+      grid-row-end: 4;
+    }
+
+    .imgBox {
+      grid-column-start: 3;
+      grid-column-end: 4;
+      grid-row-start: 4;
+      grid-row-end: 5;
+    }
+
+    .createdTime {
+      grid-column-start: 3;
+      grid-column-end: 4;
+      grid-row-start: 5;
+      grid-row-end: 6;
+    }
+  }
+}

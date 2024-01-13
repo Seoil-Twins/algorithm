@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { notosansBold } from "@/styles/_font";
 import styles from "./snsAccount.module.scss";
 
-import { notosansBold } from "@/styles/_font";
-import { getUserSNSInfo } from "@/api/user";
+import { Link } from "@/interfaces/link";
 
 interface SNSLinking {
   id: string;
@@ -16,39 +16,46 @@ interface SNSLinking {
   disabled: boolean;
 }
 
-const fetchUserLink = async () => {
-  const response = await getUserSNSInfo();
-  return response;
+type SnsAccountProps = {
+  sns: {
+    userId: number;
+    links: Link[];
+  };
 };
 
-const SnsAccount = () => {
+const SnsAccount = ({ sns }: SnsAccountProps) => {
   const router = useRouter();
+  const snsId = {
+    github: "1001",
+    google: "1002",
+    naver: "1003",
+    kakao: "1004",
+  };
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [snsLinkings, setSnsLinkings] = useState<SNSLinking[]>([
+  const [snsLinkings, _] = useState<SNSLinking[]>([
     {
-      id: "1001",
+      id: snsId.github,
       title: "Github",
       imgSrc: "./svgs/github.svg",
-      disabled: false,
+      disabled: sns.links[0].linkKind === snsId.github,
     },
     {
-      id: "1002",
+      id: snsId.google,
       title: "Google",
       imgSrc: "./svgs/google.svg",
-      disabled: false,
+      disabled: sns.links[0].linkKind === snsId.google,
     },
     {
-      id: "1003",
+      id: snsId.naver,
       title: "Naver",
       imgSrc: "./svgs/naver.svg",
-      disabled: false,
+      disabled: sns.links[0].linkKind === snsId.naver,
     },
     {
-      id: "1004",
+      id: snsId.kakao,
       title: "Kakako",
       imgSrc: "./svgs/kakao.svg",
-      disabled: false,
+      disabled: sns.links[0].linkKind === snsId.kakao,
     },
   ]);
 
@@ -165,62 +172,28 @@ const SnsAccount = () => {
     [handleGithub, handleGoogle, handleNaver, handleKakao],
   );
 
-  const handleSnsInfo = useCallback(async () => {
-    const response = await fetchUserLink();
-
-    setSnsLinkings((prev: SNSLinking[]) => {
-      const newSnsLinkings = response.links.flatMap((item) => {
-        return prev.map((sns: SNSLinking) => {
-          const info: SNSLinking = {
-            ...sns,
-            disabled: false,
-          };
-
-          if (sns.id === item.linkKind) {
-            info.disabled = true;
-          }
-
-          return info;
-        });
-      });
-
-      setIsLoading(false);
-      return newSnsLinkings;
-    });
-  }, []);
-
-  useEffect(() => {
-    handleSnsInfo();
-  }, [handleSnsInfo]);
-
   return (
-    <>
-      {!isLoading ? (
-        <div className={styles.linking}>
-          {snsLinkings.map((item: SNSLinking, idx: number) => (
-            <div className={styles.sns} key={idx}>
-              <Image
-                src={item.imgSrc}
-                alt={`${item.title} 아이콘`}
-                width={45}
-                height={45}
-              />
-              <span>{item.title}</span>
-              <button
-                className={`${
-                  item.disabled ? styles.disabledBtn : styles.linkingBtn
-                } ${notosansBold.className}`}
-                onClick={() => handleSnsLinking(item.id)}
-              >
-                {item.disabled ? "연동 완료" : "연동"}
-              </button>
-            </div>
-          ))}
+    <div className={styles.linking}>
+      {snsLinkings.map((item: SNSLinking, idx: number) => (
+        <div className={styles.sns} key={idx}>
+          <Image
+            src={item.imgSrc}
+            alt={`${item.title} 아이콘`}
+            width={45}
+            height={45}
+          />
+          <span>{item.title}</span>
+          <button
+            className={`${
+              item.disabled ? styles.disabledBtn : styles.linkingBtn
+            } ${notosansBold.className}`}
+            onClick={() => handleSnsLinking(item.id)}
+          >
+            {item.disabled ? "연동 완료" : "연동"}
+          </button>
         </div>
-      ) : (
-        <div className={styles.loading} />
-      )}
-    </>
+      ))}
+    </div>
   );
 };
 

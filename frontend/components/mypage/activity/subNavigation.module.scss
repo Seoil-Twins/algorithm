@@ -1,0 +1,61 @@
+.nav {
+  border-bottom: 1px solid $blueBorder;
+  margin-bottom: 10px;
+
+  .btn {
+    padding: 10px 20px;
+  }
+}
+
+@include desktop {
+  .nav {
+    display: flex;
+  }
+
+  .active {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top: 2px solid $primaryColor !important;
+    border-left: 2px solid $primaryColor !important;
+    border-right: 2px solid $primaryColor !important;
+    margin: -2px;
+
+    &:focus {
+      margin: -2px;
+    }
+  }
+}
+
+@include tablet {
+  .nav {
+    width: 100%;
+    margin-bottom: 15px;
+
+    .btn {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .active {
+    border-radius: 5px;
+    background-color: $lightBackground;
+  }
+}
+
+@include mobile {
+  .nav {
+    width: 100%;
+    margin-bottom: 15px;
+
+    .btn {
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .active {
+    border-radius: 5px;
+    background-color: $lightBackground;
+  }
+}

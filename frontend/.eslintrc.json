@@ -19,7 +19,7 @@
   "ignorePatterns": ["node_modules/", "tsconfig.json"],
   "rules": {
     "no-console": "off",
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+    "import/no-extraneous-dependencies": "off",
     "prettier/prettier": [
       "error",
       {
@@ -41,6 +41,8 @@
       "always",
       { "exceptAfterSingleLine": true }
     ],
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   }
 }

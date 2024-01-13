@@ -3,14 +3,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
+import { notosansBold } from "@/styles/_font";
 import styles from "./userProfileForm.module.scss";
 
-import { useAuth } from "@/providers/AuthProvider";
+import { User } from "@/interfaces/user";
 
 import { updateProfileImg, updateProfileUser } from "@/api/user";
 
+import { useAuth } from "@/providers/AuthProvider";
+
 import Input from "@/components/common/input";
-import { notosansBold } from "@/styles/_font";
+
 import {
   ValidationError,
   validationEmail,
@@ -32,8 +35,13 @@ type UserProfile = {
   } & ValidationError;
 };
 
-const UserProfileForm = () => {
-  const { user, mutate } = useAuth()!;
+type UserProfileProps = {
+  user: User;
+};
+
+const UserProfileForm = ({ user }: UserProfileProps) => {
+  const { mutate } = useAuth()!;
+
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
     email: {
@@ -54,6 +62,9 @@ const UserProfileForm = () => {
       disabled: true,
     },
   });
+  const [profileImg, setProfileImg] = useState<string | undefined>(
+    user.profile,
+  );
   const [isVerified, setIsVerified] = useState<boolean>(false);
 
   const handleProfileInfo = useCallback(
@@ -128,7 +139,6 @@ const UserProfileForm = () => {
       );
 
       if (response.statusCode === 204) {
-        await mutate();
         setIsVerified(false);
         setProfileInfo((prev: UserProfile) => {
           const {
@@ -149,13 +159,15 @@ const UserProfileForm = () => {
             },
           } as UserProfile;
         });
+
+        await mutate();
       } else {
         alert("에러 발생");
       }
 
       setIsProfileDisabled(true);
     },
-    [mutate, profileInfo, validationProfile],
+    [profileInfo, validationProfile, mutate],
   );
 
   const handleProfileImg = useCallback(
@@ -167,12 +179,13 @@ const UserProfileForm = () => {
       const response = await updateProfileImg(profile);
 
       if (response.statusCode === 204) {
-        await mutate();
+        setProfileImg(URL.createObjectURL(profile));
+        await await mutate();
       } else {
         alert("에러 발생");
       }
     },
-    [mutate, user],
+    [user, mutate],
   );
 
   const sendVerifyCode = useCallback(() => {
@@ -278,74 +291,71 @@ const UserProfileForm = () => {
 
   return (
     <>
-      {user ? (
-        <form className={styles.form} onSubmit={handleSubmitProfile}>
-          <div className={styles.profile}>
-            <label htmlFor="profile">
-              <Image
-                src={
-                  user.profile ? user.profile : "/svgs/user_profile_default.svg"
-                }
-                alt="유저 프로필 사진"
-                width={96}
-                height={96}
-                className={styles.profileImg}
-              />
-              <div className={styles.edit}>
-                <Image
-                  src="/svgs/edit_pencil.svg"
-                  alt="프로필 사진 변경 아이콘"
-                  width={25}
-                  height={25}
-                />
-              </div>
-            </label>
-            <input
-              type="file"
-              id="profile"
-              accept="image/jpeg, image/png, image/svg+xml"
-              onChange={handleProfileImg}
+      <form className={styles.form} onSubmit={handleSubmitProfile}>
+        <div className={styles.profile}>
+          <label htmlFor="profile">
+            <Image
+              src={profileImg ? profileImg : "/svgs/user_profile_default.svg"}
+              alt="유저 프로필 사진"
+              width={96}
+              height={96}
+              className={styles.profileImg}
             />
-          </div>
+            <div className={styles.edit}>
+              <Image
+                src="/svgs/edit_pencil.svg"
+                alt="프로필 사진 변경 아이콘"
+                width={25}
+                height={25}
+              />
+            </div>
+          </label>
+          <input
+            type="file"
+            id="profile"
+            accept="image/jpeg, image/png, image/svg+xml"
+            onChange={handleProfileImg}
+          />
+        </div>
+        <Input
+          title="닉네임"
+          defaultValue={user.nickname}
+          disabled={isProfileDisabled}
+          isError={profileInfo.nickname.isError}
+          errorMsg={profileInfo.nickname.errMsg}
+          onChange={(changedValue: string) =>
+            handleProfileInfo(changedValue, "nickname")
+          }
+        />
+        {isProfileDisabled && !isVerified ? (
           <Input
-            title="닉네임"
-            defaultValue={user.nickname}
-            disabled={isProfileDisabled}
-            isError={profileInfo.nickname.isError}
-            errorMsg={profileInfo.nickname.errMsg}
+            title="이메일"
+            type="email"
+            defaultValue={user.email}
+            disabled={profileInfo.email.disabled}
+            isError={profileInfo.email.isError}
+            errorMsg={profileInfo.email.errMsg}
             onChange={(changedValue: string) =>
-              handleProfileInfo(changedValue, "nickname")
+              handleProfileInfo(changedValue, "email")
             }
           />
-          {isProfileDisabled && !isVerified ? (
-            <Input
-              title="이메일"
-              type="email"
-              defaultValue={user.email}
-              disabled={profileInfo.email.disabled}
-              isError={profileInfo.email.isError}
-              errorMsg={profileInfo.email.errMsg}
-              onChange={(changedValue: string) =>
-                handleProfileInfo(changedValue, "email")
-              }
-            />
-          ) : (
-            <>
-              <div className={styles.flexBox}>
-                <Input
-                  title="이메일"
-                  type="email"
-                  defaultValue={user.email}
-                  disabled={isProfileDisabled}
-                  isError={profileInfo.email.isError}
-                  errorMsg={profileInfo.email.errMsg}
-                  onChange={(changedValue: string) =>
-                    handleProfileInfo(changedValue, "email")
-                  }
-                />
-                <button
-                  type="button"
-                  className={`
+        ) : (
+          <>
+            <div className={styles.flexBox}>
+              <Input
+                title="이메일"
+                type="email"
+                defaultValue={user.email}
+                disabled={isProfileDisabled}
+                isError={profileInfo.email.isError}
+                errorMsg={profileInfo.email.errMsg}
+                onChange={(changedValue: string) =>
+                  handleProfileInfo(changedValue, "email")
+                }
+              />
+              <button
+                type="button"
+                className={`
             ${
               profileInfo.verifyCode.disabled === true &&
               profileInfo.email.value != user.email
@@ -354,67 +364,64 @@ const UserProfileForm = () => {
             }
             ${styles.codeBtn}
           `}
-                  onClick={sendVerifyCode}
-                >
-                  인증 번호 발송
-                </button>
-              </div>
-              <div>
-                <Input
-                  placeholder="인증 번호 입력"
-                  length={6}
-                  disabled={profileInfo.verifyCode.disabled}
-                  isError={profileInfo.verifyCode.isError}
-                  errorMsg={profileInfo.verifyCode.errMsg}
-                  onChange={(changedValue: string) =>
-                    handleProfileInfo(changedValue, "verifyCode")
-                  }
-                />
-              </div>
-              <button
-                type="button"
-                className={`${
-                  profileInfo.verifyCode.disabled
-                    ? styles.disabledBtn
-                    : styles.activeBtn
+                onClick={sendVerifyCode}
+              >
+                인증 번호 발송
+              </button>
+            </div>
+            <div>
+              <Input
+                placeholder="인증 번호 입력"
+                length={6}
+                disabled={profileInfo.verifyCode.disabled}
+                isError={profileInfo.verifyCode.isError}
+                errorMsg={profileInfo.verifyCode.errMsg}
+                onChange={(changedValue: string) =>
+                  handleProfileInfo(changedValue, "verifyCode")
                 }
+              />
+            </div>
+            <button
+              type="button"
+              className={`${
+                profileInfo.verifyCode.disabled
+                  ? styles.disabledBtn
+                  : styles.activeBtn
+              }
                     ${isVerified && styles.verifiedBtn}
                     ${styles.verifyBtn}`}
-                onClick={checkVerifyCode}
+              onClick={checkVerifyCode}
+            >
+              {isVerified ? "인증 완료" : "인증 번호 확인"}
+            </button>
+          </>
+        )}
+        <div className={styles.btnBox}>
+          {isProfileDisabled ? (
+            <input
+              type="button"
+              value="수정"
+              onClick={handleUpdateBtn}
+              className={`${styles.update} ${notosansBold.className}`}
+            />
+          ) : (
+            <>
+              <input
+                type="button"
+                className={`${styles.cancel} ${notosansBold.className}`}
+                value="취소"
+                onClick={handleCancel}
+              />
+              <button
+                type="submit"
+                className={`${styles.update} ${notosansBold.className}`}
               >
-                {isVerified ? "인증 완료" : "인증 번호 확인"}
+                수정
               </button>
             </>
           )}
-          <div className={styles.btnBox}>
-            {isProfileDisabled ? (
-              <input
-                type="button"
-                value="수정"
-                onClick={handleUpdateBtn}
-                className={`${styles.update} ${notosansBold.className}`}
-              />
-            ) : (
-              <>
-                <input
-                  type="button"
-                  className={`${styles.cancel} ${notosansBold.className}`}
-                  value="취소"
-                  onClick={handleCancel}
-                />
-                <button
-                  type="submit"
-                  className={`${styles.update} ${notosansBold.className}`}
-                >
-                  수정
-                </button>
-              </>
-            )}
-          </div>
-        </form>
-      ) : (
-        <div className={styles.loading} />
-      )}
+        </div>
+      </form>
     </>
   );
 };

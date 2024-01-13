@@ -64,7 +64,9 @@ export const updateProfileImg = async (profile: File) => {
   };
 };
 
-export const getUserSNSInfo = async () => {
+export const getUserSNSInfo = async (sessionId: string | undefined) => {
+  if (!sessionId) return;
+
   return {
     userId: 1,
     links: [

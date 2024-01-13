@@ -1,0 +1,10 @@
+.board {
+  display: flex;
+  flex-direction: column;
+  min-height: 472px;
+
+  .content {
+    position: relative;
+    flex: 1;
+  }
+}

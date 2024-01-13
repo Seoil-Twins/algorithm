@@ -55,7 +55,7 @@ export async function POST() {
 
 export async function DELETE() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
-  session.destroy();
+  await session.destroy();
 
   return NextResponse.json({});
 }
