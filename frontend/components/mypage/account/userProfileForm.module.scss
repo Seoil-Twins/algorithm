@@ -41,8 +41,7 @@
   }
 
   .codeBtn {
-    margin-left: 5px;
-    padding: 14px;
+    padding: 10px;
     border-radius: 6px;
     white-space: nowrap;
   }
@@ -81,6 +80,7 @@
 
     .cancel {
       @include disabledBtn;
+      cursor: pointer !important;
       margin-right: 8px;
     }
   }

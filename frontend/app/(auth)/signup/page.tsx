@@ -30,7 +30,7 @@ type SignupKeys = keyof SignupProperty;
 
 type Signup = {
   [key in SignupKeys]: {
-    value: SignupProperty[key];
+    value: NonNullable<SignupProperty[key]>;
     disabled?: boolean;
   } & ValidationError;
 };
@@ -91,7 +91,35 @@ const Signup = () => {
   );
 
   const sendVerifyCode = useCallback(() => {
-    if (!signupInfo.verifyCode.disabled || isVerified) return;
+    const changeErrorInfo = (
+      name: SignupKeys,
+      isError: boolean,
+      errMsg?: string,
+    ) => {
+      const { [name]: updatedField } = signupInfo;
+      const newSignupInfo = {
+        ...signupInfo,
+        [name]: {
+          ...updatedField,
+          isError,
+          errMsg,
+        },
+      };
+
+      return newSignupInfo;
+    };
+
+    const isEmailValid = validationEmail(signupInfo.email.value);
+
+    if (isEmailValid.isError) {
+      const newProfileInfo = changeErrorInfo(
+        "email",
+        isEmailValid.isError,
+        isEmailValid.errMsg,
+      );
+      setSignupInfo(newProfileInfo);
+      return;
+    } else if (!signupInfo.verifyCode.disabled || isVerified) return;
 
     // 이메일 전송 API 구현
     const {
@@ -104,6 +132,8 @@ const Signup = () => {
       ...prev,
       email: {
         ...emailField,
+        isError: false,
+        errMsg: "",
         disabled: true,
       },
       verifyCode: {
@@ -130,6 +160,7 @@ const Signup = () => {
       verifyCode: {
         ...verifyCodeField,
         isError,
+        disabled: !isError,
         errMsg: "인증 번호가 맞지 않습니다.",
       },
     });
@@ -221,6 +252,7 @@ const Signup = () => {
           type="text"
           title="닉네임"
           placeholder="닉네임 입력"
+          value={signupInfo.nickname.value}
           isError={signupInfo.nickname.isError}
           errorMsg={signupInfo.nickname.errMsg}
           onChange={(changedValue: string) =>
@@ -229,11 +261,12 @@ const Signup = () => {
         />
       </div>
       <div className={styles.mb20}>
-        <div className={`${styles.mb10} ${styles.flexBox}`}>
+        <div className={styles.mb20}>
           <Input
             type="email"
             title="이메일"
             placeholder="이메일 입력"
+            value={signupInfo.email.value}
             disabled={signupInfo.email.disabled}
             isError={signupInfo.email.isError}
             errorMsg={signupInfo.email.errMsg}
@@ -256,6 +289,7 @@ const Signup = () => {
           <Input
             placeholder="인증 번호 입력"
             length={6}
+            value={signupInfo.verifyCode.value}
             disabled={signupInfo.verifyCode.disabled}
             isError={signupInfo.verifyCode.isError}
             errorMsg={signupInfo.verifyCode.errMsg}
@@ -286,6 +320,7 @@ const Signup = () => {
             type="password"
             title="비밀번호"
             placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
+            value={signupInfo.password.value}
             isError={signupInfo.password.isError}
             errorMsg={signupInfo.password.errMsg}
             onChange={(changedValue: string) =>
@@ -297,6 +332,7 @@ const Signup = () => {
         <Input
           type="password"
           placeholder="비밀번호 확인 입력"
+          value={signupInfo.confirmPassword.value}
           isError={signupInfo.confirmPassword.isError}
           errorMsg={signupInfo.confirmPassword.errMsg}
           onChange={(changedValue: string) =>
@@ -305,7 +341,7 @@ const Signup = () => {
           usePasswordToggle
         />
       </div>
-      <div className={styles.termsBox} onClick={handleClickCheckBox}>
+      <div className={styles.termsBox}>
         <input
           type="checkbox"
           id="terms"

@@ -25,7 +25,7 @@ type LoginKeys = keyof LoginProperty;
 
 type Login = {
   [key in LoginKeys]: {
-    value: LoginProperty[key];
+    value: NonNullable<LoginProperty[key]>;
   } & ValidationError;
 };
 
@@ -141,6 +141,7 @@ const Login = () => {
           type="email"
           title="이메일"
           placeholder="이메일 입력"
+          value={loginInfo.email.value}
           isError={loginInfo.email.isError}
           errorMsg={loginInfo.email.errMsg}
           onChange={(changedValue: string) =>
@@ -153,6 +154,7 @@ const Login = () => {
           type="password"
           title="비밀번호"
           placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
+          value={loginInfo.password.value}
           isError={loginInfo.password.isError}
           errorMsg={loginInfo.password.errMsg}
           onChange={(changedValue: string) =>

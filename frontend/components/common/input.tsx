@@ -14,22 +14,19 @@ type PasswordVisibilityToggleProps = {
 type BaseInputProps = {
   type?: HTMLInputTypeAttribute;
   placeholder?: string;
-  value?: string;
+  value: string;
   disabled?: boolean;
   length?: number;
   // eslint-disable-next-line no-unused-vars
   onChange: (value: string) => void;
 };
 
-type BaseInputWithoutValueProps = Omit<BaseInputProps, "value">;
-
 type InputProps = {
   title?: string;
-  defaultValue?: string;
   usePasswordToggle?: boolean;
   isError?: boolean;
   errorMsg?: string;
-} & BaseInputWithoutValueProps;
+} & BaseInputProps;
 
 const PasswordVisibilityToogle = ({
   isVisible,
@@ -73,7 +70,7 @@ const Input = ({
   title,
   type = "text",
   placeholder = "",
-  defaultValue = "",
+  value = "",
   length,
   disabled = false,
   usePasswordToggle = false,
@@ -81,13 +78,11 @@ const Input = ({
   errorMsg = "",
   onChange,
 }: InputProps) => {
-  const [value, setValue] = useState<any>(defaultValue);
   const [inputType, setInputType] = useState<HTMLInputTypeAttribute>(type);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleChange = useCallback(
     (changedValue: string) => {
-      setValue(changedValue);
       onChange?.(changedValue);
     },
     [onChange],
