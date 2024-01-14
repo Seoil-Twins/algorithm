@@ -135,7 +135,6 @@ const Activity = () => {
           queryKey="algorithm"
           navItems={algorithmNavItems}
           apis={algorithmApis}
-          kindType={algorithmKindType}
         />
       </Content>
       <Content title="커뮤니티">
@@ -143,7 +142,6 @@ const Activity = () => {
           queryKey="community"
           navItems={communityNavItems}
           apis={communityApis}
-          kindType={communityKindType}
         />
       </Content>
     </>

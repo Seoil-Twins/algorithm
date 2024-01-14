@@ -1,0 +1,21 @@
+.container {
+  position: relative;
+  display: grid;
+  row-gap: 25px;
+  grid-template-rows: auto;
+  min-height: 495px;
+
+  .item {
+    .title {
+      margin-bottom: 3px;
+      font-size: 0.875rem;
+      color: $grayText;
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+}

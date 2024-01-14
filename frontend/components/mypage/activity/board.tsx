@@ -26,13 +26,12 @@ type PaginationOptions = {
 } & PageOptions;
 
 export type BoardProps = {
-  kindType: KindType;
   apis: APIs;
   navItems: NavItem[];
   queryKey: string;
 };
 
-const Board = ({ kindType, apis, navItems, queryKey }: BoardProps) => {
+const Board = ({ apis, navItems, queryKey }: BoardProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [kind, setKind] = useState<string | undefined>();
   const [pageOptions, setPageOptions] = useState<PaginationOptions>({

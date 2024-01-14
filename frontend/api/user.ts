@@ -79,3 +79,25 @@ export const getUserSNSInfo = async (sessionId: string | undefined) => {
     ],
   };
 };
+
+export type ResponseNotification = {
+  annoNofi: boolean;
+  postNofi: boolean;
+  commentNofi: boolean;
+  likeNofi: boolean;
+  answerNofi: boolean;
+  eventNofi: boolean;
+};
+
+export const getNotificationSettings = async () => {
+  const response: ResponseNotification = {
+    annoNofi: false,
+    postNofi: true,
+    commentNofi: false,
+    likeNofi: true,
+    answerNofi: false,
+    eventNofi: true,
+  };
+
+  return response;
+};

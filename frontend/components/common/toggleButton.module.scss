@@ -1,0 +1,52 @@
+.btn {
+  position: relative;
+  width: 3.75rem;
+  height: 1.875rem;
+  border-radius: 15px;
+
+  .circle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: $white;
+    border-radius: 100px;
+  }
+}
+
+@keyframes moveOn {
+  0% {
+    left: 8%;
+  }
+
+  100% {
+    left: 52%;
+  }
+}
+
+@keyframes moveOff {
+  0% {
+    left: 52%;
+  }
+
+  100% {
+    left: 8%;
+  }
+}
+
+.active {
+  background-color: $primaryColor;
+
+  .circle {
+    animation: moveOn 0.5s forwards;
+  }
+}
+
+.none {
+  background-color: #efefef;
+
+  .circle {
+    animation: moveOff 0.5s forwards;
+  }
+}
