@@ -8,6 +8,7 @@ import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 export default async function middleware(req: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   const pathname = req.nextUrl.pathname;
+  const url = req.nextUrl.clone();
 
   const hasSessionButUnAuthPath =
     NO_AUTH_PATHS.includes(pathname) && session.sessionId;
@@ -16,8 +17,12 @@ export default async function middleware(req: NextRequest) {
 
   // 잘못된 권한으로 접근할 시 홈으로 리다이렉션
   if (hasSessionButUnAuthPath || noSessionButAuthPath) {
-    const url = req.nextUrl.clone();
     url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  if (pathname === "/activity") {
+    url.pathname = "/activity/question";
     return NextResponse.redirect(url);
   }
 

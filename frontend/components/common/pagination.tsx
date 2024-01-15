@@ -1,13 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
 import styles from "./pagination.module.scss";
@@ -15,9 +11,8 @@ import styles from "./pagination.module.scss";
 type PaginationProps = {
   count: number;
   total: number;
-  defaultPage?: number;
+  current: number;
   marginTop: number;
-  onChange: (page: number) => void;
 };
 
 function getClosestGreaterNumbers(arr: number[], target: number): number[] {
@@ -70,12 +65,17 @@ const getPaginationBoundary = (
 const Pagination = ({
   total,
   count,
-  defaultPage = 1,
+  current = 1,
   marginTop = 25,
-  onChange,
 }: PaginationProps) => {
-  const [current, setCurrent] = useState<number>(defaultPage);
-  const [viewPages, setViewPages] = useState<number[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const prevSearchParams = Object.fromEntries(
+    Array.from(searchParams.entries()),
+  );
+  const viewPages = getPaginationBoundary(total, count, current);
+
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
   const handleWindowSize = useDebouncedCallback(
@@ -90,27 +90,40 @@ const Pagination = ({
   );
 
   const handlePrevois = useCallback(() => {
-    setCurrent(current - 1);
-    onChange(current - 1);
-  }, [current, onChange]);
+    delete prevSearchParams["count"];
+    delete prevSearchParams["page"];
+
+    router.replace(
+      `${pathname}?page=${current - 1}&count=${count}&${new URLSearchParams(
+        prevSearchParams,
+      ).toString()}`,
+    );
+  }, [count, current, pathname, prevSearchParams, router]);
 
   const handleChange = useCallback(
     (num: number) => {
-      setCurrent(num);
-      onChange(num);
+      delete prevSearchParams["count"];
+      delete prevSearchParams["page"];
+
+      router.replace(
+        `${pathname}?page=${num}&count=${count}&${new URLSearchParams(
+          prevSearchParams,
+        ).toString()}`,
+      );
     },
-    [onChange],
+    [count, pathname, prevSearchParams, router],
   );
 
   const handleNext = useCallback(() => {
-    setCurrent(current + 1);
-    onChange(current + 1);
-  }, [current, onChange]);
+    delete prevSearchParams["count"];
+    delete prevSearchParams["page"];
 
-  useEffect(() => {
-    const newViewPages = getPaginationBoundary(total, count, current);
-    setViewPages(newViewPages);
-  }, [total, count, current]);
+    router.replace(
+      `${pathname}?page=${current + 1}&count=${count}&${new URLSearchParams(
+        prevSearchParams,
+      ).toString()}`,
+    );
+  }, [count, current, pathname, prevSearchParams, router]);
 
   useEffect(() => {
     const isMobile = /iphone|ipad|ipod|android/i.test(
@@ -127,7 +140,7 @@ const Pagination = ({
   }, [handleWindowSize]);
 
   return (
-    <>
+    <nav>
       {total != 0 && (
         <ul className={styles.pagination} style={{ marginTop }}>
           <li className={styles.previous}>
@@ -176,7 +189,7 @@ const Pagination = ({
           </li>
         </ul>
       )}
-    </>
+    </nav>
   );
 };
 

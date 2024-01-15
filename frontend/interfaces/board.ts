@@ -6,7 +6,7 @@ export default interface Board {
   title: string;
   content: string;
   tags: string[];
-  solved: boolean;
+  solved?: boolean;
   likeTotal: number;
   commentTotal: number;
   createdTime: string;

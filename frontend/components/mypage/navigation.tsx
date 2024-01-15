@@ -36,7 +36,7 @@ const Navigation = () => {
         <Link href={item.link} key={idx}>
           <div
             className={`${styles.item} ${
-              pathname === item.link && styles.active
+              pathname.includes(item.link) && styles.active
             }`}
           >
             <Image

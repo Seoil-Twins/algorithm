@@ -23,6 +23,10 @@
       text-overflow: ellipsis;
     }
 
+    .solved {
+      color: #1cca00;
+    }
+
     .imgBox {
       grid-column-start: 4;
       display: flex;
@@ -31,7 +35,7 @@
       font-size: 0.875rem;
 
       img {
-        margin-right: 5px;
+        margin-right: 3px;
       }
 
       .mr10 {
@@ -64,6 +68,7 @@
     .title {
       grid-column-start: 1;
       grid-column-end: 4;
+      margin-right: 60px;
     }
 
     .content {
@@ -81,6 +86,7 @@
     .title {
       grid-column-start: 1;
       grid-column-end: 4;
+      margin-right: 60px;
     }
 
     .content {
