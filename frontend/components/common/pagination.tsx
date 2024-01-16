@@ -93,7 +93,7 @@ const Pagination = ({
     delete prevSearchParams["count"];
     delete prevSearchParams["page"];
 
-    router.replace(
+    router.push(
       `${pathname}?page=${current - 1}&count=${count}&${new URLSearchParams(
         prevSearchParams,
       ).toString()}`,
@@ -105,7 +105,7 @@ const Pagination = ({
       delete prevSearchParams["count"];
       delete prevSearchParams["page"];
 
-      router.replace(
+      router.push(
         `${pathname}?page=${num}&count=${count}&${new URLSearchParams(
           prevSearchParams,
         ).toString()}`,
@@ -118,7 +118,7 @@ const Pagination = ({
     delete prevSearchParams["count"];
     delete prevSearchParams["page"];
 
-    router.replace(
+    router.push(
       `${pathname}?page=${current + 1}&count=${count}&${new URLSearchParams(
         prevSearchParams,
       ).toString()}`,

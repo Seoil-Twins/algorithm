@@ -46,11 +46,14 @@ const fetchAlrams = async () => {
       },
       board: {
         boardId: 2234,
+        boardType: 1,
         userId: 1,
         username: "닉네임1",
         title: "님들 산타가 언제 쉬는지 암?",
         content: "산타 클로스(close) 촤하하하하",
         tags: ["질문", "Java", "피보나치 수"],
+        commentTotal: 500,
+        likeTotal: 500,
         createdTime: "2023-12-25 12:25:25",
       },
       content: "회원님이 작성하신 글에 댓글을 남기셨습니다.",
@@ -77,9 +80,12 @@ const fetchAlrams = async () => {
       board: {
         boardId: 2234,
         userId: 1,
+        boardType: 2,
         username: "닉네임1",
         title: "님들 산타가 언제 쉬는지 암?",
         content: "산타 클로스(close) 촤하하하하",
+        commentTotal: 50,
+        likeTotal: 50,
         tags: ["질문", "Java", "피보나치 수"],
         createdTime: "2023-12-25 12:25:25",
       },
@@ -106,10 +112,13 @@ const fetchAlrams = async () => {
       },
       board: {
         boardId: 2234,
+        boardType: 3,
         userId: 1,
         username: "닉네임1",
         title: "님들 산타가 언제 쉬는지 암?",
         content: "산타 클로스(close) 촤하하하하",
+        commentTotal: 50,
+        likeTotal: 50,
         tags: ["질문", "Java", "피보나치 수"],
         createdTime: "2023-12-25 12:25:25",
       },
@@ -138,12 +147,12 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   const [alrams, setAlrams] = useState<Alram[]>([]);
 
   const onAlramClick = useCallback((event: MouseEvent) => {
-    const insideOther = alramModalRef.current?.contains(event.target as Node);
+    const insideAlram = alramModalRef.current?.contains(event.target as Node);
     const insideProfileImg = alramImgRef.current?.contains(
       event.target as Node,
     );
 
-    if (insideOther || insideProfileImg) {
+    if (insideAlram || insideProfileImg) {
       return;
     }
 

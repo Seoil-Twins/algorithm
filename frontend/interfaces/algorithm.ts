@@ -1,9 +1,12 @@
-import { AlgorithmImage } from "./algorithmImage";
 import { Testcase } from "./testcase";
 
 export interface Algorithm {
   algorithmId: number;
-  userId: number;
+  user: {
+    userId: number;
+    profile?: string;
+    nickname: string;
+  };
   title: string;
   level: string;
   algorithmKind: number;
@@ -12,7 +15,8 @@ export interface Algorithm {
   limitMem: string;
   createdTime: string;
   content: string;
-  tags: string[];
-  images?: AlgorithmImage[];
+  kinds: string[];
   testcase: Testcase[];
+  solved?: boolean;
+  solvedRate: number;
 }

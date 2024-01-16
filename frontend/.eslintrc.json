@@ -16,7 +16,7 @@
     "browser": true
   },
   "root": true,
-  "ignorePatterns": ["node_modules/", "tsconfig.json"],
+  "ignorePatterns": ["node_modules/", "tsconfig.json", "next.config.js"],
   "rules": {
     "no-console": "off",
     "import/no-extraneous-dependencies": "off",

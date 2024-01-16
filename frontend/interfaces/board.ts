@@ -5,6 +5,7 @@ export default interface Board {
   username: string;
   title: string;
   content: string;
+  thumbnail?: string;
   tags: string[];
   solved?: boolean;
   likeTotal: number;

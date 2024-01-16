@@ -1,0 +1,75 @@
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: auto;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid $blueBorder;
+  background-color: $white;
+  cursor: pointer;
+
+  .button {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    & > img {
+      position: relative;
+      top: 2px;
+      margin-left: 5px;
+    }
+
+    span {
+      text-align: left;
+      word-break: keep-all;
+    }
+  }
+
+  .modal {
+    position: absolute;
+    left: 0;
+    top: 45px;
+    width: 100%;
+    background-color: $white;
+    z-index: 55;
+
+    .itemBox {
+      overflow: hidden;
+      overflow-y: auto;
+      max-height: 266px;
+      border-radius: 8px;
+      border: 1px solid $blueBorder;
+
+      .item {
+        width: 100%;
+        padding: 10px 15px;
+        cursor: pointer;
+
+        button {
+          text-align: left;
+        }
+      }
+    }
+  }
+}
+
+@include desktop {
+  .dropdown {
+    height: 40px;
+  }
+}
+
+@include tablet {
+  .dropdown {
+    height: 40px;
+  }
+}
+
+@include mobile {
+  .dropdown {
+    height: 50px;
+  }
+}
