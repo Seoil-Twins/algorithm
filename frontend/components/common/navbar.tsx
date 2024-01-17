@@ -17,7 +17,7 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import { Alram } from "@/interfaces/alram";
 
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 import { MenuItems } from "./navigation";
 

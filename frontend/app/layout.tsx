@@ -8,7 +8,8 @@ import { notosansRegular } from "@/styles/_font";
 import Navigation from "@/components/common/navigation";
 import Footer from "@/components/common/footer";
 
-import { AuthProvider } from "@/providers/AuthProvider";
+import { AuthProvider } from "@/providers/authProvider";
+import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 
 export const metadata: Metadata = {
   title: "Algorithm",
@@ -24,9 +25,11 @@ export default async function RootLayout({
     <html lang="ko">
       <body className={`${notosansRegular.className}`}>
         <AuthProvider>
-          <Navigation />
-          <div className="mainCenterBox">{children}</div>
-          <Footer />
+          <CodeTypeProvider>
+            <Navigation />
+            <div className="mainCenterBox">{children}</div>
+            <Footer />
+          </CodeTypeProvider>
         </AuthProvider>
       </body>
     </html>

@@ -715,6 +715,36 @@ export const getAlgorithms = async (
   };
 };
 
+export const getAlgorithm = async (algorithmId: number): Promise<Algorithm> => {
+  return {
+    algorithmId: 369,
+    user: {
+      userId: 1,
+      nickname: "1",
+    },
+    title: "PIZZZA ALVOLOC",
+    level: "1",
+    algorithmKind: 1001,
+    algorithmCompe: 2001,
+    limitTime: "2.0",
+    limitMem: "256",
+    createdTime: "2020-12-12 12:12:12",
+    content:
+      "상근이는 우리나라에서 가장 유명한 놀이 공원을 운영하고 있다. 이 놀이 공원은 야외에 있고, 다양한 롤러코스터가 많이 있다. 어느날 벤치에 앉아있던 상근이는 상상을 해보았다. 롤러코스터가 이쪽으로 가고 저쪽으로 간다면?",
+    kinds: ["그리디 알고리즘", "구현", "해 구성하기"],
+    testcase: [
+      {
+        testcaseId: 1,
+        algorithmId: 369,
+        input: [3, 5, 3, 2],
+        output: [13],
+      },
+    ],
+    solved: true,
+    solvedRate: 80,
+  };
+};
+
 export const getRecommendAlgorithms = async (): Promise<Algorithm[]> => {
   return [
     {

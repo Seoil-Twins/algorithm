@@ -1,0 +1,29 @@
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 75px;
+  padding: 0 20px;
+  background-color: #0a0e1b;
+  color: $white;
+
+  .chapter {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      display: block;
+      height: 35px;
+      margin-right: 15px;
+    }
+
+    .m15 {
+      margin: 0 15px;
+    }
+  }
+}

@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "./app/api/sessionConfig";
 import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 
+const routes = ["/algorithm/detail/*"];
+
 export default async function middleware(req: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   const pathname = req.nextUrl.pathname;
@@ -25,10 +27,23 @@ export default async function middleware(req: NextRequest) {
     url.pathname = "/activity/question";
     return NextResponse.redirect(url);
   }
+  if (
+    pathname.includes("/algorithm/detail/") &&
+    !pathname.includes("css") &&
+    !pathname.includes("js")
+  ) {
+    const splitedPathname = pathname.split("/");
+    const algorithmId = splitedPathname[splitedPathname.length - 1];
+
+    if (isNaN(Number(algorithmId))) {
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", ...NO_AUTH_PATHS, ...AUTH_PATHS],
+  matcher: ["/", ...NO_AUTH_PATHS, ...AUTH_PATHS, ...routes],
 };

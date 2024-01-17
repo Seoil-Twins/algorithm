@@ -10,7 +10,7 @@ import { User } from "@/interfaces/user";
 
 import { updateProfileImg, updateProfileUser } from "@/api/user";
 
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 import Input from "@/components/common/input";
 

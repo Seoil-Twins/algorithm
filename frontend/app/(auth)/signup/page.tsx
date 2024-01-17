@@ -16,7 +16,7 @@ import {
   validationPassword,
 } from "@/utils/validation";
 
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 interface SignupProperty {
   nickname?: string;

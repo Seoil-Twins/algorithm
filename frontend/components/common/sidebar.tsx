@@ -15,7 +15,7 @@ import styles from "./sidebar.module.scss";
 
 import { MenuItems } from "./navigation";
 
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 type SidebarProps = {
   menuItems: MenuItems[];

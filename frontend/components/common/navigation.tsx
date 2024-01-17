@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import styles from "./navigation.module.scss";
 
 import { AUTH_PATHS } from "@/constants";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 const DynamicNavbar = dynamic(() => import("./navbar"), { ssr: false });
 const DynamicSidebar = dynamic(() => import("./sidebar"), { ssr: false });
@@ -75,13 +75,17 @@ const Navigation = () => {
   }, [session.sessionId, pathname, isLoading, router]);
 
   return (
-    <header className={styles.headerBox}>
-      {isMobile ? (
-        <DynamicSidebar menuItems={menuItems} />
-      ) : (
-        <DynamicNavbar menuItems={menuItems} />
+    <>
+      {!pathname.includes("/algorithm/detail/") && (
+        <header className={styles.headerBox}>
+          {isMobile ? (
+            <DynamicSidebar menuItems={menuItems} />
+          ) : (
+            <DynamicNavbar menuItems={menuItems} />
+          )}
+        </header>
       )}
-    </header>
+    </>
   );
 };
 

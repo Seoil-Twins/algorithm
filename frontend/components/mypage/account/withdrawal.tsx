@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/providers/authProvider";
 
 const Withdrawal = () => {
   const { logout } = useAuth()!;
