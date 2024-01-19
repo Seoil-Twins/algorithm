@@ -11,6 +11,12 @@ import Footer from "@/components/common/footer";
 import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 
+declare global {
+  interface Window {
+    Kakao: any;
+  }
+}
+
 export const metadata: Metadata = {
   title: "Algorithm",
   description: "Alogrithm Site",

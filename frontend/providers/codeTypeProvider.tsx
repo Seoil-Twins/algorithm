@@ -7,15 +7,17 @@ import React, {
   Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
 } from "react";
 
 import { KindOptions } from "@/api/algorithm";
 
-type CodeType = Exclude<KindOptions, "a">;
+export type CodeType = Exclude<KindOptions, "a">;
+export const CODE_TYPE_OPTIONS_ARRAY: CodeType[] = ["c", "p", "j"];
 
 type CodeTypeProviderContext = {
   type: CodeType;
-  setType: Dispatch<SetStateAction<CodeType>>;
+  setType: (value: CodeType) => void;
 };
 
 const CodeTypeContext = createContext<CodeTypeProviderContext>({
@@ -23,8 +25,27 @@ const CodeTypeContext = createContext<CodeTypeProviderContext>({
   setType: () => {},
 });
 
+export const checkMyType = (compareArray: CodeType[], value: CodeType) => {
+  return compareArray.includes(value);
+};
+
 export const CodeTypeProvider = ({ children }: { children: ReactNode }) => {
-  const [type, setType] = useState<CodeType>("p");
+  const [type, setStateType] = useState<CodeType>("p");
+
+  useEffect(() => {
+    const codeType = window.localStorage.getItem("codeType") || "p";
+
+    setStateType(
+      checkMyType(CODE_TYPE_OPTIONS_ARRAY, codeType as CodeType)
+        ? (codeType as CodeType)
+        : "p",
+    );
+  }, [type]);
+
+  const setType = (value: CodeType) => {
+    window.localStorage.setItem("codeType", value);
+    setStateType(value);
+  };
 
   return (
     <CodeTypeContext.Provider value={{ type, setType }}>

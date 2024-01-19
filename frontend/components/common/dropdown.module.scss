@@ -2,7 +2,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: auto;
+  height: 40px;
   padding: 0 15px;
   border-radius: 8px;
   border: 1px solid $blueBorder;
@@ -33,7 +33,6 @@
     left: 0;
     top: 45px;
     width: 100%;
-    background-color: $white;
     z-index: 55;
 
     .itemBox {
@@ -42,6 +41,7 @@
       max-height: 266px;
       border-radius: 8px;
       border: 1px solid $blueBorder;
+      background-color: $white;
 
       .item {
         width: 100%;
@@ -53,23 +53,5 @@
         }
       }
     }
-  }
-}
-
-@include desktop {
-  .dropdown {
-    height: 40px;
-  }
-}
-
-@include tablet {
-  .dropdown {
-    height: 40px;
-  }
-}
-
-@include mobile {
-  .dropdown {
-    height: 50px;
   }
 }

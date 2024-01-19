@@ -12,7 +12,7 @@ export type DropdownItem = {
 };
 
 type DropdownProps = {
-  isVisible?: boolean;
+  isVisible: boolean;
   queryKey?: string;
   defaultTitle: string;
   items: DropdownItem[];
@@ -32,6 +32,7 @@ const Dropdown = ({
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [title, setTitle] = useState<string>(defaultTitle);
+  console.log(title);
 
   const handleVisible = useCallback(
     (event: MouseEvent) => {
@@ -74,6 +75,10 @@ const Dropdown = ({
       document.body.removeEventListener("click", handleVisible);
     };
   }, [isVisible, handleClick, handleVisible]);
+
+  useEffect(() => {
+    setTitle(defaultTitle);
+  }, [defaultTitle]);
 
   return (
     <div

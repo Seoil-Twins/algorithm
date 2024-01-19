@@ -15,8 +15,10 @@ export interface Algorithm {
   limitMem: string;
   createdTime: string;
   content: string;
+  thumbnail?: string;
   kinds: string[];
   testcase: Testcase[];
+  isSave: boolean;
   solved?: boolean;
   solvedRate: number;
 }
