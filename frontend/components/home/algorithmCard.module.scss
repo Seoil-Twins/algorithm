@@ -8,7 +8,7 @@
   .itemBox {
     padding: 25px;
     border-radius: 12px;
-    background-color: $white;
+    background-color: var(--color-modal-background);
 
     .id {
       text-align: right;
@@ -59,6 +59,13 @@
   }
 }
 
+[data-theme="dark"] {
+  .moreBtn {
+    border: 1px solid var(--color-border) !important;
+    background-color: #23262f !important;
+  }
+}
+
 @media screen and (min-width: 769px) and (max-width: 1024px) {
   .cardBox {
     grid-template-columns: 1fr 1fr;
@@ -68,5 +75,10 @@
 @media screen and (max-width: 768px) {
   .cardBox {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto auto;
+
+    .title {
+      text-wrap: wrap !important;
+    }
   }
 }

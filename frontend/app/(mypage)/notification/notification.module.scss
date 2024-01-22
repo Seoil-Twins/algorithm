@@ -9,13 +9,21 @@
     .title {
       margin-bottom: 3px;
       font-size: 0.875rem;
-      color: $grayText;
+      color: var(--color-primary-gray-text);
     }
 
     .bottom {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
+    }
+  }
+}
+
+@include mobile {
+  .bottom {
+    button {
+      margin-left: 10px;
     }
   }
 }

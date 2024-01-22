@@ -4,8 +4,8 @@
   align-items: center;
   width: 100%;
   min-height: 75px;
-  background-color: #0a0e1b;
-  color: $white;
+  background-color: var(--color-deep-background);
+  color: var(--color-primary-text);
 
   .chapter {
     display: flex;

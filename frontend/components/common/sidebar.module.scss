@@ -19,6 +19,15 @@
       }
     }
 
+    .right {
+      display: flex;
+      align-items: center;
+
+      .themeBtn {
+        margin-right: 15px;
+      }
+    }
+
     .hamburger {
       cursor: pointer;
     }
@@ -30,7 +39,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: $white;
+    background-color: var(--color-background);
     z-index: 100;
 
     .close {
@@ -54,7 +63,7 @@
         align-items: center;
         width: 7.5rem;
         height: 4.25rem;
-        border-bottom: 1px solid $blueBorder;
+        border-bottom: 1px solid var(--color-border);
       }
 
       .active {
@@ -70,7 +79,7 @@
       transform: translateX(-50%);
       display: flex;
       align-items: center;
-      color: $grayText;
+      color: var(--color-primary-gray-text);
       cursor: pointer;
 
       .mlr10 {

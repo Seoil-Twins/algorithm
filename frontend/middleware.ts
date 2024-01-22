@@ -27,8 +27,12 @@ export default async function middleware(req: NextRequest) {
     url.pathname = "/activity/question";
     return NextResponse.redirect(url);
   }
+
+  // eslint-disable-next-line no-useless-escape
+  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
+
   if (
-    pathname.includes("/algorithm/detail/") &&
+    regex.test(pathname) &&
     !pathname.includes("css") &&
     !pathname.includes("js")
   ) {

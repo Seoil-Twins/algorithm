@@ -34,7 +34,7 @@
       align-items: center;
       font-size: 0.875rem;
 
-      img {
+      div {
         margin-right: 3px;
       }
 
@@ -48,7 +48,7 @@
       text-wrap: nowrap;
       text-overflow: ellipsis;
       font-size: 0.875rem;
-      color: $grayText;
+      color: var(--color-primary-gray-text);
     }
 
     .createdTime {
@@ -56,7 +56,7 @@
       display: flex;
       justify-content: flex-end;
       font-size: 0.875rem;
-      color: $grayText;
+      color: var(--color-primary-gray-text);
     }
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import ThemeImage from "@/components/common/themeImage";
 import Image from "next/image";
 import Script from "next/script";
 import { useCallback, useState } from "react";
@@ -72,7 +73,13 @@ const Share = ({ algorithmId, title, description, thumbnail }: ShareProps) => {
         onLoad={onLoadKakao}
       />
       <button onClick={share}>
-        <Image src="/svgs/share.svg" alt="공유" width={25} height={25} />
+        <ThemeImage
+          lightSrc="/svgs/share_black.svg"
+          darkSrc="/svgs/share_white.svg"
+          alt="공유"
+          width={25}
+          height={25}
+        />
       </button>
     </>
   );

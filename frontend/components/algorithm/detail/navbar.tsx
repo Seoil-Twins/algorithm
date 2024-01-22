@@ -11,6 +11,8 @@ import { Algorithm } from "@/interfaces/algorithm";
 
 import Share from "./share";
 import Dropdown from "@/components/common/dropdown";
+import ThemeSwitch from "@/components/common/themeSwitch";
+import ThemeImage from "@/components/common/themeImage";
 
 import {
   CODE_TYPE_OPTIONS_ARRAY,
@@ -108,8 +110,9 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
         />
         {algorithm.isSave ? (
           <button className={styles.btn}>
-            <Image
-              src="/svgs/bookmark_active.svg"
+            <ThemeImage
+              lightSrc="/svgs/bookmark_active_black.svg"
+              darkSrc="/svgs/bookmark_active_white.svg"
               alt="북마크"
               width={28}
               height={28}
@@ -117,17 +120,16 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
           </button>
         ) : (
           <button className={styles.btn} onClick={handleBoomark}>
-            <Image
-              src="/svgs/bookmark_none.svg"
+            <ThemeImage
+              lightSrc="/svgs/bookmark_none_black.svg"
+              darkSrc="/svgs/bookmark_none_white.svg"
               alt="북마크"
               width={28}
               height={28}
             />
           </button>
         )}
-        <button className={styles.btn}>
-          <Image src="/svgs/sun.svg" alt="밝은 모드" width={28} height={28} />
-        </button>
+        <ThemeSwitch className={styles.btn} />
         <Dropdown
           defaultTitle={defaultTitle}
           items={codeTypeDropdownItems}

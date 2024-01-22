@@ -1,7 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import ThemeImage from "./themeImage";
 
 import styles from "./dropdown.module.scss";
 import { notosansMedium } from "@/styles/_font";
@@ -32,7 +33,6 @@ const Dropdown = ({
   const modalRef = useRef<HTMLDivElement>(null);
 
   const [title, setTitle] = useState<string>(defaultTitle);
-  console.log(title);
 
   const handleVisible = useCallback(
     (event: MouseEvent) => {
@@ -88,8 +88,9 @@ const Dropdown = ({
     >
       <button className={styles.button}>
         <span className={notosansMedium.className}>{title}</span>
-        <Image
-          src="/svgs/arrow_down.svg"
+        <ThemeImage
+          lightSrc="/svgs/arrow_down_black.svg"
+          darkSrc="/svgs/arrow_down_white.svg"
           alt="화살표 아래"
           width={20}
           height={20}

@@ -1,7 +1,7 @@
 .btn {
   position: relative;
-  width: 3.75rem;
-  height: 1.875rem;
+  min-width: 3.75rem;
+  min-height: 1.875rem;
   border-radius: 15px;
 
   .circle {
@@ -12,6 +12,28 @@
     height: 1.5rem;
     background-color: $white;
     border-radius: 100px;
+  }
+}
+
+.active {
+  background-color: $primaryColor;
+
+  .circle {
+    animation: moveOn 0.5s forwards;
+  }
+}
+
+.none {
+  background-color: #efefef;
+
+  .circle {
+    animation: moveOff 0.5s forwards;
+  }
+}
+
+[data-theme="dark"] {
+  .none {
+    background-color: #090e1b;
   }
 }
 
@@ -32,21 +54,5 @@
 
   100% {
     left: 8%;
-  }
-}
-
-.active {
-  background-color: $primaryColor;
-
-  .circle {
-    animation: moveOn 0.5s forwards;
-  }
-}
-
-.none {
-  background-color: #efefef;
-
-  .circle {
-    animation: moveOff 0.5s forwards;
   }
 }

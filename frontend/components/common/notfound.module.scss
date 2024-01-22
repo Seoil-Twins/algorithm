@@ -5,8 +5,8 @@
   margin-top: 20px;
   padding: 45px 0px;
   border-radius: 8px;
-  border: 1px solid $blueBorder;
-  background-color: $white;
+  border: 1px solid var(--color-boder);
+  background-color: var(--color-background);
 
   .dynamicImg {
     @include dynamicImg;
@@ -23,7 +23,7 @@
     }
 
     .desc {
-      font-size: $grayText;
+      font-size: var(--color-primary-gray-text);
     }
   }
 }

@@ -3,7 +3,7 @@
   flex-direction: column;
   padding: 25px 40px;
   border-radius: 12px;
-  background-color: $white;
+  background-color: var(--color-modal-background);
 
   .title,
   .desc {
@@ -17,7 +17,7 @@
 
   .desc {
     margin-bottom: 15px;
-    color: #4c4c4d;
+    color: var(--color-primary-gray-text);
   }
 
   .mb20 {
@@ -55,8 +55,8 @@
   }
 
   .disabledBtn {
-    border: 1px solid $grayText;
-    color: $grayText;
+    border: 1px solid var(--color-primary-gray-text);
+    color: var(--color-primary-gray-text);
     cursor: default;
   }
 

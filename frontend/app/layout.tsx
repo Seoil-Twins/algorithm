@@ -10,6 +10,7 @@ import Footer from "@/components/common/footer";
 
 import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
+import ThemeProvider from "@/providers/themeProvider";
 
 declare global {
   interface Window {
@@ -28,13 +29,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body className={`${notosansRegular.className}`}>
         <AuthProvider>
           <CodeTypeProvider>
-            <Navigation />
-            <div className="mainCenterBox">{children}</div>
-            <Footer />
+            <ThemeProvider>
+              <Navigation />
+              <div className="mainCenterBox">{children}</div>
+              <Footer />
+            </ThemeProvider>
           </CodeTypeProvider>
         </AuthProvider>
       </body>

@@ -1,0 +1,34 @@
+.mainCenterBox {
+  max-width: none;
+  padding: 0;
+}
+
+.ql-container {
+  font-family: inherit !important;
+}
+
+.ql-editor {
+  font-size: 1rem;
+  padding: 0 !important;
+  white-space: normal !important;
+}
+
+.cm-scroller,
+.cm-gutter {
+  background-color: var(--color-background);
+}
+
+.ql-editor pre {
+  margin-top: 5px !important;
+  background-color: #e2e2e2 !important;
+}
+
+.ql-editor img {
+  width: 100%;
+}
+
+[data-theme="dark"] {
+  .ql-editor pre {
+    background-color: #32394f !important;
+  }
+}

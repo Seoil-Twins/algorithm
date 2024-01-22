@@ -4,10 +4,10 @@
   align-items: center;
   flex-direction: column;
   padding-bottom: 50px;
-  background-color: $lightBackground;
+  background-color: var(--color-background);
 
   .grayText {
-    color: $grayText;
+    color: var(--color-primary-gray-text);
   }
 
   .underline {

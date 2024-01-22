@@ -49,8 +49,8 @@
 
 @mixin disabledBtn {
   @include btn;
-  border: 1px solid $grayText;
-  color: $grayText;
+  border: 1px solid var(--color-primary-gray-text);
+  color: var(--color-primary-gray-text);
   cursor: default;
 }
 

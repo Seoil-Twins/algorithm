@@ -8,8 +8,8 @@
     margin-bottom: 25px;
     padding: 1.5625rem 2.8125rem;
     border-radius: 10px;
-    border: 1px solid $blueBorder;
-    background-color: $white;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-modal-background);
   }
 }
 

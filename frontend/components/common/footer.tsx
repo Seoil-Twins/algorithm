@@ -4,15 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import ThemeImage from "./themeImage";
+
 import styles from "./footer.module.scss";
 import { notosansMedium } from "@/styles/_font";
 
 const Footer = () => {
+  // eslint-disable-next-line no-useless-escape
+  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
   const pathname = usePathname();
 
   return (
     <>
-      {!pathname.includes("/algorithm/detail/") && (
+      {!regex.test(pathname) && (
         <div className={styles.footer}>
           <div className={styles.centerBox}>
             <div className={styles.contactBox}>
@@ -20,16 +24,16 @@ const Footer = () => {
                 <Image
                   src="/svgs/logo.svg"
                   alt="로고 이미지"
-                  sizes="100vw"
-                  width={0}
-                  height={0}
+                  width={36}
+                  height={36}
                 />
               </div>
               <div>
                 <div className={styles.infoBox}>
                   <div className={styles.img}>
-                    <Image
-                      src="/svgs/email.svg"
+                    <ThemeImage
+                      lightSrc="/svgs/email_black.svg"
+                      darkSrc="/svgs/email_white.svg"
                       alt="이메일 아이콘"
                       width={20}
                       height={20}
@@ -41,8 +45,9 @@ const Footer = () => {
                 </div>
                 <div className={styles.infoBox}>
                   <div className={styles.img}>
-                    <Image
-                      src="/svgs/email.svg"
+                    <ThemeImage
+                      lightSrc="/svgs/email_black.svg"
+                      darkSrc="/svgs/email_white.svg"
                       alt="이메일 아이콘"
                       width={20}
                       height={20}
@@ -54,8 +59,9 @@ const Footer = () => {
                 </div>
                 <div className={styles.infoBox}>
                   <div className={styles.img}>
-                    <Image
-                      src="/svgs/phone.svg"
+                    <ThemeImage
+                      lightSrc="/svgs/phone_black.svg"
+                      darkSrc="/svgs/phone_white.svg"
                       alt="전화 아이콘"
                       width={20}
                       height={20}
@@ -85,8 +91,9 @@ const Footer = () => {
               <div className={styles.snsLineBox}>
                 <div className={styles.imgBox}>
                   <Link href="https://www.facebook.com" target="_blank">
-                    <Image
-                      src="/svgs/facebook.svg"
+                    <ThemeImage
+                      lightSrc="/svgs/facebook_black.svg"
+                      darkSrc="/svgs/facebook_white.svg"
                       alt="페이스북"
                       width={24}
                       height={24}
@@ -95,8 +102,9 @@ const Footer = () => {
                 </div>
                 <div className={styles.imgBox}>
                   <Link href="https://www.twitter.com" target="_blank">
-                    <Image
-                      src="/svgs/twitter.svg"
+                    <ThemeImage
+                      lightSrc="/svgs/twitter_black.svg"
+                      darkSrc="/svgs/twitter_white.svg"
                       alt="트위터"
                       width={24}
                       height={24}

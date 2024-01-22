@@ -6,7 +6,7 @@
   .itemBox {
     padding: 25px;
     border-radius: 12px;
-    background-color: $white;
+    background-color: var(--color-modal-background);
 
     .imgBox {
       display: flex;
@@ -15,7 +15,7 @@
       width: 100%;
       height: 280px;
       margin-bottom: 15px;
-      background-color: $lightBackground;
+      background-color: var(--color-background);
 
       img {
         @include dynamicImg;
@@ -45,7 +45,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 14px;
-      color: $grayText;
+      color: var(--color-primary-gray-text);
     }
 
     .moreBtn {
@@ -56,7 +56,7 @@
       height: 44px;
       padding: 0 10px;
       border-radius: 8px;
-      background-color: $lightBackground;
+      background-color: var(--color-background);
     }
   }
 

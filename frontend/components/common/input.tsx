@@ -62,6 +62,7 @@ const BaseInput = ({
       disabled={disabled}
       className={styles.input}
       maxLength={length}
+      autoComplete="none"
     />
   );
 };

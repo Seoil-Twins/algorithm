@@ -8,9 +8,8 @@ import styles from "./navigation.module.scss";
 
 import { AUTH_PATHS } from "@/constants";
 import { useAuth } from "@/providers/authProvider";
-
-const DynamicNavbar = dynamic(() => import("./navbar"), { ssr: false });
-const DynamicSidebar = dynamic(() => import("./sidebar"), { ssr: false });
+import Sidebar from "./sidebar";
+import Navbar from "./navbar";
 
 export type MenuItems = {
   title: string;
@@ -18,6 +17,8 @@ export type MenuItems = {
 };
 
 const Navigation = () => {
+  // eslint-disable-next-line no-useless-escape
+  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
   const menuItems: MenuItems[] = [
     {
       title: "메인",
@@ -76,12 +77,12 @@ const Navigation = () => {
 
   return (
     <>
-      {!pathname.includes("/algorithm/detail/") && (
+      {!regex.test(pathname) && (
         <header className={styles.headerBox}>
           {isMobile ? (
-            <DynamicSidebar menuItems={menuItems} />
+            <Sidebar menuItems={menuItems} />
           ) : (
-            <DynamicNavbar menuItems={menuItems} />
+            <Navbar menuItems={menuItems} />
           )}
         </header>
       )}

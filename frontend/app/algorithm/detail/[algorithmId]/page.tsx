@@ -21,33 +21,13 @@ const Detail = async ({ params }: { params: PageParams }) => {
           padding: 0;
         }
 
-        .ql-container {
-          font-family: inherit !important;
-        }
-
-        .ql-editor {
-          font-size: 1rem;
-          padding: 0 !important;
-          white-space: normal !important;
-        }
-
         .cm-scroller,
         .cm-gutter {
-          background-color: #1d202a;
-        }
-
-        .ql-editor pre {
-          margin-top: 5px !important;
-          background-color: #32394f !important;
-        }
-
-        .ql-editor img {
-          width: 100%;
+          background-color: var(--color-background);
         }
       `}</style>
       <Navbar algorithm={algorithm} />
       <Contents algorithm={algorithm} />
-      <footer style={{ height: "44px" }}>footer</footer>
     </div>
   );
 };

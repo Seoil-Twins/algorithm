@@ -2,8 +2,8 @@
   height: fit-content;
   padding: 1.5625rem 0.9375rem;
   border-radius: 8px;
-  border: 1px solid $blueBorder;
-  background-color: $white;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-modal-background);
 
   .title {
     margin-bottom: 0.9375rem;
@@ -16,13 +16,21 @@
     padding: 0.625rem;
     border-radius: 5px;
 
-    .menuIcon {
+    .iconBox {
+      width: 25px;
+      height: 25px;
+      max-width: 25px;
+      max-height: 25px;
       margin-right: 10px;
+
+      .icon {
+        display: block;
+      }
     }
   }
 
   .active {
-    background-color: #f1f1f3;
+    background-color: var(--color-deep-background);
   }
 }
 

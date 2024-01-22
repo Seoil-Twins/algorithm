@@ -23,7 +23,7 @@
     height: 100%;
     border-radius: 3px;
     border: 1px solid #cacad6;
-    background-color: $white;
+    background-color: var(--color-background);
 
     img {
       display: block;

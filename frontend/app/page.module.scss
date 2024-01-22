@@ -11,7 +11,7 @@
     margin-bottom: 20px;
     padding: 14px 20px;
     border-radius: 11px;
-    background-color: $white;
+    background-color: var(--color-modal-background);
 
     .brightImg {
       position: absolute;
@@ -25,7 +25,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-right: 10px;
       padding: 14px;
       border-radius: 6px;
       background-color: #fff4e5;
@@ -97,7 +96,7 @@
       align-items: center;
       padding: 10px 20px;
       border-radius: 8px;
-      background-color: $white;
+      background-color: var(--color-modal-background);
     }
   }
 }
@@ -113,5 +112,23 @@
     .title {
       justify-content: center;
     }
+  }
+}
+
+@media (min-width: 406px) {
+  .topBox {
+    .imgBox {
+      margin-right: 10px;
+    }
+  }
+}
+
+@media (max-width: 405px) {
+  .imgBox {
+    flex-direction: column;
+    width: 64px;
+    height: 64px;
+    margin-right: 0;
+    margin-bottom: 10px;
   }
 }

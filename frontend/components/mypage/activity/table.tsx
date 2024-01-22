@@ -9,6 +9,7 @@ import { BoardType } from "@/interfaces/boardType";
 
 import { getTimeAgo } from "@/utils/day";
 import { useCallback } from "react";
+import ThemeImage from "@/components/common/themeImage";
 
 type TableProps = {
   boardTypes: BoardType[];
@@ -58,16 +59,18 @@ const Table = ({ boardTypes, items }: TableProps) => {
                 />
               )}
               {item.solved !== undefined && item.solved === false && (
-                <Image
-                  src="/svgs/selection_none.svg"
+                <ThemeImage
+                  lightSrc="/svgs/selection_black.svg"
+                  darkSrc="/svgs/selection_white.svg"
                   alt="미 해결 아이콘"
                   width={18}
                   height={18}
                   className={styles.mr10}
                 />
               )}
-              <Image
-                src="/svgs/thumb_up.svg"
+              <ThemeImage
+                lightSrc="/svgs/thumb_up_black.svg"
+                darkSrc="/svgs/thumb_up_white.svg"
                 alt="좋아요 아이콘"
                 width={18}
                 height={18}
@@ -75,8 +78,9 @@ const Table = ({ boardTypes, items }: TableProps) => {
               <span className={styles.mr10}>{item.likeTotal}</span>
               {item.commentTotal !== undefined && (
                 <>
-                  <Image
-                    src="/svgs/comment.svg"
+                  <ThemeImage
+                    lightSrc="/svgs/comment_black.svg"
+                    darkSrc="/svgs/comment_white.svg"
                     alt="댓글 아이콘"
                     width={18}
                     height={18}

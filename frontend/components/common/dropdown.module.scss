@@ -5,8 +5,8 @@
   height: 40px;
   padding: 0 15px;
   border-radius: 8px;
-  border: 1px solid $blueBorder;
-  background-color: $white;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-modal-background);
   cursor: pointer;
 
   .button {
@@ -40,8 +40,8 @@
       overflow-y: auto;
       max-height: 266px;
       border-radius: 8px;
-      border: 1px solid $blueBorder;
-      background-color: $white;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-modal-background);
 
       .item {
         width: 100%;

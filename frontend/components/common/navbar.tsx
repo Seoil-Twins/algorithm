@@ -20,6 +20,8 @@ import { Alram } from "@/interfaces/alram";
 import { useAuth } from "@/providers/authProvider";
 
 import { MenuItems } from "./navigation";
+import ThemeSwitch from "./themeSwitch";
+import ThemeImage from "./themeImage";
 
 type NavbarProps = {
   menuItems: MenuItems[];
@@ -195,21 +197,6 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     logout();
   }, [logout]);
 
-  useEffect(() => {
-    menuItems.map((menu, idx) => {
-      const ele = menuRefs.current[idx];
-      if (!ele.current) return;
-
-      if (menu.link == path) {
-        ele.current.style.backgroundColor = "#EFEFEF";
-        ele.current.style.color = "#ff9500";
-      } else {
-        ele.current.style.backgroundColor = "transparent";
-        ele.current.style.color = "#222222";
-      }
-    });
-  }, [menuItems, path]);
-
   const callFetchAlrams = useCallback(async () => {
     const fetchedAlrams = await fetchAlrams();
     const newAlrams = [...alrams, ...fetchedAlrams];
@@ -242,7 +229,12 @@ const Navbar = ({ menuItems }: NavbarProps) => {
           {menuItems.map((menu: MenuItems, idx: number) => {
             return (
               <Link href={menu.link} key={idx}>
-                <div className={styles.menuItemBox} ref={menuRefs.current[idx]}>
+                <div
+                  className={`${styles.menuItemBox} ${
+                    menu.link === path ? styles.active : styles.none
+                  }`}
+                  ref={menuRefs.current[idx]}
+                >
                   {menu.title}
                 </div>
               </Link>
@@ -250,16 +242,18 @@ const Navbar = ({ menuItems }: NavbarProps) => {
           })}
         </div>
         {!isLoading && (
-          <div>
+          <>
             {session.sessionId && user ? (
               <div className={styles.headerItem}>
+                <ThemeSwitch className={styles.theme} />
                 <div
                   className={styles.alramImgBox}
                   onClick={openAlramModal}
                   ref={alramImgRef}
                 >
-                  <Image
-                    src="/svgs/alram.svg"
+                  <ThemeImage
+                    lightSrc="/svgs/bell_black.svg"
+                    darkSrc="/svgs/bell_white.svg"
                     alt="알람 아이콘"
                     width={30}
                     height={30}
@@ -271,9 +265,8 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   onClick={openProfileModal}
                 >
                   {user.profile ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.profile}
+                    <Image
+                      src="/svgs/user_profile_default.svg"
                       alt="유저 아이콘"
                       width={38}
                       height={38}
@@ -290,6 +283,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
             ) : (
               <div className={styles.headerItem}>
+                <ThemeSwitch className={styles.theme} />
                 <Link href="/signup">
                   <div className={styles.menuItemBox}>회원가입</div>
                 </Link>
@@ -300,7 +294,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                 </Link>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
       <div ref={profileModalRef}>
@@ -312,8 +306,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
               <div className={styles.imgBox}>
                 {user.profile ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={user.profile}
                     alt="유저 아이콘"
                     width={80}
@@ -352,27 +345,29 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                 href="/account"
                 onClick={() => setIsOpenProfileModal(false)}
               >
-                <div className={styles.btn}>
-                  <Image
-                    src="/svgs/mypage_menu.svg"
-                    alt="마이페이지"
-                    width={20}
-                    height={20}
+                <button className={styles.btn}>
+                  <ThemeImage
+                    lightSrc="/svgs/mypage_menu_black.svg"
+                    darkSrc="/svgs/mypage_menu_white.svg"
+                    alt="알람 아이콘"
+                    width={18}
+                    height={18}
                     className={styles.img}
                   />
                   마이페이지
-                </div>
+                </button>
               </Link>
-              <div className={styles.btn} onClick={handleLogout}>
-                <Image
-                  src="/svgs/logout.svg"
-                  alt="로그아웃"
-                  width={20}
-                  height={20}
+              <button className={styles.btn} onClick={handleLogout}>
+                <ThemeImage
+                  lightSrc="/svgs/logout_black.svg"
+                  darkSrc="/svgs/logout_white.svg"
+                  alt="알람 아이콘"
+                  width={18}
+                  height={18}
                   className={styles.img}
                 />
                 로그아웃
-              </div>
+              </button>
             </div>
           </div>
         )}

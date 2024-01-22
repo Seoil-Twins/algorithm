@@ -6,15 +6,15 @@
     width: 100%;
     min-width: 600px;
     border-radius: 8px;
-    border: 1px solid $blueBorder;
-    background-color: $white;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-modal-background);
 
     .tr {
       display: flex;
       align-items: center;
 
       &:not(:last-child) {
-        border-bottom: 1px solid $blueBorder;
+        border-bottom: 1px solid var(--color-border);
       }
 
       .cell {

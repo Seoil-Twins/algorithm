@@ -86,21 +86,58 @@ iframe {
 }
 
 /* Custom Style */
+:root {
+  --color-primary-text: #222222;
+  --color-primary-gray-text: #656567;
+  --color-primary-reverse: #ffffff;
+  --color-background: #f7f7f8;
+  --color-deep-background: #e7e7e7;
+  --color-header-background: #f7f7f8;
+  --color-modal-background: #ffffff;
+  --color-border: #cacad6;
+  --color-scroller: #cacaca;
+}
+
+[data-theme="dark"] {
+  --color-primary-text: #f5f4f4;
+  --color-primary-gray-text: #b1b1b1;
+  --color-primary-reverse: #222222;
+  --color-background: #1d202a;
+  --color-deep-background: #090e1b;
+  --color-header-background: #1d202a;
+  --color-modal-background: #292c33;
+  --color-border: #6d6d6f;
+  --color-scroller: #343c46;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: red !important;
+  }
+}
+
 body {
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  color: #222222;
-  background-color: $lightBackground;
+  color: var(--color-primary-text);
+  background-color: var(--color-background);
 }
 
 input {
   font-family: inherit;
 
-  &::placeholder {
+  &::autofi &::placeholder {
     font-family: inherit;
   }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #222222;
 }
 
 input[type="button"] {
@@ -125,7 +162,7 @@ input[type="checkbox"] {
   border-radius: 4px;
   border: 1px solid #f1f1f3;
   background-color: #f7f7f8;
-  background-color: $lightBackground;
+  background-color: var(--color-background);
   vertical-align: middle;
   --tw-shadow: 0 0 #0000;
   cursor: pointer;

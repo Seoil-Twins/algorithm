@@ -11,7 +11,7 @@
 
     .profileImg {
       border-radius: 100px;
-      box-shadow: 1px 1px 2px $blueBorder;
+      box-shadow: 1px 1px 2px var(--color-border);
       cursor: pointer;
     }
 
@@ -30,7 +30,7 @@
       right: 5px;
       height: 25px;
       border-radius: 100px;
-      box-shadow: 1px 1px 3px $darkBackground;
+      box-shadow: 1px 1px 3px #000;
       cursor: pointer;
     }
   }
@@ -65,8 +65,8 @@
   }
 
   .disabledBtn {
-    border: 1px solid $grayText;
-    color: $grayText;
+    border: 1px solid var(--color-primary-gray-text);
+    color: var(--color-primary-gray-text);
     cursor: default;
   }
 

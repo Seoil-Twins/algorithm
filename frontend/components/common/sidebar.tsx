@@ -16,6 +16,8 @@ import styles from "./sidebar.module.scss";
 import { MenuItems } from "./navigation";
 
 import { useAuth } from "@/providers/authProvider";
+import ThemeImage from "./themeImage";
+import ThemeSwitch from "./themeSwitch";
 
 type SidebarProps = {
   menuItems: MenuItems[];
@@ -59,21 +61,6 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     menuRefs.current = customMenuItems.map(() => createRef());
   }, [customMenuItems]);
 
-  useEffect(() => {
-    customMenuItems.map((menu, idx) => {
-      const ele = menuRefs.current[idx];
-      if (!ele.current) return;
-
-      if (menu.link == path) {
-        ele.current.style.borderColor = "1px solid #ff9500";
-        ele.current.style.color = "#ff9500";
-      } else {
-        ele.current.style.borderColor = "#cacad6";
-        ele.current.style.color = "#222222";
-      }
-    });
-  }, [customMenuItems, isOpen, path]);
-
   return (
     <div className={styles.centerBox}>
       <div className={styles.content}>
@@ -88,25 +75,32 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
             Algorithm
           </div>
         </Link>
-        <Image
-          src="/svgs/hamburger.svg"
-          alt="메뉴 아이콘"
-          width={36}
-          height={36}
-          className={styles.hamburger}
-          onClick={toggleModal}
-        />
+        <div className={styles.right}>
+          <ThemeSwitch className={styles.themeBtn} />
+          <button onClick={toggleModal}>
+            <ThemeImage
+              lightSrc="/svgs/hamburger_black.svg"
+              darkSrc="/svgs/hamburger_white.svg"
+              alt="메뉴 아이콘"
+              width={36}
+              height={36}
+              className={styles.hamburger}
+            />
+          </button>
+        </div>
       </div>
       {isOpen && (
         <div className={styles.menuModal}>
           <div className={styles.close}>
-            <Image
-              src="/svgs/close.svg"
-              alt="닫기 아이콘"
-              width={36}
-              height={36}
-              onClick={toggleModal}
-            />
+            <button onClick={toggleModal}>
+              <ThemeImage
+                lightSrc="/svgs/close_black.svg"
+                darkSrc="/svgs/close_white.svg"
+                alt="닫기 아이콘"
+                width={36}
+                height={36}
+              />
+            </button>
           </div>
           <div className={styles.menuItemBox}>
             {customMenuItems.map((menu: MenuItems, idx: number) => {
@@ -116,7 +110,12 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
                   key={idx}
                   onClick={() => setTimeout(toggleModal, 100)}
                 >
-                  <div className={styles.menuItem} ref={menuRefs.current[idx]}>
+                  <div
+                    className={`${styles.menuItem} ${
+                      menu.link === path && styles.active
+                    }`}
+                    ref={menuRefs.current[idx]}
+                  >
                     {menu.title}
                   </div>
                 </Link>
