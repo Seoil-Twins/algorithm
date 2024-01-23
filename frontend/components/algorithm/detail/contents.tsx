@@ -19,6 +19,7 @@ import styles from "./contents.module.scss";
 
 import { useCodeType } from "@/providers/codeTypeProvider";
 import dynamic from "next/dynamic";
+import Modal from "@/components/common/modal";
 
 type DetailProps = {
   algorithm: Algorithm;
@@ -51,6 +52,7 @@ const Contents = ({ algorithm }: DetailProps) => {
   const [isVisibleContentResize, setIsVisibleContentResize] =
     useState<boolean>(true);
   const [isVisibleCodeResize, setIsVisibleCodeResize] = useState<boolean>(true);
+  const [isVisibleTestcase, setIsVisibleTestcase] = useState<boolean>(false);
 
   const handleChangeCode = useCallback((val: string) => {
     setCode(val);
@@ -75,6 +77,10 @@ const Contents = ({ algorithm }: DetailProps) => {
     setCode("\n\n\n\n\n\n");
   }, []);
 
+  const handleSubmit = useCallback(() => {
+    console.log(code);
+  }, [code]);
+
   useEffect(() => {
     if (type === "p") {
       setLanguage(python);
@@ -92,6 +98,10 @@ const Contents = ({ algorithm }: DetailProps) => {
       window.removeEventListener("resize", handleResize);
     };
   }, [handleResize]);
+
+  const handleTestcaseModal = useCallback(() => {
+    setIsVisibleTestcase((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     handleResize();
@@ -152,7 +162,7 @@ const Contents = ({ algorithm }: DetailProps) => {
                   bottomLeft: false,
                   bottomRight: false,
                 }}
-                handleClasses={{ right: styles.bottomLine }}
+                handleClasses={{ bottom: styles.bottomLine }}
               >
                 <div className={styles.codeBox}>
                   <h4 className={styles.title}>코드창</h4>
@@ -192,10 +202,12 @@ const Contents = ({ algorithm }: DetailProps) => {
                 문제 설명
               </h4>
               <div className={styles.viewer}>
-                <div className="quill">
-                  <div className="ql-container ql-bubble ql-disabled">
+                <div className={`quill ${styles.quill}`}>
+                  <div
+                    className={`ql-container ql-bubble ql-disabled ${styles.qlContainer}`}
+                  >
                     <div
-                      className="ql-editor"
+                      className={`ql-editor ${styles.qlEditor}`}
                       data-gramm="false"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(algorithm.content),
@@ -290,7 +302,9 @@ const Contents = ({ algorithm }: DetailProps) => {
         )}
       </div>
       <footer className={styles.footer}>
-        <button className={styles.btn}>테스트 케이스</button>
+        <button className={styles.btn} onClick={handleTestcaseModal}>
+          테스트 케이스
+        </button>
         <button className={styles.btn}>
           <Link href={`/algorithm/detail/${algorithm.algorithmId}/question`}>
             질문 및 피드백
@@ -314,10 +328,28 @@ const Contents = ({ algorithm }: DetailProps) => {
         </button>
         <button
           className={`${styles.btn} ${styles.submit} ${notosansMedium.className}`}
+          onClick={handleSubmit}
         >
           제출
         </button>
       </footer>
+      <Modal
+        isVisible={isVisibleTestcase}
+        title="테스트 케이스"
+        onOk={handleTestcaseModal}
+        onCancel={handleTestcaseModal}
+      >
+        <div className={styles.table}>
+          <div className={`${styles.th} ${styles.padding}`}>입력</div>
+          <div className={`${styles.th} ${styles.padding}`}>출력</div>
+          {algorithm.testcase.map((value) => (
+            <React.Fragment key={value.testcaseId}>
+              <div className={styles.padding}>{value.input}</div>
+              <div className={styles.padding}>{value.output}</div>
+            </React.Fragment>
+          ))}
+        </div>
+      </Modal>
     </>
   );
 };

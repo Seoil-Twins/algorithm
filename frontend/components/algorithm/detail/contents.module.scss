@@ -1,3 +1,31 @@
+.quill {
+  .qlContainer {
+    font-family: inherit !important;
+  }
+
+  .qlEditor {
+    font-size: 1rem;
+    padding: 0 !important;
+    white-space: normal !important;
+  }
+
+  .qlEditor pre {
+    color: #222222;
+    margin-top: 5px !important;
+    background-color: #d1d1d1 !important;
+  }
+
+  .qlEditor img {
+    width: 100%;
+  }
+
+  [data-themes="dark"] {
+    .qlEditor pre {
+      background-color: #32394f !important;
+    }
+  }
+}
+
 .content {
   overflow: hidden;
   flex: 1;
@@ -17,34 +45,6 @@
 
     .viewer {
       color: #5c5c5c;
-
-      .quill {
-        .qlContainer {
-          font-family: inherit !important;
-        }
-
-        .qlEditor {
-          font-size: 1rem;
-          padding: 0 !important;
-          white-space: normal !important;
-        }
-
-        .qlEditor pre {
-          color: #222222;
-          margin-top: 5px !important;
-          background-color: #d1d1d1 !important;
-        }
-
-        .qlEditor img {
-          width: 100%;
-        }
-
-        [data-themes="dark"] {
-          .qlEditor pre {
-            background-color: #32394f !important;
-          }
-        }
-      }
     }
   }
 
@@ -59,7 +59,7 @@
     position: absolute;
     width: 100% !important;
     height: 2px !important;
-    right: 0 !important;
+    bottom: 0 !important;
     background-color: #d1d1d1;
   }
 
@@ -93,7 +93,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 10px 20px;
-        border-bottom: 2px solid var(--color-deep-background);
+        border-bottom: 2px solid #d1d1d1;
 
         .limit {
           font-size: 0.875rem;
@@ -111,6 +111,27 @@
   }
 }
 
+.table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #cacad6;
+  border-left: 1px solid #cacad6;
+  background-color: #f5f5f5;
+
+  & > div {
+    border-right: 1px solid #cacad6;
+    border-bottom: 1px solid #cacad6;
+  }
+
+  .th {
+    background-color: var(--color-deep-background);
+  }
+
+  .padding {
+    padding: 10px 12px;
+  }
+}
+
 [data-theme="dark"] {
   .viewer {
     color: #d5d8df !important;
@@ -122,6 +143,21 @@
 
   .bottomLine {
     background-color: #090e1b;
+  }
+
+  .runTitle {
+    border-bottom: 2px solid #090e1b !important;
+  }
+
+  .table {
+    border-top: 1px solid #090e1b;
+    border-left: 1px solid #090e1b;
+    background-color: #32394f;
+
+    & > div {
+      border-right: 1px solid #090e1b;
+      border-bottom: 1px solid #090e1b;
+    }
   }
 }
 

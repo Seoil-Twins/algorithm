@@ -32,6 +32,12 @@
   }
 }
 
+[data-theme="dark"] {
+  .form {
+    color: #b1b1b1;
+  }
+}
+
 @include mobile {
   .alignCenter {
     margin-bottom: 10px;

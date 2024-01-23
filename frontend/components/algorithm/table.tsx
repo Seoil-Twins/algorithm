@@ -9,7 +9,6 @@ export type TableData = {
 };
 
 type TableProps = {
-  sizes?: number[];
   headers: string[];
   datas: TableData[];
 };

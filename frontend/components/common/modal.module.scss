@@ -1,0 +1,97 @@
+.modal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  user-select: none;
+
+  .box {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 25px 40px;
+    border-radius: 8px;
+    background-color: var(--color-modal-background);
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+
+      .title {
+        font-size: 1.25rem;
+      }
+
+      .cancel {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 100px;
+        background-color: #dfdfdf;
+      }
+    }
+
+    .btnBox {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 25px;
+
+      .btn {
+        padding: 10px 15px;
+        border-radius: 8px;
+      }
+
+      .confirm {
+        color: $white;
+        background-color: $primaryColor;
+      }
+
+      .danger {
+        color: $white;
+        background-color: $red;
+      }
+
+      .cancel {
+        margin-right: 15px;
+        color: #656567;
+        border: 1px solid var(--color-border);
+      }
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .header {
+    .cancel {
+      background-color: #494f61;
+    }
+  }
+
+  .btnBox {
+    .cancel {
+      color: $white;
+    }
+  }
+}
+
+@include mobile {
+  .box {
+    top: 20px !important;
+    transform: translate(-50%, 0) !important;
+    max-width: 92vw !important;
+  }
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba($color: #000000, $alpha: 0.3);
+  z-index: 1;
+}
