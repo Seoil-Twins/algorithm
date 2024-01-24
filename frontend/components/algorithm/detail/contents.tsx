@@ -306,7 +306,9 @@ const Contents = ({ algorithm }: DetailProps) => {
           테스트 케이스
         </button>
         <button className={styles.btn}>
-          <Link href={`/algorithm/detail/${algorithm.algorithmId}/question`}>
+          <Link
+            href={`/algorithm/detail/${algorithm.algorithmId}/all?page=1&count=10`}
+          >
             질문 및 피드백
           </Link>
         </button>

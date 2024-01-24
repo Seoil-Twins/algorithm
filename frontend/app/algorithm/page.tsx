@@ -14,7 +14,7 @@ import {
   checkMyType,
   getAlgorithmKinds,
   getAlgorithms,
-} from "@/api/algorithm";
+} from "@/api/algorithm/algorithm";
 import Navigation from "@/components/algorithm/navigation";
 import Table, { TableData } from "@/components/algorithm/table";
 import Pagination from "@/components/common/pagination";
@@ -72,7 +72,7 @@ const Algorithm = async ({
             width={24}
             height={24}
           />,
-          <span className={styles.title}>{algorithm.title}</span>,
+          <span>{algorithm.title}</span>,
           <span
             className={`${styles[`level${algorithm.level}`]} ${
               notosansBold.className
@@ -93,7 +93,11 @@ const Algorithm = async ({
       <Navigation algorithmKinds={algorithmKinds} />
       {algorithms.total > 0 ? (
         <>
-          <Table headers={tableHeaders} datas={tableDatas} />
+          <Table
+            headers={tableHeaders}
+            datas={tableDatas}
+            sizes={[10, 50, 15, 15, 10]}
+          />
           <Pagination
             count={5}
             total={algorithms.total}

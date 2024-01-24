@@ -25,17 +25,8 @@
         padding: 15px 0px;
         word-break: keep-all;
 
-        &:not(:nth-child(2)) {
-          width: 15%;
-        }
-
-        &:nth-child(1) {
-          width: 10%;
-        }
-
         &:nth-child(2) {
           overflow: hidden;
-          width: 50%;
 
           span {
             overflow: hidden;

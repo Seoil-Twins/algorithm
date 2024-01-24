@@ -15,6 +15,7 @@ import {
 } from "@/utils/validation";
 
 import { useAuth } from "@/providers/authProvider";
+import { revalidatePath } from "next/cache";
 
 interface LoginProperty {
   email?: string;
@@ -121,8 +122,9 @@ const Login = () => {
       // }
       await login("1234");
       await mutate();
+      await router.refresh();
+      await revalidatePath("/algorithm/[algorithmId]/(board)", "layout");
 
-      router.refresh();
       router.replace("/");
     },
     [router, login, mutate, validation],

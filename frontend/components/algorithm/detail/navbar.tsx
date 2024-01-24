@@ -20,7 +20,7 @@ import {
   useCodeType,
 } from "@/providers/codeTypeProvider";
 
-import { checkMyType } from "@/api/algorithm";
+import { checkMyType } from "@/api/algorithm/algorithm";
 
 type AlgorithmNavbarProps = {
   algorithm: Algorithm;

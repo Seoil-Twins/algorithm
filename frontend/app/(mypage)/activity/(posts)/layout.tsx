@@ -6,7 +6,7 @@ import SubNavigation, {
 } from "@/components/mypage/activity/subNavigation";
 import Content from "@/components/mypage/content";
 
-import { getAlgorithmCounts } from "@/api/algorithm";
+import { getAlgorithmCounts } from "@/api/algorithm/algorithm";
 
 import styles from "./posts.module.scss";
 

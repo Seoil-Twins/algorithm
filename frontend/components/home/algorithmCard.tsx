@@ -9,7 +9,7 @@ import { Algorithm } from "@/interfaces/algorithm";
 
 import TagSlider from "./tagSlider";
 
-import { getRecommendAlgorithms } from "@/api/algorithm";
+import { getRecommendAlgorithms } from "@/api/algorithm/algorithm";
 
 const fetchRecommendAlgorithm = async () => {
   const response: Algorithm[] = await getRecommendAlgorithms();

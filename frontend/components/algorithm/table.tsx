@@ -9,17 +9,22 @@ export type TableData = {
 };
 
 type TableProps = {
+  sizes: number[];
   headers: string[];
   datas: TableData[];
 };
 
-const Table = ({ headers, datas }: TableProps) => {
+const Table = ({ sizes, headers, datas }: TableProps) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.table}>
         <div className={styles.tr}>
           {headers.map((header: string, idx: number) => (
-            <span key={idx} className={styles.cell}>
+            <span
+              key={idx}
+              className={styles.cell}
+              style={{ width: `${sizes[idx]}%` }}
+            >
               {header}
             </span>
           ))}
@@ -27,7 +32,11 @@ const Table = ({ headers, datas }: TableProps) => {
         {datas.map((items: TableData, idx: number) => (
           <Link href={items.link} key={idx} className={styles.tr}>
             {items.datas.map((node: React.ReactNode, idx: number) => (
-              <div key={idx} className={styles.cell}>
+              <div
+                key={idx}
+                className={styles.cell}
+                style={{ width: `${sizes[idx]}%` }}
+              >
                 {node}
               </div>
             ))}

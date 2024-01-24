@@ -1,0 +1,112 @@
+.nav {
+  margin-bottom: 20px;
+
+  .btnBox {
+    display: grid;
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    .active {
+      background-color: $primaryColor;
+
+      button {
+        color: $white;
+      }
+    }
+  }
+
+  .func {
+    display: grid;
+
+    .search {
+      display: flex;
+      align-items: center;
+      padding: 7px 15px;
+      border-radius: 8px;
+      border: 1px solid #f1f1f3;
+      background-color: #fcfcfd;
+
+      input {
+        flex: 1;
+        margin-right: 5px;
+        border: none;
+        outline: none;
+        color: #222222;
+        background-color: transparent;
+
+        &::placeholder {
+          color: var(--color-primary-gray-text);
+        }
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .post {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid $primaryColor;
+      background-color: var(--color-modal-background);
+    }
+  }
+}
+
+@mixin desktopAndTablet {
+  .nav {
+    display: flex;
+    justify-content: space-between;
+
+    .btnBox {
+      grid-template-columns: auto auto auto;
+      grid-template-rows: 1fr;
+    }
+
+    .func {
+      column-gap: 15px;
+      grid-template-columns: auto auto;
+      grid-template-rows: 1fr;
+
+      .search {
+        width: 320px;
+      }
+    }
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet();
+}
+
+@include tablet {
+  @include desktopAndTablet();
+}
+
+@include mobile {
+  .nav {
+    .btnBox {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+    }
+
+    .func {
+      margin-top: 15px;
+      row-gap: 5px;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+
+      .search {
+        width: 100%;
+      }
+
+      .post {
+        text-align: center;
+      }
+    }
+  }
+}

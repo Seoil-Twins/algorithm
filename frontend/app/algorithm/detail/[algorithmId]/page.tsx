@@ -1,6 +1,6 @@
 import styles from "./detail.module.scss";
 
-import { getAlgorithm } from "@/api/algorithm";
+import { getAlgorithm } from "@/api/algorithm/algorithm";
 
 import Navbar from "@/components/algorithm/detail/navbar";
 import Contents from "@/components/algorithm/detail/contents";

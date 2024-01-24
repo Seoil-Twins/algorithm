@@ -9,7 +9,7 @@ import styles from "./navigation.module.scss";
 
 import Dropdown, { DropdownItem } from "../common/dropdown";
 
-import { AlgorithmKind } from "@/api/algorithm";
+import { AlgorithmKind } from "@/api/algorithm/algorithm";
 
 type NavigationProps = {
   algorithmKinds: AlgorithmKind[];
