@@ -27,7 +27,7 @@ const DEFAULT_PREFIX = "algorithm";
 const solvedDropdownItems: DropdownItems = {
   queryKey: "solved",
   placeholder: "해결 여부",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "전체",
@@ -46,7 +46,7 @@ const solvedDropdownItems: DropdownItems = {
 const sortDropdownItems: DropdownItems = {
   queryKey: "sort",
   placeholder: "최신순",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "최신순",
@@ -65,7 +65,7 @@ const sortDropdownItems: DropdownItems = {
 const levelDropdownItems: DropdownItems = {
   queryKey: "level",
   placeholder: "알고리즘 레벨",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "전체",
@@ -100,7 +100,7 @@ const levelDropdownItems: DropdownItems = {
 const kindDropdownItems: DropdownItems = {
   queryKey: "kind",
   placeholder: "언어",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "전체",
@@ -123,7 +123,7 @@ const kindDropdownItems: DropdownItems = {
 const rateDropdownItems: DropdownItems = {
   queryKey: "rate",
   placeholder: "정답률",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "전체",
@@ -142,7 +142,7 @@ const rateDropdownItems: DropdownItems = {
 const tagDropdownItems: DropdownItems = {
   queryKey: "tag",
   placeholder: "알고리즘 분류",
-  isVisible: true,
+  isVisible: false,
   items: [
     {
       title: "선택 안 함",
@@ -221,7 +221,7 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
   );
 
   const handleRouter = useCallback(
-    (value: string, queryKey?: string) => {
+    (value: string | number, queryKey?: string) => {
       delete prevParams[`${queryKey}`];
 
       router.replace(
@@ -241,7 +241,7 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
           if (item.queryKey === queryKey) {
             return { ...item, isVisible: value };
           } else {
-            return { ...item, isVisible: true };
+            return { ...item, isVisible: false };
           }
         },
       );

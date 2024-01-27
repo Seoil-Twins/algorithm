@@ -9,7 +9,7 @@ import { notosansMedium } from "@/styles/_font";
 
 export type DropdownItem = {
   title: string;
-  value: string;
+  value: string | number;
 };
 
 type DropdownProps = {
@@ -18,11 +18,11 @@ type DropdownProps = {
   defaultTitle: string;
   items: DropdownItem[];
   onVisible: (value: boolean, queryKey?: string) => void;
-  onChange: (value: string, queryKey?: string) => void;
+  onChange: (value: string | number, queryKey?: string) => void;
 };
 
 const Dropdown = ({
-  isVisible = true,
+  isVisible = false,
   queryKey,
   defaultTitle,
   items,
@@ -43,15 +43,20 @@ const Dropdown = ({
 
       if (dorpdownInside || modalInside) return;
 
-      onVisible(true, queryKey);
+      onVisible(false, queryKey);
       document.body.removeEventListener("click", handleVisible);
     },
     [queryKey, onVisible],
   );
 
-  const handleClick = useCallback(() => {
-    onVisible(!isVisible, queryKey || undefined);
-  }, [queryKey, isVisible, onVisible]);
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      onVisible(!isVisible, queryKey || undefined);
+    },
+    [queryKey, isVisible, onVisible],
+  );
 
   const handleChange = useCallback(
     (event: React.MouseEvent<HTMLLIElement>, item: DropdownItem) => {
@@ -65,7 +70,7 @@ const Dropdown = ({
   );
 
   useEffect(() => {
-    if (!isVisible) {
+    if (isVisible) {
       document.body.addEventListener("click", handleVisible);
     } else {
       document.body.removeEventListener("click", handleVisible);
@@ -84,7 +89,7 @@ const Dropdown = ({
     <div
       ref={dorpdownRef}
       className={styles.dropdown}
-      onClick={() => handleClick()}
+      onClick={(event) => handleClick(event)}
     >
       <button className={styles.button}>
         <span className={notosansMedium.className}>{title}</span>
@@ -97,7 +102,7 @@ const Dropdown = ({
         />
       </button>
       <div ref={modalRef} className={styles.modal}>
-        {!isVisible && (
+        {isVisible && (
           <ul className={styles.itemBox}>
             {items.map((item, idx: number) => (
               <li

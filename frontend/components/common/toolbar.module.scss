@@ -1,0 +1,167 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+
+  .itemBox {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    .modalBox {
+      position: relative;
+      width: 30px;
+      height: 30px;
+      margin-right: 10px;
+    }
+
+    .toolbarBtn {
+      width: 30px;
+      height: 30px;
+      background-size: 26px;
+      background-repeat: no-repeat;
+      background-position: center;
+
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
+
+    .active {
+      background-color: var(--color-deep-background);
+    }
+  }
+
+  .line {
+    width: 1px;
+    height: 25px;
+    margin: 0 15px;
+    background-color: var(--color-border);
+  }
+}
+
+.h1 {
+  background-image: url("/svgs/editor_h1.svg");
+}
+
+.h2 {
+  background-image: url("/svgs/editor_h2.svg");
+}
+
+.h3 {
+  background-image: url("/svgs/editor_h3.svg");
+}
+
+.bold {
+  background-image: url("/svgs/editor_bold.svg");
+}
+
+.italic {
+  background-image: url("/svgs/editor_italic.svg");
+}
+
+.underline {
+  background-image: url("/svgs/editor_underline.svg");
+}
+
+.strike {
+  background-image: url("/svgs/editor_strike.svg");
+}
+
+.bulleted {
+  background-size: 24px !important;
+  background-image: url("/svgs/editor_list_bulleted.svg");
+}
+
+.numbered {
+  background-size: 24px !important;
+  background-image: url("/svgs/editor_list_numbered.svg");
+}
+
+.quote {
+  background-image: url("/svgs/editor_quote.svg");
+}
+
+.link {
+  background-image: url("/svgs/editor_link.svg");
+}
+
+.image {
+  background-image: url("/svgs/editor_image.svg");
+}
+
+.youtube {
+  background-image: url("/svgs/editor_youtube.svg");
+}
+
+.table {
+  background-image: url("/svgs/editor_table.svg");
+}
+
+.newline {
+  background-image: url("/svgs/editor_line.svg");
+}
+
+[data-theme="dark"] {
+  .h1 {
+    background-image: url("/svgs/editor_h1_white.svg");
+  }
+
+  .h2 {
+    background-image: url("/svgs/editor_h2_white.svg");
+  }
+
+  .h3 {
+    background-image: url("/svgs/editor_h3_white.svg");
+  }
+
+  .bold {
+    background-image: url("/svgs/editor_bold_white.svg");
+  }
+
+  .italic {
+    background-image: url("/svgs/editor_italic_white.svg");
+  }
+
+  .underline {
+    background-image: url("/svgs/editor_underline_white.svg");
+  }
+
+  .strike {
+    background-image: url("/svgs/editor_strike_white.svg");
+  }
+
+  .bulleted {
+    background-size: 24px !important;
+    background-image: url("/svgs/editor_list_bulleted_white.svg");
+  }
+
+  .numbered {
+    background-size: 24px !important;
+    background-image: url("/svgs/editor_list_numbered_white.svg");
+  }
+
+  .quote {
+    background-image: url("/svgs/editor_quote_white.svg");
+  }
+
+  .link {
+    background-image: url("/svgs/editor_link_white.svg");
+  }
+
+  .image {
+    background-image: url("/svgs/editor_image_white.svg");
+  }
+
+  .youtube {
+    background-image: url("/svgs/editor_youtube_white.svg");
+  }
+
+  .table {
+    background-image: url("/svgs/editor_table_white.svg");
+  }
+
+  .newline {
+    background-image: url("/svgs/editor_line_white.svg");
+  }
+}

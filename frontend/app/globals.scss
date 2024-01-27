@@ -52,7 +52,6 @@ a:hover {
 }
 
 /* 폰트 스타일 초기화 */
-em,
 address {
   font-style: normal;
 }
@@ -225,5 +224,109 @@ select:-webkit-autofill:focus {
 @include mobile {
   .mainCenterBox {
     padding: 50px $padding-mobile;
+  }
+}
+
+/* tiptab editor */
+.ProseMirror-focused {
+  border: none !important;
+  outline: none !important;
+}
+
+.ProseMirror {
+  padding-bottom: 1.25rem;
+}
+
+.tiptap {
+  p {
+    padding: 0.375rem 0;
+  }
+
+  pre {
+    background: #0d0d0d;
+    border-radius: 0.5rem;
+    color: #fff;
+    font-family: inherit;
+    padding: 0.75rem 1rem;
+
+    code {
+      background: none;
+      color: inherit;
+      font-size: 1rem;
+      padding: 0;
+    }
+  }
+
+  ul,
+  ol {
+    padding: 0 2rem;
+
+    p {
+      padding: 0;
+    }
+  }
+
+  ul > li {
+    list-style: disc;
+
+    li {
+      list-style: circle;
+    }
+  }
+
+  ol > li {
+    list-style: decimal;
+  }
+
+  blockquote {
+    border-left: 3px solid var(--color-border);
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0.625rem;
+  }
+
+  a {
+    text-decoration: underline;
+    color: $blueLight;
+  }
+
+  iframe {
+    padding: 0.625rem 0;
+  }
+
+  .tableWrapper {
+    margin: 1.25rem 0;
+  }
+
+  table {
+    overflow: hidden;
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    user-select: contain;
+
+    tr {
+      &:nth-child(2n) {
+        background-color: var(--color-background);
+      }
+
+      &:nth-child(2n + 1) {
+        background-color: var(--color-deep-background);
+      }
+
+      td {
+        padding: 0.9375rem 0.375rem;
+        border-right: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+      }
+    }
+  }
+}
+
+.resize-cursor {
+  td:has(.column-resize-handle) {
+    border-right: 2px solid $blueLight !important;
+    cursor: col-resize;
   }
 }

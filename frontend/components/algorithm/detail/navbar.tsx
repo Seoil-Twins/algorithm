@@ -47,15 +47,18 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
     return type === value;
   })[0].title;
 
-  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleVisible = useCallback((value: boolean) => {
     setIsVisible(value);
   }, []);
 
   const handleTypeChange = useCallback(
-    (value: string) => {
-      const codeType: CodeType = checkMyType(CODE_TYPE_OPTIONS_ARRAY, value)
+    (value: string | number) => {
+      const codeType: CodeType = checkMyType(
+        CODE_TYPE_OPTIONS_ARRAY,
+        value as CodeType,
+      )
         ? (value as CodeType)
         : "p";
 

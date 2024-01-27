@@ -89,7 +89,10 @@ const BoardNavigation = ({ items, isVisiblePost }: BoardNavigationProps) => {
           </Link>
         </div>
         {isVisiblePost && (
-          <Link href="/algorithm/post" className={styles.post}>
+          <Link
+            href={`${pathname.slice(0, pathname.lastIndexOf("/"))}/new`}
+            className={styles.post}
+          >
             <button>글쓰기</button>
           </Link>
         )}

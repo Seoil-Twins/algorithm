@@ -17,8 +17,10 @@ type BaseInputProps = {
   value: string;
   disabled?: boolean;
   length?: number;
+  multiple?: boolean;
   // eslint-disable-next-line no-unused-vars
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
+  onChangeFile?: (file: File | FileList) => void;
 };
 
 type InputProps = {
@@ -57,12 +59,13 @@ const BaseInput = ({
       placeholder={placeholder}
       value={value}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-        onChange(event.target.value)
+        onChange?.(event.target.value)
       }
       disabled={disabled}
       className={styles.input}
       maxLength={length}
       autoComplete="none"
+      min={1}
     />
   );
 };
@@ -77,7 +80,9 @@ const Input = ({
   usePasswordToggle = false,
   isError = false,
   errorMsg = "",
+  multiple = false,
   onChange,
+  onChangeFile,
 }: InputProps) => {
   const [inputType, setInputType] = useState<HTMLInputTypeAttribute>(type);
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -87,6 +92,16 @@ const Input = ({
       onChange?.(changedValue);
     },
     [onChange],
+  );
+
+  const handleFile = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (!event.target.files) return;
+
+      if (multiple) onChangeFile?.(event.target.files);
+      else onChangeFile?.(event.target.files[0]);
+    },
+    [onChangeFile],
   );
 
   const handleClickHideOrShow = useCallback(() => {
@@ -111,14 +126,23 @@ const Input = ({
         </div>
       )}
       <div className={`${styles.inputBox} ${isError ? styles.error : null}`}>
-        <BaseInput
-          type={inputType}
-          value={value}
-          onChange={handleChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          length={length}
-        />
+        {type !== "file" ? (
+          <BaseInput
+            type={inputType}
+            value={value}
+            onChange={handleChange}
+            placeholder={placeholder}
+            disabled={disabled}
+            length={length}
+          />
+        ) : (
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+            multiple={multiple}
+            onChange={handleFile}
+          />
+        )}
         {type === "password" && usePasswordToggle && (
           <PasswordVisibilityToogle
             isVisible={isVisible}
