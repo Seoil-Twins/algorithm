@@ -32,7 +32,7 @@ const ThemeImage = ({
     <div style={{ width, height }} className={className}>
       {isMounted && (
         <Image
-          src={resolvedTheme === "light" ? lightSrc : darkSrc}
+          src={resolvedTheme !== "dark" ? lightSrc : darkSrc}
           alt={alt}
           width={width}
           height={height}

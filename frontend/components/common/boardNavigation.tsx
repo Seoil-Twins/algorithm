@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import styles from "./boardNavigation.module.scss";
+import ThemeImage from "./themeImage";
 
 export type NavItem = {
   title: string;
@@ -79,11 +79,12 @@ const BoardNavigation = ({ items, isVisiblePost }: BoardNavigationProps) => {
               query: { ...prevParams, keyword },
             }}
           >
-            <Image
-              src="/svgs/search.svg"
+            <ThemeImage
+              lightSrc="/svgs/search_black.svg"
+              darkSrc="/svgs/search_white.svg"
               alt="검색 아이콘"
-              width={24}
-              height={24}
+              width={18}
+              height={18}
               className={styles.searchImg}
             />
           </Link>

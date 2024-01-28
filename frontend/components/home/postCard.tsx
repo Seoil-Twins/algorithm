@@ -20,45 +20,45 @@ const PostCard = async () => {
     <div className={styles.cardBox}>
       {recommendPosts.map((post: BoardList) => {
         return (
-          <div className={styles.itemBox} key={post.boardId}>
-            <Link href={`/board/${post.boardId}`}>
-              <div className={styles.imgBox}>
-                {post.thumbnail ? (
+          <Link
+            href={`/board/${post.boardId}`}
+            className={styles.itemBox}
+            key={post.boardId}
+          >
+            <div className={styles.imgBox}>
+              {post.thumbnail ? (
+                <Image
+                  src={post.thumbnail}
+                  alt="이미지 없음"
+                  width={0}
+                  height={0}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                <div className={styles.nonImgBox}>
                   <Image
-                    src={post.thumbnail}
+                    src="/svgs/no_image.svg"
                     alt="이미지 없음"
+                    sizes="100vw"
                     width={0}
                     height={0}
-                    style={{ width: "100%", height: "100%" }}
                   />
-                ) : (
-                  <div className={styles.nonImgBox}>
-                    <Image
-                      src="/svgs/no_image.svg"
-                      alt="이미지 없음"
-                      sizes="100vw"
-                      width={0}
-                      height={0}
-                    />
-                  </div>
-                )}
-              </div>
-            </Link>
+                </div>
+              )}
+            </div>
             {post.tags && (
               <div className={styles.tagSliderBox}>
                 <TagSlider tags={post.tags} />
               </div>
             )}
-            <Link href={`/board/${post.boardId}`}>
-              <div className={`${styles.title} ${notosansMedium.className}`}>
-                {post.title}
-              </div>
-              <div className={styles.infoBox}>
-                <div className={styles.username}>{post.username}</div>
-                <div>{post.createdTime}</div>
-              </div>
-            </Link>
-          </div>
+            <div className={`${styles.title} ${notosansMedium.className}`}>
+              {post.title}
+            </div>
+            <div className={styles.infoBox}>
+              <div className={styles.username}>{post.username}</div>
+              <div>{post.createdTime}</div>
+            </div>
+          </Link>
         );
       })}
     </div>

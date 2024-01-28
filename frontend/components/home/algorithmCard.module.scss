@@ -2,8 +2,6 @@
   display: grid;
   column-gap: 20px;
   row-gap: 35px;
-  grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
-  grid-template-rows: repeat(2, 1fr);
 
   .itemBox {
     padding: 25px;
@@ -66,9 +64,10 @@
   }
 }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
+@media screen and (min-width: 769px) {
   .cardBox {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
   }
 }
 

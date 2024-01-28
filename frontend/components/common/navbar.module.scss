@@ -80,7 +80,7 @@
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     border-bottom: 1px solid var(--color-border);
-    background-color: var(--color-deep-background);
+    background-color: #22222266;
   }
 
   .content {
@@ -128,8 +128,7 @@
   right: 0;
   padding: 15px 20px 0px 20px;
   border-radius: 8px;
-  box-shadow: 1px 4px 4px
-    rgba($color: var(--color-primary-reverse-text), $alpha: 0.4);
+  box-shadow: 1px 4px 4px #22222266;
   background-color: var(--color-modal-background);
 
   .topBox {

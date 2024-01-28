@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useState } from "react";
+import ThemeImage from "../common/themeImage";
 
 import styles from "./navigation.module.scss";
 
@@ -278,11 +278,12 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
             query: { ...prevParams, keyword },
           }}
         >
-          <Image
-            src="/svgs/search.svg"
+          <ThemeImage
+            lightSrc="/svgs/search_black.svg"
+            darkSrc="/svgs/search_white.svg"
             alt="검색 아이콘"
-            width={24}
-            height={24}
+            width={18}
+            height={18}
             className={styles.searchImg}
           />
         </Link>

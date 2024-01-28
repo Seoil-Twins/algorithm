@@ -36,7 +36,7 @@
     align-items: center;
     border-radius: 10px;
     border: 1px solid #f1f1f3;
-    background-color: #fcfcfd;
+    background-color: var(--color-input-background);
 
     img {
       width: 20px;
@@ -49,6 +49,7 @@
       height: 100%;
       border: none;
       outline: none;
+      border-radius: 10px;
       background-color: transparent;
 
       &::placeholder {
@@ -71,20 +72,49 @@
 @include desktop {
   .inputBox {
     min-width: 30rem;
-    padding: 15px;
+
+    &:has(img) {
+      padding-right: 15px;
+    }
+
+    .input {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      padding-left: 15px;
+    }
   }
 }
 
 @include tablet {
   .inputBox {
     min-width: 30rem;
-    padding: 15px;
+    padding-right: 15px;
+
+    &:has(img) {
+      padding-right: 15px;
+    }
+
+    .input {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      padding-left: 15px;
+    }
   }
 }
 
 @include mobile {
   .inputBox {
     width: auto !important;
-    padding: 12px;
+    padding-right: 12px;
+
+    &:has(img) {
+      padding-right: 12px;
+    }
+
+    .input {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      padding-left: 12px;
+    }
   }
 }

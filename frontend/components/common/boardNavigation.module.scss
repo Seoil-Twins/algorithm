@@ -26,8 +26,8 @@
       align-items: center;
       padding: 7px 15px;
       border-radius: 8px;
-      border: 1px solid #f1f1f3;
-      background-color: #fcfcfd;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-input-background);
 
       input {
         flex: 1;

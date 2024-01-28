@@ -234,7 +234,7 @@ const Signup = () => {
       await mutate();
 
       router.refresh();
-      router.replace("/");
+      window.location.replace("/");
     },
     [validation, login, mutate, isCheck, router],
   );

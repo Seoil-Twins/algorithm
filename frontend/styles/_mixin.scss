@@ -40,21 +40,21 @@
   min-height: $height;
 }
 
-@mixin activeBtn($paddingWidth: 10px, $paddingHeight: 35px) {
+@mixin activeBtn($paddingWidth: 20px, $paddingHeight: 10px) {
   @include btn($paddingWidth, $paddingHeight);
   border: 1px solid $primaryColor;
   color: $primaryColor;
   cursor: pointer;
 }
 
-@mixin disabledBtn($paddingWidth: 10px, $paddingHeight: 35px) {
+@mixin disabledBtn($paddingWidth: 20px, $paddingHeight: 10px) {
   @include btn($paddingWidth, $paddingHeight);
   border: 1px solid var(--color-primary-gray-text);
   color: var(--color-primary-gray-text);
   cursor: default;
 }
 
-@mixin warningBtn($paddingWidth: 10px, $paddingHeight: 35px) {
+@mixin warningBtn($paddingWidth: 20px, $paddingHeight: 10px) {
   @include btn($paddingWidth, $paddingHeight);
   background-color: $red;
   color: $white;

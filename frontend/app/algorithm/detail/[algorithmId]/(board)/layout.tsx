@@ -16,7 +16,7 @@ const Board = async ({
 }) => {
   const sessionId = await getSessionId();
   const algorithmId = params?.algorithmId;
-  // console.log(algorithmId);
+
   const navItems: NavItem[] = [
     {
       title: "전체",

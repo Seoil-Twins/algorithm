@@ -3,7 +3,6 @@
 import React, { useCallback } from "react";
 import { useTheme } from "next-themes";
 
-import Image from "next/image";
 import ThemeImage from "./themeImage";
 
 type ThemeSwitchProps = {
@@ -18,6 +17,12 @@ const ThemeSwitch = ({ className }: ThemeSwitchProps) => {
       setTheme("dark");
     } else if (theme === "dark") {
       setTheme("light");
+    } else if (theme === "system") {
+      const systemTheme = getComputedStyle(
+        document.querySelector("html")!,
+      ).colorScheme;
+      const changeTheme = systemTheme === "light" ? "dark" : "light";
+      setTheme(changeTheme);
     }
   }, [theme, setTheme]);
 

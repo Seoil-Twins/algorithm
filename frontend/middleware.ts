@@ -13,9 +13,19 @@ export default async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
 
   const hasSessionButUnAuthPath =
-    NO_AUTH_PATHS.includes(pathname) && session.sessionId;
+    NO_AUTH_PATHS.some((noAuthPath) => {
+      const regex = new RegExp(noAuthPath);
+      return regex.test(pathname);
+    }) && session.sessionId;
   const noSessionButAuthPath =
-    AUTH_PATHS.includes(pathname) && !session.sessionId;
+    AUTH_PATHS.some((authPath) => {
+      const regex = new RegExp(authPath);
+      return regex.test(pathname);
+    }) && !session.sessionId;
+
+  if (pathname === "/algorithm/detail/369/new") {
+    console.log(AUTH_PATHS, session.sessionId);
+  }
 
   // 잘못된 권한으로 접근할 시 홈으로 리다이렉션
   if (hasSessionButUnAuthPath || noSessionButAuthPath) {
