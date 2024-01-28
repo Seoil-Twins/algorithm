@@ -1,9 +1,11 @@
 import Content from "../content";
 
-const Feedback = async () => {
+type FeedbackParams = { algorithmId: number };
+
+const Feedback = async ({ params }: { params: FeedbackParams }) => {
   return (
     <>
-      <Content type={4} />
+      <Content type={4} algorithmId={params.algorithmId} />
     </>
   );
 };

@@ -1,9 +1,11 @@
 import Content from "../content";
 
-const All = async () => {
+type AllParams = { algorithmId: number };
+
+const All = async ({ params }: { params: AllParams }) => {
   return (
     <>
-      <Content type={6} />
+      <Content type={6} algorithmId={params.algorithmId} />
     </>
   );
 };

@@ -24,15 +24,14 @@ type ContentProps = {
 const tableHeaders = ["상태", "제목", "닉네임", "분류", "일자"];
 
 const Content = async ({
-  type,
   searchParams,
-  params,
+  type,
+  algorithmId,
 }: {
-  type: ContentProps["type"];
   searchParams?: { [key: string]: string | string[] | undefined };
-  params?: ContentProps;
+  type: ContentProps["type"];
+  algorithmId: ContentProps["algorithmId"];
 }) => {
-  const algorithmId = params?.algorithmId;
   const sortOptions: BoardOptions = {
     count: Number(searchParams?.count) || 20,
     page: Number(searchParams?.page) || 1,
@@ -67,7 +66,7 @@ const Content = async ({
           </span>,
           <span>{getTimeAgo(board.createdTime)}</span>,
         ],
-        link: `/board/${board.boardId}`,
+        link: `/algorithm/detail/${algorithmId}/board/${board.boardId}`,
       };
     },
   );

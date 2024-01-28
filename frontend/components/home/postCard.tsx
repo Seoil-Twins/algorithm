@@ -2,16 +2,14 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import Board from "@/interfaces/board";
-
 import styles from "./postCard.module.scss";
 import { notosansMedium } from "@/styles/_font";
 
 import TagSlider from "./tagSlider";
-import { getRecommendPosts } from "@/api/board";
+import { BoardList, getRecommendPosts } from "@/api/board";
 
 const fetchRecommendPosts = async () => {
-  const result: Board[] = await getRecommendPosts();
+  const result: BoardList[] = await getRecommendPosts();
   return result;
 };
 
@@ -20,7 +18,7 @@ const PostCard = async () => {
 
   return (
     <div className={styles.cardBox}>
-      {recommendPosts.map((post: Board) => {
+      {recommendPosts.map((post: BoardList) => {
         return (
           <div className={styles.itemBox} key={post.boardId}>
             <Link href={`/board/${post.boardId}`}>
@@ -46,9 +44,11 @@ const PostCard = async () => {
                 )}
               </div>
             </Link>
-            <div className={styles.tagSliderBox}>
-              <TagSlider tags={post.tags} />
-            </div>
+            {post.tags && (
+              <div className={styles.tagSliderBox}>
+                <TagSlider tags={post.tags} />
+              </div>
+            )}
             <Link href={`/board/${post.boardId}`}>
               <div className={`${styles.title} ${notosansMedium.className}`}>
                 {post.title}

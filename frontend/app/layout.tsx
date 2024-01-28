@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import React from "react";
 
 import "./globals.scss";
+import "highlight.js/styles/stackoverflow-dark.min.css";
 
 import { notosansRegular } from "@/styles/_font";
 

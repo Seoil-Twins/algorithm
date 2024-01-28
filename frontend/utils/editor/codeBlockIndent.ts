@@ -10,7 +10,6 @@ import cpp from "highlight.js/lib/languages/cpp";
 import json from "highlight.js/lib/languages/json";
 import md from "highlight.js/lib/languages/markdown";
 import bash from "highlight.js/lib/languages/bash";
-import { TextSelection } from "prosemirror-state";
 
 lowlight.registerLanguage("css", css);
 lowlight.registerLanguage("js", js);

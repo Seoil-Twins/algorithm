@@ -1,7 +1,5 @@
 "use client";
 
-import "highlight.js/styles/stackoverflow-dark.min.css";
-
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 

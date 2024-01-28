@@ -1,9 +1,11 @@
 import Content from "../content";
 
-const Question = async () => {
+type QuestionParams = { algorithmId: number };
+
+const Question = async ({ params }: { params: QuestionParams }) => {
   return (
     <>
-      <Content type={3} />
+      <Content type={3} algorithmId={params.algorithmId} />
     </>
   );
 };

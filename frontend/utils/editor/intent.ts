@@ -130,16 +130,16 @@ export const Indent = Extension.create<IndentOptions>({
           indent: {
             default: this.options.defaultIndentLevel,
             renderHTML: (attributes) => {
+              console.log(attributes);
               return {
-                style: `margin-left: ${attributes.indent}px!important;`,
+                style: `margin-left: ${attributes.indent}px !important`,
               };
             },
             parseHTML: (element) => {
-              return {
-                indent:
-                  parseInt(element.style.marginLeft) ||
-                  this.options.defaultIndentLevel,
-              };
+              return (
+                parseInt(element.style.marginLeft) ||
+                this.options.defaultIndentLevel
+              );
             },
           },
         },

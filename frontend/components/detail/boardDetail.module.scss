@@ -1,0 +1,48 @@
+.contentBox {
+  margin-top: 2.1875rem;
+  padding: 1.5625rem 2.8125rem;
+  border-radius: 8px;
+  background-color: var(--color-modal-background);
+
+  .user {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+
+    .profileImg {
+      margin-right: 10px;
+      border-radius: 100px;
+    }
+
+    .createdTime {
+      font-size: 0.875rem;
+      color: var(--color-primary-gray-text);
+    }
+  }
+
+  .solved {
+    color: $red;
+    font-size: 0.875rem;
+  }
+
+  .notSolved {
+    color: $blueLight;
+    font-size: 0.875rem;
+  }
+
+  .title {
+    font-size: 1.875rem;
+    margin-bottom: 1.5625rem;
+  }
+
+  .content {
+    margin-bottom: 1.5625rem;
+  }
+
+  .line {
+    margin: 3.4375rem 0;
+    height: 1px;
+    border: none;
+    background-color: #bbc1cc;
+  }
+}

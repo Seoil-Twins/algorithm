@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 
 import styles from "./new.module.scss";
 import { notosansMedium } from "@/styles/_font";
@@ -93,8 +93,6 @@ const New = ({ params }: { params: NewParams }) => {
       }
 
       setIsErrorTitle(false);
-
-      console.log(requestData);
       router.push(`/algorithm/detail/${algorithmId}/all`);
     },
     [algorithmId, requestData, router],

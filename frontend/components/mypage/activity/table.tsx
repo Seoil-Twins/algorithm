@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
-import Board from "@/interfaces/board";
+import { BoardList } from "@/api/board";
 import { BoardType } from "@/interfaces/boardType";
 
 import { getTimeAgo } from "@/utils/day";
@@ -13,7 +13,7 @@ import ThemeImage from "@/components/common/themeImage";
 
 type TableProps = {
   boardTypes: BoardType[];
-  items: Board[];
+  items: BoardList[];
 };
 
 const Table = ({ boardTypes, items }: TableProps) => {
@@ -32,7 +32,7 @@ const Table = ({ boardTypes, items }: TableProps) => {
 
   return (
     <div className={styles.table}>
-      {items.map((item: Board) => (
+      {items.map((item: BoardList) => (
         <Link
           href={`/board/${item.boardType}/${item.boardId}`}
           key={item.boardId}

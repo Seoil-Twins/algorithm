@@ -56,8 +56,8 @@
 
 @mixin warningBtn($paddingWidth: 10px, $paddingHeight: 35px) {
   @include btn($paddingWidth, $paddingHeight);
-  border: 1px solid $red;
-  color: $red;
+  background-color: $red;
+  color: $white;
 }
 
 @mixin checkBox($checkBoxSize, $checkImgSize) {

@@ -6,17 +6,11 @@ export type RequiredUser = Pick<
   "userId" | "profile" | "nickname"
 >;
 
-export default interface Board {
+export default interface Comment {
+  commentId: number;
   boardId: number;
-  boardType: number;
   user: RequiredUser;
-  title: string;
   content: string;
-  views: number;
-  tags?: string[];
-  isSolved?: boolean;
-  likeTotal: number;
-  isLike: boolean;
-  isView: boolean;
+  recommend: number;
   createdTime: string;
 }

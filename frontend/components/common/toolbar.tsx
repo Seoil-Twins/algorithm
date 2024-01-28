@@ -280,18 +280,6 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         <button
           type="button"
           className={`${styles.toolbarBtn} ${styles.h1} ${
-            editor.isActive("heading", { level: 1 }) ? styles.active : null
-          }`}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
-          disabled={
-            !editor.can().chain().focus().toggleHeading({ level: 1 }).run()
-          }
-        />
-        <button
-          type="button"
-          className={`${styles.toolbarBtn} ${styles.h2} ${
             editor.isActive("heading", { level: 2 }) ? styles.active : null
           }`}
           onClick={() =>
@@ -303,7 +291,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         />
         <button
           type="button"
-          className={`${styles.toolbarBtn} ${styles.h3} ${
+          className={`${styles.toolbarBtn} ${styles.h2} ${
             editor.isActive("heading", { level: 3 }) ? styles.active : null
           }`}
           onClick={() =>
