@@ -12,6 +12,7 @@ import Footer from "@/components/common/footer";
 import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 import ThemeProvider from "@/providers/themeProvider";
+import Script from "next/script";
 
 declare global {
   interface Window {

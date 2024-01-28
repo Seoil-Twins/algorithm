@@ -1,31 +1,3 @@
-.quill {
-  .qlContainer {
-    font-family: inherit !important;
-  }
-
-  .qlEditor {
-    font-size: 1rem;
-    padding: 0 !important;
-    white-space: normal !important;
-  }
-
-  .qlEditor pre {
-    color: #222222;
-    margin-top: 5px !important;
-    background-color: #d1d1d1 !important;
-  }
-
-  .qlEditor img {
-    width: 100%;
-  }
-
-  [data-themes="dark"] {
-    .qlEditor pre {
-      background-color: #32394f !important;
-    }
-  }
-}
-
 .content {
   overflow: hidden;
   flex: 1;
@@ -45,6 +17,10 @@
 
     .viewer {
       color: #5c5c5c;
+
+      img {
+        width: 100% !important;
+      }
     }
   }
 

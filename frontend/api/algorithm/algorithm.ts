@@ -796,38 +796,22 @@ export const getAlgorithm = async (algorithmId: number): Promise<Algorithm> => {
       <p>
           <br>
       </p>
-      <p>
-          <strong style="font-size: large;">
+      <strong style="font-size: large;">
               <u>예제 입력 1</u>
           </strong>
           <p><pre spellcheck="false">0 0 6 2 5 -4 2 2</pre></p>
-      </p>
-      <p><br /></p>
-      <p>
           <strong style="font-size: large;">
-              <u>예제 출력 1</u>
-          </strong>
-          <p><pre spellcheck="false">1</pre></p>
-      </p>
-      <p>
-          <br>
-      </p>
-      <p>
-          <strong style="font-size: large;">
+          <u>예제 출력 1</u>
+      </strong>
+      <p><pre spellcheck="false">1</pre></p>
+      <strong style="font-size: large;">
               <u>예제 입력 2</u>
           </strong>
           <p><pre spellcheck="false">-1 -5 6 3 1 10 -4 -1</pre></p>
-      </p>
-      <p><br /></p>
-      <p>
           <strong style="font-size: large;">
-              <u>예제 출력 2</u>
-          </strong>
-          <p><pre spellcheck="false">0</pre></p>
-      </p>
-      <p>
-          <br>
-      </p>`,
+          <u>예제 출력 2</u>
+      </strong>
+      <p><pre spellcheck="false">0</pre></p>`,
     // thumbnail:
     //   "https://mud-kage.kakao.com/dn/NTmhS/btqfEUdFAUf/FjKzkZsnoeE4o19klTOVI1/openlink_640x640s.jpg",
     kinds: ["그리디 알고리즘", "구현", "해 구성하기"],

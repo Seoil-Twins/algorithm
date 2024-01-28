@@ -1,7 +1,5 @@
 "use client";
 
-import "react-quill/dist/quill.bubble.css";
-
 import React, { useCallback, useEffect, useState } from "react";
 import { Extension, ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { cpp } from "@codemirror/lang-cpp";
@@ -11,6 +9,7 @@ import DOMPurify from "isomorphic-dompurify";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { Resizable } from "re-resizable";
+import dynamic from "next/dynamic";
 
 import { Algorithm } from "@/interfaces/algorithm";
 
@@ -18,8 +17,9 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
 import { useCodeType } from "@/providers/codeTypeProvider";
-import dynamic from "next/dynamic";
+
 import Modal from "@/components/common/modal";
+import EditorViewer from "@/components/common/editorViewer";
 
 type DetailProps = {
   algorithm: Algorithm;
@@ -132,19 +132,10 @@ const Contents = ({ algorithm }: DetailProps) => {
                   문제 설명
                 </h4>
                 <div className={styles.viewer}>
-                  <div className={`quill ${styles.quill}`}>
-                    <div
-                      className={`ql-container ql-bubble ql-disabled ${styles.qlContainer}`}
-                    >
-                      <div
-                        className={`ql-editor ${styles.qlEditor}`}
-                        data-gramm="false"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(algorithm.content),
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <EditorViewer
+                    className={styles.qlEditor}
+                    content={algorithm.content}
+                  />
                 </div>
               </div>
             </Resizable>
@@ -202,19 +193,10 @@ const Contents = ({ algorithm }: DetailProps) => {
                 문제 설명
               </h4>
               <div className={styles.viewer}>
-                <div className={`quill ${styles.quill}`}>
-                  <div
-                    className={`ql-container ql-bubble ql-disabled ${styles.qlContainer}`}
-                  >
-                    <div
-                      className={`ql-editor ${styles.qlEditor}`}
-                      data-gramm="false"
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(algorithm.content),
-                      }}
-                    />
-                  </div>
-                </div>
+                <EditorViewer
+                  className={styles.qlEditor}
+                  content={algorithm.content}
+                />
               </div>
             </div>
             <div className={styles.right}>
