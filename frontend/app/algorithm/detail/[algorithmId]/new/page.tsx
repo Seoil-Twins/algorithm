@@ -4,15 +4,11 @@ import React, { useCallback, useRef, useState } from "react";
 
 import styles from "./new.module.scss";
 import { notosansMedium } from "@/styles/_font";
+import { useRouter } from "next/navigation";
 
 import Dropdown, { DropdownItem } from "@/components/common/dropdown";
 import Input from "@/components/common/input";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-
-const DynamicEditor = dynamic(() => import("@/components/common/editor"), {
-  ssr: false,
-});
+import Editor from "@/components/common/editor";
 
 type NewParams = {
   algorithmId: number;
@@ -135,7 +131,11 @@ const New = ({ params }: { params: NewParams }) => {
           <span className={`${notosansMedium.className}`}>내용</span>
           <span className={styles.required}>*</span>
         </div>
-        <DynamicEditor value={requestData.content} onChange={handleEditor} />
+        <Editor
+          value={requestData.content}
+          onChange={handleEditor}
+          className={styles.editor}
+        />
       </div>
       <div className={styles.btnBox}>
         <button type="button" className={styles.cancel} onClick={handleCancel}>

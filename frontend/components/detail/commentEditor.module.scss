@@ -1,0 +1,72 @@
+.commentEditor {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+
+  .editorBox {
+    display: grid;
+    margin-bottom: 10px;
+
+    .profileImg {
+      border-radius: 100px;
+    }
+
+    .editor {
+      padding: 10px 20px;
+      border-radius: 8px;
+      background-color: #fcfcfd;
+
+      & > div {
+        min-height: 95px;
+      }
+    }
+  }
+
+  .btnBox {
+    display: flex;
+    justify-content: flex-end;
+
+    .comment {
+      @include activeBtn;
+      background-color: $primaryColor;
+      color: $white;
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .editor {
+    background-color: #3f4047;
+  }
+}
+
+@mixin desktopAndTablet {
+  .commentEditor {
+    padding: 20px 30px;
+
+    .editorBox {
+      column-gap: 10px;
+      grid-template-rows: 1fr;
+      grid-template-columns: auto 1fr;
+    }
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet;
+}
+
+@include tablet {
+  @include desktopAndTablet;
+}
+
+@include mobile {
+  .commentEditor {
+    padding: 10px 15px;
+
+    .editorBox {
+      row-gap: 10px;
+      grid-template-rows: auto auto;
+      grid-template-columns: 1fr;
+    }
+  }
+}

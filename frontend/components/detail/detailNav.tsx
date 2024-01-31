@@ -18,6 +18,11 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
     router.back();
   }, [router]);
 
+  const handleDelete = useCallback(() => {
+    console.log("Delete API");
+    router.back();
+  }, [router]);
+
   return (
     <nav className={styles.detailNav}>
       <button className={styles.back} onClick={handleBack}>
@@ -31,7 +36,9 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
           >
             글 수정
           </Link>
-          <button className={`${styles.delete}`}>글 삭제</button>
+          <button className={`${styles.delete}`} onClick={handleDelete}>
+            글 삭제
+          </button>
         </div>
       )}
     </nav>

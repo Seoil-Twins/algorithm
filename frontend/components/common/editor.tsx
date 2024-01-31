@@ -13,6 +13,7 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import ImageResize from "tiptap-extension-resize-image";
+import Placeholder from "@tiptap/extension-placeholder";
 
 import styles from "./editor.module.scss";
 
@@ -23,10 +24,19 @@ import Toolbar from "./toolbar";
 
 type EditorProps = {
   value: string;
+  isVisibleToolbar?: boolean;
+  placeholder?: string;
+  className?: string;
   onChange: (value: string) => void;
 };
 
-const Editor = ({ value, onChange }: EditorProps) => {
+const Editor = ({
+  value,
+  isVisibleToolbar = true,
+  placeholder,
+  className,
+  onChange,
+}: EditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -46,6 +56,7 @@ const Editor = ({ value, onChange }: EditorProps) => {
       TableHeader,
       TableCell,
       ImageResize.configure({ allowBase64: true }),
+      Placeholder.configure({ placeholder: placeholder }),
       Indent,
       CustomCodeBlockLowlight,
     ],
@@ -59,8 +70,8 @@ const Editor = ({ value, onChange }: EditorProps) => {
 
   return (
     <div className={styles.editorBox}>
-      <Toolbar editor={editor} />
-      <EditorContent editor={editor} className={styles.editor} />
+      {isVisibleToolbar && <Toolbar editor={editor} />}
+      <EditorContent editor={editor} className={className} />
     </div>
   );
 };

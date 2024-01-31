@@ -7,14 +7,21 @@ import { useEffect } from "react";
 
 type EditorViewerProps = {
   content: string;
-  className: string;
+  className?: string;
 };
 
 const EditorViewer = ({ content, className }: EditorViewerProps) => {
   useEffect(() => {
-    document.querySelectorAll("pre code").forEach((el: Element) => {
-      hljs.highlightElement(el as HTMLElement);
-    });
+    setTimeout(() => {
+      document.querySelectorAll("pre code").forEach((el: Element) => {
+        const element = el as HTMLElement;
+
+        if (!element.dataset.highlighted) {
+          hljs.highlightElement(el as HTMLElement);
+          element.dataset.highlighted = "true";
+        }
+      });
+    }, 500);
   }, []);
 
   return (

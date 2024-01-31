@@ -1,10 +1,13 @@
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 5px 10px;
+  border-bottom: 1px solid var(--color-border);
 
   .itemBox {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     height: 100%;
 
@@ -163,5 +166,11 @@
 
   .newline {
     background-image: url("/svgs/editor_line_white.svg");
+  }
+}
+
+@include mobile {
+  .line {
+    margin: 0 5px !important;
   }
 }

@@ -14,7 +14,7 @@ export default interface Board {
   content: string;
   views: number;
   tags?: string[];
-  isSolved?: boolean;
+  solved?: number | null;
   likeTotal: number;
   isLike: boolean;
   isView: boolean;

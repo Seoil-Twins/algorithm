@@ -56,6 +56,10 @@
         color: #656567;
       }
     }
+
+    .input[type="file"] {
+      cursor: pointer;
+    }
   }
 
   .error {
@@ -75,6 +79,12 @@
 
     &:has(img) {
       padding-right: 15px;
+    }
+
+    &:not(:has(img)) {
+      .input {
+        padding-right: 15px;
+      }
     }
 
     .input {

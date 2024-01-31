@@ -1,15 +1,22 @@
-import Board from "@/interfaces/board";
-import { ResponseComment, getBoardDetail, getComments } from "@/api/board";
 import Image from "next/image";
+
+import Board from "@/interfaces/board";
+
+import { getBoardDetail } from "@/api/board";
+import { ResponseComment, getComments } from "@/api/comment";
+import { getUser } from "@/api/user";
+import { User } from "@/interfaces/user";
 
 import { getSessionId } from "@/utils/serverSideSession";
 
 import DetailNav from "./detailNav";
 import EditorViewer from "../common/editorViewer";
+import RecommendPost from "./recommendPost";
+import CommentEditor from "./commentEditor";
+import Comment from "./comment";
 
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
-import RecommendPost from "./recommendPost";
 
 type BoardDetailProps = {
   boardId: number;
@@ -17,12 +24,13 @@ type BoardDetailProps = {
 
 const BoardDetail = async ({ boardId }: BoardDetailProps) => {
   const sessionId = await getSessionId();
+  const user: User | undefined = await getUser(sessionId);
   const board: Board = await getBoardDetail(boardId);
   const comments: ResponseComment = await getComments(boardId);
 
   return (
     <div>
-      <DetailNav isEditable={board.user.userId === Number(sessionId)} />
+      <DetailNav isEditable={user?.userId === board.user.userId} />
       <div className={styles.contentBox}>
         <div className={styles.user}>
           <Image
@@ -43,11 +51,12 @@ const BoardDetail = async ({ boardId }: BoardDetailProps) => {
             <div className={styles.createdTime}>{board.createdTime}</div>
           </div>
         </div>
-        {board.isSolved ? (
+        {typeof board.solved === "number" && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>
-            해결
+            해결 완료
           </span>
-        ) : (
+        )}
+        {board.solved === null && (
           <span className={styles.notSolved}>미해결</span>
         )}
         <div className={`${styles.title} ${notosansBold.className}`}>
@@ -61,10 +70,22 @@ const BoardDetail = async ({ boardId }: BoardDetailProps) => {
           boardId={board.boardId}
         />
         <hr className={styles.line} />
+        <div className={styles.commentTotal}>{comments.total}개의 답변</div>
+        {sessionId && <CommentEditor />}
+        {comments.total > 0 && (
+          <div className={styles.commentBox}>
+            {comments.comments.map((comment) => (
+              <Comment
+                key={comment.commentId}
+                comment={comment}
+                userId={board.user.userId}
+                boardTypeId={board.boardType}
+                solved={board.solved}
+              />
+            ))}
+          </div>
+        )}
       </div>
-      {/** CommentEditor (Client) => Profile Image는 ? (optional) */}
-      {/** Comment (Client) => 수정, 삭제, 추천, 안에서 수정 누르면 CommendEdtiro 부르기 */}
-      {/** Comment (Client) => BoardDetail에서 처음 comment는 주고 N번째는 comment component에서 api 부르기 */}
     </div>
   );
 };

@@ -33,6 +33,14 @@
     }
   }
 
+  .editor {
+    padding: 10px;
+
+    & > div {
+      min-height: 300px;
+    }
+  }
+
   .btnBox {
     display: flex;
     justify-content: flex-end;

@@ -2,14 +2,4 @@
   border-radius: 8px;
   border: 1px solid var(--color-border);
   background-color: var(--color-modal-background);
-
-  .editor {
-    min-height: 300px;
-    padding: 10px;
-    border-top: 1px solid var(--color-border);
-
-    & > div {
-      min-height: 300px;
-    }
-  }
 }

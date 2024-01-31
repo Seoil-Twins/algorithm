@@ -43,13 +43,13 @@ const Table = ({ boardTypes, items }: TableProps) => {
             </div>
             <div
               className={`${styles.title} ${notosansMedium.className} ${
-                item.solved === true && styles.solved
+                item.solved && styles.solved
               }`}
             >
               {item.title}
             </div>
             <div className={styles.imgBox}>
-              {item.solved !== undefined && item.solved === true && (
+              {item.solved !== undefined && item.solved && (
                 <Image
                   src="/svgs/selection_active.svg"
                   alt="해결완료 아이콘"
@@ -58,7 +58,7 @@ const Table = ({ boardTypes, items }: TableProps) => {
                   className={styles.mr10}
                 />
               )}
-              {item.solved !== undefined && item.solved === false && (
+              {item.solved !== undefined && item.solved === null && (
                 <ThemeImage
                   lightSrc="/svgs/selection_black.svg"
                   darkSrc="/svgs/selection_white.svg"

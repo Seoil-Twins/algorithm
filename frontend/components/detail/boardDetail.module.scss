@@ -21,12 +21,12 @@
   }
 
   .solved {
-    color: $red;
+    color: #1cca00;
     font-size: 0.875rem;
   }
 
   .notSolved {
-    color: $blueLight;
+    color: $red;
     font-size: 0.875rem;
   }
 
@@ -44,5 +44,28 @@
     height: 1px;
     border: none;
     background-color: #bbc1cc;
+  }
+
+  .commentTotal {
+    margin-bottom: 25px;
+  }
+
+  .commentBox {
+    display: grid;
+    row-gap: 25px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto, minmax(98px, auto));
+    margin-top: 25px;
+  }
+}
+
+@include mobile {
+  .contentBox {
+    padding: 20px 15px;
+
+    .content img {
+      width: 100% !important;
+      height: auto !important;
+    }
   }
 }

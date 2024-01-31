@@ -130,7 +130,6 @@ export const Indent = Extension.create<IndentOptions>({
           indent: {
             default: this.options.defaultIndentLevel,
             renderHTML: (attributes) => {
-              console.log(attributes);
               return {
                 style: `margin-left: ${attributes.indent}px !important`,
               };

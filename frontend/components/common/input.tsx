@@ -101,7 +101,7 @@ const Input = ({
       if (multiple) onChangeFile?.(event.target.files);
       else onChangeFile?.(event.target.files[0]);
     },
-    [onChangeFile],
+    [multiple, onChangeFile],
   );
 
   const handleClickHideOrShow = useCallback(() => {
@@ -141,6 +141,7 @@ const Input = ({
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             multiple={multiple}
             onChange={handleFile}
+            className={styles.input}
           />
         )}
         {type === "password" && usePasswordToggle && (
