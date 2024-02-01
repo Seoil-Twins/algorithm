@@ -594,7 +594,7 @@ export const getMyFavorites = async (options: PageOptions) => {
 // eslint-disable-next-line prefer-const
 export let boardDetail: Board = {
   boardId: 2231,
-  boardType: 1,
+  boardType: 4,
   user: {
     userId: 1,
     profile:

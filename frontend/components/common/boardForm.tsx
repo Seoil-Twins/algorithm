@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import styles from "./new.module.scss";
+import styles from "./boardForm.module.scss";
 import { notosansMedium } from "@/styles/_font";
 import { useRouter } from "next/navigation";
 
@@ -10,38 +10,40 @@ import Dropdown, { DropdownItem } from "@/components/common/dropdown";
 import Input from "@/components/common/input";
 import Editor from "@/components/common/editor";
 
-type NewParams = {
-  algorithmId: number;
-};
+export type BOARD_TYPE_VALUE = 1 | 2 | 3 | 4;
 
-type RequestBoard = {
+export const BOARD_TYPE = {
+  PUBLIC_QUESTION: 1,
+  PUBLIC_FREE: 2,
+  ALGORITHM_QUESTION: 3,
+  ALGORITHM_FEEDBACK: 4,
+} as const;
+
+export type RequestBoard = {
   title: string;
   content: string;
-  boardType: 3 | 4;
+  boardType: BOARD_TYPE_VALUE;
 };
 
-const dropdownItems: DropdownItem[] = [
-  {
-    title: "질문",
-    value: 3,
-  },
-  {
-    title: "자유",
-    value: 4,
-  },
-];
+type BoardFormProps = {
+  request: RequestBoard;
+  dropdownItems: DropdownItem[];
+  btnTitle: string;
+  onChangeRequest: (request: RequestBoard) => void;
+  onSubmit: () => void;
+};
 
-const New = ({ params }: { params: NewParams }) => {
-  const algorithmId = params.algorithmId;
+const BoardForm = ({
+  request,
+  dropdownItems,
+  btnTitle,
+  onChangeRequest,
+  onSubmit,
+}: BoardFormProps) => {
   const router = useRouter();
 
   const titleRef = useRef<HTMLDivElement>(null);
 
-  const [requestData, setRequestData] = useState<RequestBoard>({
-    title: "",
-    content: "",
-    boardType: 3,
-  });
   const [isErrorTitle, setIsErrorTitle] = useState<boolean>(false);
   const [isVisibleDropdown, setIsVisibleDropdown] = useState<boolean>(false);
 
@@ -49,37 +51,52 @@ const New = ({ params }: { params: NewParams }) => {
     setIsVisibleDropdown(value);
   }, []);
 
-  const handleBoardType = useCallback((value: string | number) => {
-    setRequestData((prev) => ({
-      ...prev,
-      boardType: value as RequestBoard["boardType"],
-    }));
-  }, []);
+  const handleBoardType = useCallback(
+    (value: string | number) => {
+      const newRequest = {
+        ...request,
+        boardType: value as RequestBoard["boardType"],
+      };
 
-  const handleTitle = useCallback((value: string) => {
-    setRequestData((prev) => ({
-      ...prev,
-      title: value,
-    }));
-  }, []);
+      onChangeRequest(newRequest);
+    },
+    [request, onChangeRequest],
+  );
 
-  const handleEditor = useCallback((value: string) => {
-    setRequestData((prev) => ({
-      ...prev,
-      content: value,
-    }));
-  }, []);
+  const handleTitle = useCallback(
+    (value: string) => {
+      const newRequest = {
+        ...request,
+        title: value,
+      };
+
+      onChangeRequest(newRequest);
+    },
+    [request, onChangeRequest],
+  );
+
+  const handleEditor = useCallback(
+    (value: string) => {
+      const newRequest = {
+        ...request,
+        content: value,
+      };
+
+      onChangeRequest(newRequest);
+    },
+    [request, onChangeRequest],
+  );
 
   const handleCancel = useCallback(() => {
     router.back();
   }, [router]);
 
   const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    async (event: React.FormEvent<HTMLFormElement>) => {
       event.stopPropagation();
       event.preventDefault();
 
-      if (!requestData.title || requestData.title.length <= 0) {
+      if (!request.title || request.title.length <= 0) {
         setIsErrorTitle(true);
         window.scrollTo({
           top: titleRef.current?.offsetTop && titleRef.current?.offsetTop - 200,
@@ -89,13 +106,13 @@ const New = ({ params }: { params: NewParams }) => {
       }
 
       setIsErrorTitle(false);
-      router.push(`/algorithm/detail/${algorithmId}/all`);
+      onSubmit();
     },
-    [algorithmId, requestData, router],
+    [request, onSubmit],
   );
 
   return (
-    <form className={styles.new} onSubmit={handleSubmit}>
+    <form className={styles.form} onSubmit={handleSubmit}>
       <div>
         <div className={styles.boardTitle}>
           <span className={`${notosansMedium.className}`}>카테고리</span>
@@ -106,7 +123,10 @@ const New = ({ params }: { params: NewParams }) => {
             isVisible={isVisibleDropdown}
             onVisible={handleVisibleDropdown}
             items={dropdownItems}
-            defaultTitle={dropdownItems[0].title}
+            defaultTitle={
+              dropdownItems.find((item) => item.value === request.boardType)
+                ?.title || dropdownItems[0].title
+            }
             onChange={handleBoardType}
           />
         </div>
@@ -118,7 +138,7 @@ const New = ({ params }: { params: NewParams }) => {
         </div>
         <div className={styles.title} ref={titleRef}>
           <Input
-            value={requestData.title}
+            value={request.title}
             onChange={handleTitle}
             placeholder="제목 입력"
             errorMsg="제목을 입력해주세요."
@@ -132,7 +152,7 @@ const New = ({ params }: { params: NewParams }) => {
           <span className={styles.required}>*</span>
         </div>
         <Editor
-          value={requestData.content}
+          value={request.content}
           onChange={handleEditor}
           className={styles.editor}
         />
@@ -142,11 +162,11 @@ const New = ({ params }: { params: NewParams }) => {
           취소
         </button>
         <button type="submit" className={styles.submit}>
-          등록
+          {btnTitle}
         </button>
       </div>
     </form>
   );
 };
 
-export default New;
+export default BoardForm;

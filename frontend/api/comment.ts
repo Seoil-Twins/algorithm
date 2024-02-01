@@ -5,9 +5,17 @@ export interface ResponseComment {
   total: number;
 }
 
+export interface PageOptions {
+  count: number;
+  page: number;
+}
+
 export const getComments = async (
   boardId: string | number,
+  pageOptions: PageOptions,
 ): Promise<ResponseComment> => {
+  console.log(boardId, pageOptions);
+
   return {
     comments: [
       {

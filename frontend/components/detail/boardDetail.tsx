@@ -17,16 +17,26 @@ import Comment from "./comment";
 
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
+import Pagination from "../common/pagination";
 
 type BoardDetailProps = {
   boardId: number;
 };
 
-const BoardDetail = async ({ boardId }: BoardDetailProps) => {
+const BoardDetail = async ({
+  boardId,
+  searchParams,
+}: {
+  boardId: BoardDetailProps["boardId"];
+  searchParams: { [key: string]: string | string[] | undefined };
+}) => {
   const sessionId = await getSessionId();
   const user: User | undefined = await getUser(sessionId);
   const board: Board = await getBoardDetail(boardId);
-  const comments: ResponseComment = await getComments(boardId);
+
+  const count = Number(searchParams?.count) || 10;
+  const page = Number(searchParams?.page) || 1;
+  const comments: ResponseComment = await getComments(boardId, { count, page });
 
   return (
     <div>
@@ -83,6 +93,12 @@ const BoardDetail = async ({ boardId }: BoardDetailProps) => {
                 solved={board.solved}
               />
             ))}
+            <Pagination
+              current={page}
+              count={count}
+              total={comments.total}
+              marginTop={25}
+            />
           </div>
         )}
       </div>

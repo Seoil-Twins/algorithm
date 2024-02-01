@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
+import Image from "next/image";
 
 import styles from "./modal.module.scss";
 import { notosansBold } from "@/styles/_font";
-
-import ThemeImage from "./themeImage";
-import Image from "next/image";
 
 type ModalProps = {
   isVisible: boolean;
@@ -36,6 +34,8 @@ const Modal = ({
   maxWidth = 60,
   children,
 }: ModalProps) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const handleOk = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation();
@@ -52,12 +52,43 @@ const Modal = ({
     [onCancel],
   );
 
+  const handleVisible = useCallback(
+    (event: MouseEvent) => {
+      const modalInside = modalRef.current?.contains(event.target as Node);
+
+      if (modalInside) return;
+
+      onCancel();
+      document.body.removeEventListener("click", handleVisible);
+    },
+    [onCancel],
+  );
+
+  useEffect(() => {
+    if (isVisible) {
+      document.body.style.overflow = "hidden";
+      document.body.addEventListener("click", handleVisible);
+    } else {
+      document.body.style.overflow = "auto";
+      document.body.removeEventListener("click", handleVisible);
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+      document.body.removeEventListener("click", handleVisible);
+    };
+  }, [isVisible, handleVisible]);
+
   if (!isVisible) return null;
 
   return (
     <>
-      <div className={styles.modal} onClick={handleCancel}>
-        <div className={styles.box} style={{ maxWidth: `${maxWidth}vw` }}>
+      <div className={styles.modal}>
+        <div
+          className={styles.box}
+          style={{ maxWidth: `${maxWidth}vw` }}
+          ref={modalRef}
+        >
           <div className={styles.header}>
             <span className={`${styles.title} ${notosansBold.className}`}>
               {title}
