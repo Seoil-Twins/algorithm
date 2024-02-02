@@ -338,3 +338,27 @@ select:-webkit-autofill:focus {
     cursor: col-resize;
   }
 }
+
+.level0 {
+  color: $bronze;
+}
+
+.level1 {
+  color: $silver;
+}
+
+.level2 {
+  color: $gold;
+}
+
+.level3 {
+  color: $platinum;
+}
+
+.level4 {
+  color: $diamond;
+}
+
+.level5 {
+  color: $master;
+}

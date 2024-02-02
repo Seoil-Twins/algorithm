@@ -1,4 +1,5 @@
 import { Algorithm } from "@/interfaces/algorithm";
+import Explanation from "@/interfaces/explanation";
 
 export type SolvedOptions = "a" | "s" | "ns";
 export type SortOptions = "r" | "or" | "t";
@@ -1037,4 +1038,22 @@ export const getRecommendAlgorithms = async (): Promise<Algorithm[]> => {
       solvedRate: 80,
     },
   ];
+};
+
+export const getExplain = async (algorithmId: number): Promise<Explanation> => {
+  console.log(algorithmId);
+
+  return {
+    explanationId: 2341,
+    algorithmId: 369,
+    content: `<h3 style="margin-left: 0px !important">문제</h3><p style="margin-left: 0px !important">한국도로공사는 고속도로의 유비쿼터스화를 위해 고속도로 위에 N개의 센서를 설치하였다. 문제는 이 센서들이 수집한 자료들을 모으고 분석할 몇 개의 집중국을 세우는 일인데, <br>예산상의 문제로, 고속도로 위에 최대 K개의 집중국을 세울 수 있다고 한다.</p><p style="margin-left: 0px !important">각 집중국은 센서의 수신 가능 영역을 조절할 수 있다. 집중국의 수신 가능 영역은 고속도로 상에서 연결된 구간으로 나타나게 된다. N개의 센서가 적어도 하나의 집중국과는 통신이 가능<br>해야 하며, 집중국의 유지비 문제로 인해 각 집중국의 수신 가능 영역의 길이의 합을 최소화해야 한다.</p><p style="margin-left: 0px !important">편의를 위해 고속도로는 평면상의 직선이라고 가정하고, 센서들은 이 직선 위의 한 기점인 원점으로부터의 정수 거리의 위치에 놓여 있다고 하자. 따라서, 각 센서의 좌표는 정수 하나로 표현된다. 이 상황에서 각 집중국의 수신 가능영역의 거리의 합의 최솟값을 구하는 프로그램을 작성하시오. 단, 집중국의 수신 가능영역의 길이는 0 이상이며 모든 센서의 좌표가 다를 필요는 없다.</p><p style="margin-left: 0px !important"></p><h3 style="margin-left: 0px !important">입력</h3><p style="margin-left: 0px !important">첫째 줄에 센서의 개수 N(1 ≤ N ≤ 10,000), 둘째 줄에 집중국의 개수 K(1 ≤ K ≤ 1000)가 주어진다. 셋째 줄에는 N개의 센서의 좌표가 한 개의 정수로 N개 주어진다. 각 좌표 사이에는 빈 칸이 하나 있으며, 좌표의 절댓값은 1,000,000 이하이다.</p><p style="margin-left: 0px !important"></p><h3 style="margin-left: 0px !important">출력</h3><p style="margin-left: 0px !important">첫째 줄에 문제에서 설명한 최대 K개의 집중국의 수신 가능 영역의 길이의 합의 최솟값을 출력한다.</p><table><tbody><tr><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">입력 (센서의 개수)</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">입력 (집중국의 개수)</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">입력 (센서의 좌표)</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">출력</p></td></tr><tr><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">6</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">2</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">1 6 9 3 6 7</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">5</p></td></tr><tr><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">10</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">5</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">20 3 14 6 7 8 18 10 12 15</p></td><td colspan="1" rowspan="1"><p style="margin-left: 0px !important">7</p></td></tr></tbody></table><p style="margin-left: 0px !important"></p><h3 style="margin-left: 0px !important">문제 해설</h3><p style="margin-left: 0px !important">"<strong>각 집중국은 센서의 수신 가능 영역을 조절할 수 있다. 집중국의 수신 가능 영역은 고속도로 상에서 연결된 구간으로 나타나게 된다. N개의 센서가 적어도 하나의 집중국과는 통신이 가능해야 하며, 집중국의 유지비 문제로 인해 각 집중국의 수신 가능 영역의 길이의 합을 최소화해야 한다.</strong>" 라는 뜻은 다음과 같다.</p><ul class="tight" data-tight="true"><li><p style="margin-left: 0px !important">센서 개수 : 6개</p></li><li><p style="margin-left: 0px !important">기지국 개수 : 2개</p></li><li><p style="margin-left: 0px !important">최소의 합 : 5</p></li></ul><img src="blob:http://localhost:3000/ef0411ab-d2d2-471c-b867-28d16cc56fd4" style="width: 100%; height: auto; cursor: pointer;"><p style="margin-left: 0px !important"></p><p style="margin-left: 0px !important">"<strong>평면상의 직선이라고 가정하고, 센서들은 이 직선 위의 한 기점인 원점으로부터의 정수 거리의 위치에 놓여 있다고 하자. 따라서, 각 센서의 좌표는 정수 하나로 표현된다.</strong>"를 통해 센서들을 한 기점을 중심으로 센서들이 좌표마다 배치되어 있다고 한다. 여기서 원점은 <strong>맨 왼쪽 0 (따로 표시는 하지 않음)</strong>부터 시작한다고 보면 된다. 집중국은 총 2개이니 센서들을 2개의 묶음으로 만들 수 있고 그 묶음의 합이 최솟값이면 되는 것이다. 그리고 <strong>6은 2번 중복</strong>되었기 때문에 <strong>6을 1개</strong>로 칠 수 있다.<br>그러면 이제 코드를 보자.</p><p style="margin-left: 0px !important"></p><p style="margin-left: 0px !important">위와 같은 형태를 적용한다면, 센서들의 좌표를 <strong>오름차순 정렬</strong>하여 각 좌표마다의 <strong>차이</strong>를 구해 그 중 <strong>최소의 합</strong>을 찾으면 되는 것이다. 여기서 최소의 합을 구하는 방법은 <strong>가장 차이가 많이 나는 좌표</strong>들은<strong> 1개의 기지국으로 묶어 합을 0</strong>으로 만드는 것이다. 즉, 기지국 1개를 가져가는 좌표들의 개수는 <strong>기지국 - 1개</strong>이다. 나머지 1개의 기지국은 하나로 묶어 최소의 합을 구하면 되는 것이다.</p><pre><code class="language-python">sensor_distances.sort()
+
+diffs = [
+    sensor_distances[i + 1] - sensor_distances[i]
+    for i in range(0, len(sensor_distances) - 1)
+]
+diffs.sort()</code></pre><p style="margin-left: 0px !important">센서들의 좌표를 오름차순 정렬하여, 각 좌표들의 차이를 오름차순을 정렬한다. 이 때 주의할점은 <strong>i + 1</strong> 값을<strong> i의 값</strong>으로 <strong>빼야</strong> 한다는 것이다. 왜냐하면 오름차순 정렬로 인해 i + 1의 값이 무조건 i의 값보다 높기 때문이다.</p><pre><code class="language-python">result = sum(diffs[0:len(diffs) - (building_cnt - 1)])
+print(result)</code></pre><p style="margin-left: 0px !important">좌표들의 차이 값에서 <strong>기지국 개수 - 1</strong>개만 묶어 합을 구하면 된다. 즉, <strong>기지국 하나</strong>로 <strong>1개의 좌표</strong>로만 구성되어 있는 것은 <strong>센서의 차이 값이 큰 애들</strong>만 있고, 그 외 <strong>차이 값이 적은 애들</strong>은 <strong>1개의 기지국</strong>으로만 이루어져있는 것이다.</p>`,
+    createdTime: "2022-12-31 12:12:30",
+  };
 };

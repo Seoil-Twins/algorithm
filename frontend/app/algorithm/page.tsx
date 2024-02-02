@@ -20,7 +20,6 @@ import Table, { TableData } from "@/components/algorithm/table";
 import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
 
-import styles from "./algorithm.module.scss";
 import { notosansBold } from "@/styles/_font";
 
 import { Algorithm as AlgorithmType } from "@/interfaces/algorithm";
@@ -73,11 +72,7 @@ const Algorithm = async ({
             height={24}
           />,
           <span>{algorithm.title}</span>,
-          <span
-            className={`${styles[`level${algorithm.level}`]} ${
-              notosansBold.className
-            }`}
-          >
+          <span className={`level${algorithm.level} ${notosansBold.className}`}>
             Level. {algorithm.level}
           </span>,
           <span>{algorithm.kinds[0]}</span>,

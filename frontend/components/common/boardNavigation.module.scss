@@ -24,14 +24,13 @@
     .search {
       display: flex;
       align-items: center;
+      padding: 7px 15px;
       border-radius: 8px;
       border: 1px solid var(--color-border);
       background-color: var(--color-input-background);
 
       input {
         flex: 1;
-        margin-right: 5px;
-        padding: 7px 15px;
         border: none;
         outline: none;
         color: #222222;
