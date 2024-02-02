@@ -5,6 +5,7 @@
     @include disabledBtn(20px, 10px);
     border: none;
     background-color: #e8e8e8;
+    color: var(--color-primary-reverse);
     cursor: pointer;
   }
 
@@ -21,6 +22,12 @@
     .delete {
       @include warningBtn(20px, 10px);
     }
+  }
+}
+
+[data-theme="dark"] {
+  .back {
+    background-color: #555555;
   }
 }
 

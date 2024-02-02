@@ -23,6 +23,20 @@ const CodeTypeContext = createContext<CodeTypeProviderContext>({
   setType: () => {},
 });
 
+export type CodeTypeInfo = {
+  [K in (typeof CODE_TYPE_OPTIONS_ARRAY)[number]]: string;
+};
+
+const myCodeTitle: CodeTypeInfo = {
+  c: "cpp",
+  j: "java",
+  p: "python",
+};
+
+export const findMyTitle = (value: CodeType) => {
+  return myCodeTitle[value];
+};
+
 export const checkMyType = (compareArray: CodeType[], value: CodeType) => {
   return compareArray.includes(value);
 };

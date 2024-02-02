@@ -3,7 +3,6 @@
   border: 1px solid var(--color-border);
 
   .editorBox {
-    display: grid;
     margin-bottom: 10px;
 
     .profileImg {
@@ -42,12 +41,6 @@
 @mixin desktopAndTablet {
   .commentEditor {
     padding: 20px 30px;
-
-    .editorBox {
-      column-gap: 10px;
-      grid-template-rows: 1fr;
-      grid-template-columns: auto 1fr;
-    }
   }
 }
 
@@ -62,11 +55,5 @@
 @include mobile {
   .commentEditor {
     padding: 10px 15px;
-
-    .editorBox {
-      row-gap: 10px;
-      grid-template-rows: auto auto;
-      grid-template-columns: 1fr;
-    }
   }
 }

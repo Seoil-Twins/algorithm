@@ -39,7 +39,9 @@ const Editor = ({
 }: EditorProps) => {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false,
+      }),
       Markdown,
       Underline,
       Link.extend({ inclusive: false }).configure({

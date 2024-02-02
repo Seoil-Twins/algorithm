@@ -1,0 +1,61 @@
+.answer {
+  .user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      margin-right: 5px;
+
+      .profileImg {
+        margin-right: 10px;
+        border-radius: 100px;
+      }
+    }
+
+    .recommend {
+      display: flex;
+      align-items: center;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      user-select: none;
+
+      .count {
+        margin: 0 10px;
+      }
+
+      .btn {
+        padding: 10px;
+
+        &:first-child {
+          border-right: 1px solid var(--color-border);
+        }
+
+        &:last-child {
+          border-left: 1px solid var(--color-border);
+        }
+      }
+    }
+  }
+
+  .codeBox {
+    margin-bottom: 20px;
+
+    .editor {
+      pre {
+        margin: 0;
+      }
+    }
+  }
+
+  .comment {
+    display: grid;
+    row-gap: 20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto-fill, minmax(44px, auto));
+    margin-bottom: 20px;
+  }
+}

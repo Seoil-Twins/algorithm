@@ -1,6 +1,5 @@
 import Board from "@/interfaces/board";
 import { BoardType } from "@/interfaces/boardType";
-import Comment from "@/interfaces/comment";
 
 export interface PageOptions {
   page: number;

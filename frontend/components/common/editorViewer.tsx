@@ -12,17 +12,20 @@ type EditorViewerProps = {
 
 const EditorViewer = ({ content, className }: EditorViewerProps) => {
   useEffect(() => {
-    setTimeout(() => {
-      document.querySelectorAll("pre code").forEach((el: Element) => {
-        const element = el as HTMLElement;
+    const regex = /<pre><code(?:\s+class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g;
+    if (!content.match(regex)) return;
+
+    document
+      .querySelectorAll("pre code:not([data-highlighted])")
+      .forEach((ele: Element) => {
+        const element = ele as HTMLElement;
 
         if (!element.dataset.highlighted) {
-          hljs.highlightElement(el as HTMLElement);
+          hljs.highlightElement(element);
           element.dataset.highlighted = "true";
         }
       });
-    }, 500);
-  }, []);
+  });
 
   return (
     <div
@@ -30,7 +33,6 @@ const EditorViewer = ({ content, className }: EditorViewerProps) => {
         __html: DOMPurify.sanitize(content),
       }}
       className={`tiptap ${className}`}
-      style={{ color: "#dadae5#ffffff" }}
     />
   );
 };

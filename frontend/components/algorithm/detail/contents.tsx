@@ -16,7 +16,7 @@ import { Algorithm } from "@/interfaces/algorithm";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
-import { useCodeType } from "@/providers/codeTypeProvider";
+import { findMyTitle, useCodeType } from "@/providers/codeTypeProvider";
 
 import Modal from "@/components/common/modal";
 import EditorViewer from "@/components/common/editorViewer";
@@ -297,7 +297,9 @@ const Contents = ({ algorithm }: DetailProps) => {
         <div className={styles.blank}></div>
         <button className={styles.btn}>
           <Link
-            href={`/algorithm/detail/${algorithm.algorithmId}/other-answers`}
+            href={`/algorithm/detail/${
+              algorithm.algorithmId
+            }/other-answers?language=${findMyTitle(type)}`}
           >
             다른 사람 풀이 보기
           </Link>

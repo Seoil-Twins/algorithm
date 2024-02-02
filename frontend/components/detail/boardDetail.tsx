@@ -81,7 +81,7 @@ const BoardDetail = async ({
         />
         <hr className={styles.line} />
         <div className={styles.commentTotal}>{comments.total}개의 답변</div>
-        {sessionId && <CommentEditor />}
+        {sessionId && <CommentEditor apiUrl={`/board/comment/${boardId}`} />}
         {comments.total > 0 && (
           <div className={styles.commentBox}>
             {comments.comments.map((comment) => (

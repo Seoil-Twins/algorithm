@@ -1,10 +1,4 @@
-import { User } from "./user";
-
-type OriginalUser = User;
-export type RequiredUser = Pick<
-  OriginalUser,
-  "userId" | "profile" | "nickname"
->;
+import { RequiredUser } from "./user";
 
 export default interface Comment {
   commentId: number;

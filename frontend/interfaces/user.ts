@@ -14,3 +14,5 @@ export interface User {
   profile?: string;
   createdTime: string;
 }
+
+export type RequiredUser = Pick<User, "userId" | "profile" | "nickname">;

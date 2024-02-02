@@ -3,6 +3,7 @@
 import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
 
 import styles from "./comment.module.scss";
 
@@ -14,7 +15,6 @@ import { deleteComment, modifyCommentSolved } from "@/api/comment";
 
 import EditorViewer from "../common/editorViewer";
 import CommentUpdateEditor from "./commentUpdateEditor";
-import { useDebouncedCallback } from "use-debounce";
 
 type CommentProps = {
   comment: CommentType;
@@ -65,6 +65,15 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
       router.refresh();
     },
     [router],
+  );
+
+  const handleCommentUpdate = useCallback(
+    (value: string) => {
+      console.log(value, comment.commentId);
+      router.refresh();
+      setIsVisibleEditor(false);
+    },
+    [comment.commentId, router],
   );
 
   const renderCheckMark = () => {
@@ -164,9 +173,8 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
         </div>
         {isVisibleEditor ? (
           <CommentUpdateEditor
-            commentId={comment.commentId}
             initialValue={comment.content}
-            onChangeComment={handleIsVisibleCommentEditor}
+            onSubmit={handleCommentUpdate}
           />
         ) : (
           <EditorViewer content={comment.content} />

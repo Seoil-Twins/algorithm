@@ -8,11 +8,17 @@ import Editor from "../common/editor";
 import styles from "./commentEditor.module.scss";
 
 import { useAuth } from "@/providers/authProvider";
-import { useParams } from "next/navigation";
 
-const CommentEditor = () => {
+type CommentEditorProps = {
+  apiUrl: string;
+  isVisibleToolbar?: boolean;
+};
+
+const CommentEditor = ({
+  apiUrl,
+  isVisibleToolbar = true,
+}: CommentEditorProps) => {
   const { user } = useAuth()!;
-  const { algorithmId, boardId } = useParams();
 
   const [value, setValue] = useState<string>("");
 
@@ -24,9 +30,9 @@ const CommentEditor = () => {
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      console.log(value);
+      console.log(apiUrl, value);
     },
-    [value],
+    [apiUrl, value],
   );
 
   if (!user) return null;
@@ -48,6 +54,7 @@ const CommentEditor = () => {
           onChange={handleChange}
           placeholder="Markdown을 지원하는 댓글창입니다."
           className={styles.editor}
+          isVisibleToolbar={isVisibleToolbar}
         />
       </div>
       <div className={styles.btnBox}>

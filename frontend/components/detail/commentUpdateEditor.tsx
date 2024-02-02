@@ -1,28 +1,22 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import Link from "next/link";
 
 import Editor from "../common/editor";
 
-import styles from "./commentEditor.module.scss";
-
-import { useParams, useRouter } from "next/navigation";
+import styles from "./commentUpdateEditor.module.scss";
 
 type CommentUpdateEditorProps = {
-  commentId: number;
   initialValue: string;
-  onChangeComment: () => void;
+  isVisibleToolbar?: boolean;
+  onSubmit: (value: string) => void;
 };
 
 const CommentUpdateEditor = ({
-  commentId,
   initialValue,
-  onChangeComment,
+  isVisibleToolbar = true,
+  onSubmit,
 }: CommentUpdateEditorProps) => {
-  const router = useRouter();
-  const { algorithmId, boardId } = useParams();
-
   const [value, setValue] = useState<string>(initialValue);
 
   const handleChange = useCallback((newVal: string) => {
@@ -33,12 +27,9 @@ const CommentUpdateEditor = ({
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      console.log(algorithmId, boardId, commentId, value);
-      router.refresh();
-      // local에서만 업데이트 할 거면 여기서 인자 값에다가 content 넘기면 됨
-      onChangeComment();
+      onSubmit(value);
     },
-    [algorithmId, boardId, commentId, value, router, onChangeComment],
+    [value, onSubmit],
   );
 
   return (
@@ -49,6 +40,7 @@ const CommentUpdateEditor = ({
           onChange={handleChange}
           placeholder="Markdown을 지원하는 댓글창입니다."
           className={styles.editor}
+          isVisibleToolbar={isVisibleToolbar}
         />
       </div>
       <div className={styles.btnBox}>
