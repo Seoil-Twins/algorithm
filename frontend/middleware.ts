@@ -23,6 +23,11 @@ export default async function middleware(req: NextRequest) {
       return regex.test(pathname);
     }) && !session.sessionId;
 
+  if (pathname === "/forum") {
+    url.pathname = "/forum/all";
+    return NextResponse.redirect(url);
+  }
+
   // 잘못된 권한으로 접근할 시 홈으로 리다이렉션
   if (hasSessionButUnAuthPath || noSessionButAuthPath) {
     url.pathname = "/";

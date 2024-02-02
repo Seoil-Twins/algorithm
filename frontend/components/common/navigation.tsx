@@ -30,7 +30,7 @@ const Navigation = () => {
     },
     {
       title: "게시판",
-      link: "/board",
+      link: "/forum",
     },
     {
       title: "랭킹",

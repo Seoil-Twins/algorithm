@@ -2,9 +2,9 @@
 
 import React, { useCallback } from "react";
 import Image from "next/image";
+import { useDebouncedCallback } from "use-debounce";
 
 import styles from "./recommendPost.module.scss";
-import { useDebouncedCallback } from "use-debounce";
 
 type RecommendPostProps = {
   userId?: string;

@@ -91,7 +91,7 @@ const BoardNavigation = ({ items, isVisiblePost }: BoardNavigationProps) => {
         </div>
         {isVisiblePost && (
           <Link
-            href={`${pathname.slice(0, pathname.lastIndexOf("/"))}/board/new`}
+            href={`${pathname.slice(0, pathname.lastIndexOf("/"))}/new`}
             className={styles.post}
           >
             <button>글쓰기</button>

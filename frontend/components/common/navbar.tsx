@@ -243,7 +243,13 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               <Link href={menu.link} key={idx}>
                 <div
                   className={`${styles.menuItemBox} ${
-                    menu.link === path ? styles.active : styles.none
+                    menu.link === path ||
+                    (menu.link === "/forum" &&
+                      (path === "/forum/all" ||
+                        path === "/forum/question" ||
+                        path === "/forum/free"))
+                      ? styles.active
+                      : styles.none
                   }`}
                   ref={menuRefs.current[idx]}
                 >
@@ -391,7 +397,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             <div className={styles.content}>
               {alrams ? (
                 alrams.map((alram, idx) => (
-                  <Link href={`/board/${alram.board.boardId}`} key={idx}>
+                  <Link href={`/forum/${alram.board.boardId}`} key={idx}>
                     <div className={styles.item}>
                       <div>
                         {alram.otherUser.profile ? (

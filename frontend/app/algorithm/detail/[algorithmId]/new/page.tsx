@@ -20,7 +20,7 @@ const dropdownItems: DropdownItem[] = [
     value: 3,
   },
   {
-    title: "자유",
+    title: "피드백",
     value: 4,
   },
 ];

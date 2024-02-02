@@ -28,7 +28,7 @@ const BoardDetail = async ({
   searchParams,
 }: {
   boardId: BoardDetailProps["boardId"];
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
   const sessionId = await getSessionId();
   const user: User | undefined = await getUser(sessionId);
@@ -73,12 +73,21 @@ const BoardDetail = async ({
           {board.title}
         </div>
         <EditorViewer className={styles.content} content={board.content} />
-        <RecommendPost
-          isFavorite={board.isLike}
-          recommendCount={board.likeTotal}
-          userId={sessionId}
-          boardId={board.boardId}
-        />
+        <div className={styles.bottom}>
+          <div className={styles.tagBox}>
+            {board.tags?.map((tag, idx) => (
+              <div key={idx} className={styles.tag}>
+                # {tag}
+              </div>
+            ))}
+          </div>
+          <RecommendPost
+            isFavorite={board.isLike}
+            recommendCount={board.likeTotal}
+            userId={sessionId}
+            boardId={board.boardId}
+          />
+        </div>
         <hr className={styles.line} />
         <div className={styles.commentTotal}>{comments.total}개의 답변</div>
         {sessionId && <CommentEditor apiUrl={`/board/comment/${boardId}`} />}

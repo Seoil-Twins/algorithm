@@ -66,7 +66,7 @@ const Content = async ({
           </span>,
           <span>{getTimeAgo(board.createdTime)}</span>,
         ],
-        link: `/algorithm/detail/${algorithmId}/board/${board.boardId}`,
+        link: `/forum/${board.boardId}`,
       };
     },
   );

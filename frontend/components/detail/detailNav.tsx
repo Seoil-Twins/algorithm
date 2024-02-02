@@ -39,7 +39,7 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
       {isEditable && (
         <div className={styles.editable}>
           <Link
-            href={`/algorithm/detail/${params.algorithmId}/board/${params.boardId}/update`}
+            href={`/forum/${params.boardId}/update`}
             className={`${styles.update}`}
           >
             글 수정

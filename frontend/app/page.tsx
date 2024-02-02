@@ -66,7 +66,7 @@ const page = async () => {
           <div className={`${styles.ft24} ${notosansMedium.className}`}>
             추천 게시물
           </div>
-          <Link href="/board" className={notosansMedium.className}>
+          <Link href="/forum" className={notosansMedium.className}>
             <div className={styles.moreBtn}>더 보기</div>
           </Link>
         </div>

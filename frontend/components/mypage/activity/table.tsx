@@ -34,7 +34,7 @@ const Table = ({ boardTypes, items }: TableProps) => {
     <div className={styles.table}>
       {items.map((item: BoardList) => (
         <Link
-          href={`/board/${item.boardType}/${item.boardId}`}
+          href={`/forum/${item.boardType}/${item.boardId}`}
           key={item.boardId}
         >
           <div className={styles.container}>

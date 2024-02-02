@@ -1,6 +1,3 @@
-import { Algorithm } from "@/interfaces/algorithm";
-import { User } from "@/interfaces/user";
-
 export interface BoardOptions {
   count: number;
   page: number;

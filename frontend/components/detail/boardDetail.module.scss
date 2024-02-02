@@ -39,6 +39,31 @@
     margin-bottom: 1.5625rem;
   }
 
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+
+    .tagBox {
+      display: flex;
+      font-size: 0.875rem;
+      user-select: none;
+
+      .tag {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: 0 15px;
+        border-radius: 8px;
+        background-color: var(--color-background);
+
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
   .line {
     margin: 3.4375rem 0;
     height: 1px;

@@ -21,7 +21,7 @@ const PostCard = async () => {
       {recommendPosts.map((post: BoardList) => {
         return (
           <Link
-            href={`/board/${post.boardId}`}
+            href={`/forum/${post.boardId}`}
             className={styles.itemBox}
             key={post.boardId}
           >
