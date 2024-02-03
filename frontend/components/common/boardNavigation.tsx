@@ -15,9 +15,14 @@ export type NavItem = {
 type BoardNavigationProps = {
   items: NavItem[];
   isVisiblePost: boolean;
+  placeholder?: string;
 };
 
-const BoardNavigation = ({ items, isVisiblePost }: BoardNavigationProps) => {
+const BoardNavigation = ({
+  items,
+  isVisiblePost,
+  placeholder = "제목으로 검색",
+}: BoardNavigationProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -69,7 +74,7 @@ const BoardNavigation = ({ items, isVisiblePost }: BoardNavigationProps) => {
         <div className={styles.search}>
           <input
             type="text"
-            placeholder="제목으로 검색"
+            placeholder={placeholder}
             value={keyword}
             onChange={handleKeyword}
             onKeyDown={handleEnter}
