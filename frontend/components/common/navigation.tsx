@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 
 import styles from "./navigation.module.scss";
@@ -16,9 +15,9 @@ export type MenuItems = {
   link: string;
 };
 
+const regex = new RegExp(/^\/algorithm\/detail(?:\/[^/]+)?\/?$/);
+
 const Navigation = () => {
-  // eslint-disable-next-line no-useless-escape
-  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
   const menuItems: MenuItems[] = [
     {
       title: "메인",

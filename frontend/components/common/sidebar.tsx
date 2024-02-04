@@ -15,10 +15,15 @@ import styles from "./sidebar.module.scss";
 
 import { MenuItems } from "./navigation";
 
+import AlramType from "@/interfaces/alram";
+
 import { useAuth } from "@/providers/authProvider";
+
+import { fetchAlrams } from "@/api/alram";
 
 import ThemeImage from "./themeImage";
 import ThemeSwitch from "./themeSwitch";
+import Alram from "./alram";
 
 type SidebarProps = {
   menuItems: MenuItems[];
@@ -28,10 +33,16 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   const { session, isLoading, logout } = useAuth()!;
   const path = usePathname();
 
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const alramModalRef = useRef<HTMLDivElement>(null);
+  const alramImgRef = useRef<HTMLButtonElement>(null);
   const menuRefs = useRef<RefObject<HTMLDivElement>[]>(
     menuItems.map(() => createRef()),
   );
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isVisibleAlramModal, setIsVisibleAlramModal] =
+    useState<boolean>(false);
+  const [alrams, setAlrams] = useState<AlramType[]>([]);
 
   const customMenuItems: MenuItems[] = useMemo(() => {
     return session.sessionId
@@ -53,6 +64,31 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     });
   }, []);
 
+  const onAlramClick = useCallback((event: MouseEvent) => {
+    const insideAlram = alramModalRef.current?.contains(event.target as Node);
+    const insideProfileImg = alramImgRef.current?.contains(
+      event.target as Node,
+    );
+
+    if (insideAlram || insideProfileImg) {
+      return;
+    }
+
+    setIsVisibleAlramModal(false);
+    document.body.removeEventListener("click", onAlramClick);
+  }, []);
+
+  const openAlramModal = useCallback(() => {
+    document.body.addEventListener("click", onAlramClick);
+
+    setIsVisibleAlramModal((prev) => !prev);
+  }, [onAlramClick]);
+
+  const callFetchAlrams = useCallback(async () => {
+    const newAlrams = await fetchAlrams();
+    setAlrams(newAlrams);
+  }, []);
+
   const handleLogout = useCallback(async () => {
     await logout();
   }, [logout]);
@@ -61,6 +97,12 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     // 마이페이지가 추가된 경우, menuRefs를 업데이트
     menuRefs.current = customMenuItems.map(() => createRef());
   }, [customMenuItems]);
+
+  useEffect(() => {
+    if (isVisibleAlramModal) {
+      callFetchAlrams();
+    }
+  }, [isVisibleAlramModal, callFetchAlrams]);
 
   return (
     <div className={styles.centerBox}>
@@ -78,6 +120,19 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
         </Link>
         <div className={styles.right}>
           <ThemeSwitch className={styles.themeBtn} />
+          <button
+            className={styles.alramImgBox}
+            onClick={openAlramModal}
+            ref={alramImgRef}
+          >
+            <ThemeImage
+              lightSrc="/svgs/bell_black.svg"
+              darkSrc="/svgs/bell_white.svg"
+              alt="알람 아이콘"
+              width={30}
+              height={30}
+            />
+          </button>
           <button onClick={toggleModal}>
             <ThemeImage
               lightSrc="/svgs/hamburger_black.svg"
@@ -146,6 +201,11 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
           )}
         </div>
       )}
+      <Alram
+        ref={alramModalRef}
+        alrams={alrams}
+        isVisible={isVisibleAlramModal}
+      />
     </div>
   );
 };

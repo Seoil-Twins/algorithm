@@ -1,7 +1,7 @@
 import Board from "./board";
 import { User } from "./user";
 
-export interface Alram {
+export default interface Alram {
   otherUser: User;
   board: Board;
   content: string;
