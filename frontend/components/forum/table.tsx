@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { ResponseBoards, getBoardTypes } from "@/api/board";
+import { ResponseBoard, getBoardTypes } from "@/api/board";
 
 import styles from "./table.module.scss";
 
@@ -9,7 +9,7 @@ import { notosansMedium } from "@/styles/_font";
 import Link from "next/link";
 
 type TableProps = {
-  item: ResponseBoards;
+  item: ResponseBoard;
 };
 
 const Table = async ({ item }: TableProps) => {
@@ -107,7 +107,7 @@ const Table = async ({ item }: TableProps) => {
                     width={32}
                     height={32}
                   />
-                  {content.comments}
+                  {content.commentCount}
                 </div>
               </div>
             </div>

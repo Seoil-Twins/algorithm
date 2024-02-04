@@ -16,6 +16,7 @@ import styles from "./sidebar.module.scss";
 import { MenuItems } from "./navigation";
 
 import { useAuth } from "@/providers/authProvider";
+
 import ThemeImage from "./themeImage";
 import ThemeSwitch from "./themeSwitch";
 

@@ -8,9 +8,11 @@ export default interface Board {
   content: string;
   views: number;
   tags?: string[];
+  thumbnail?: string;
   solved?: number | null;
-  likeTotal: number;
-  isLike: boolean;
+  favorites: number;
+  commentCount: number;
+  isFavorite: boolean;
   isView: boolean;
   createdTime: string;
 }

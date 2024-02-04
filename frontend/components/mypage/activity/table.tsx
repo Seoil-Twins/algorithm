@@ -1,19 +1,21 @@
+import { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
-import { BoardList } from "@/api/board";
 import { BoardType } from "@/interfaces/boardType";
 
 import { getTimeAgo } from "@/utils/day";
-import { useCallback } from "react";
+
 import ThemeImage from "@/components/common/themeImage";
+
+import Board from "@/interfaces/board";
 
 type TableProps = {
   boardTypes: BoardType[];
-  items: BoardList[];
+  items: Board[];
 };
 
 const Table = ({ boardTypes, items }: TableProps) => {
@@ -32,7 +34,7 @@ const Table = ({ boardTypes, items }: TableProps) => {
 
   return (
     <div className={styles.table}>
-      {items.map((item: BoardList) => (
+      {items.map((item: Board) => (
         <Link
           href={`/forum/${item.boardType}/${item.boardId}`}
           key={item.boardId}
@@ -75,8 +77,8 @@ const Table = ({ boardTypes, items }: TableProps) => {
                 width={18}
                 height={18}
               />
-              <span className={styles.mr10}>{item.likeTotal}</span>
-              {item.commentTotal !== undefined && (
+              <span className={styles.mr10}>{item.favorites}</span>
+              {item.commentCount !== undefined && (
                 <>
                   <ThemeImage
                     lightSrc="/svgs/comment_black.svg"
@@ -85,7 +87,7 @@ const Table = ({ boardTypes, items }: TableProps) => {
                     width={18}
                     height={18}
                   />
-                  {item.commentTotal}
+                  {item.commentCount}
                 </>
               )}
             </div>

@@ -82,8 +82,8 @@ const BoardDetail = async ({
             ))}
           </div>
           <RecommendPost
-            isFavorite={board.isLike}
-            recommendCount={board.likeTotal}
+            isFavorite={board.isFavorite}
+            recommendCount={board.favorites}
             userId={sessionId}
             boardId={board.boardId}
           />

@@ -1,96 +1,73 @@
-.cardBox {
-  display: grid;
-  column-gap: 20px;
-  row-gap: 35px;
+.itemBox {
+  padding: 25px;
+  border-radius: 12px;
+  background-color: var(--color-modal-background);
 
-  .itemBox {
-    padding: 25px;
-    border-radius: 12px;
-    background-color: var(--color-modal-background);
+  .imgBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 280px;
+    margin-bottom: 15px;
+    background-color: var(--color-background);
 
-    .imgBox {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 280px;
-      margin-bottom: 15px;
-      background-color: var(--color-background);
-
-      img {
-        @include dynamicImg;
-      }
-    }
-
-    .nonImgBox {
-      max-width: 64px;
-      height: auto;
-    }
-
-    .tagSliderBox {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .title {
-      overflow: hidden;
-      width: 100%;
-      padding-bottom: 15px;
-      text-overflow: ellipsis;
-    }
-
-    .infoBox {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      color: var(--color-primary-gray-text);
-    }
-
-    .moreBtn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      height: 44px;
-      padding: 0 10px;
-      border-radius: 8px;
-      background-color: var(--color-background);
+    img {
+      @include dynamicImg;
     }
   }
 
-  ::-webkit-scrollbar {
-    display: none;
+  .nonImgBox {
+    max-width: 64px;
+    height: auto;
+  }
+
+  .tagSliderBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .title {
+    overflow: hidden;
+    width: 100%;
+    padding-bottom: 15px;
+    text-overflow: ellipsis;
+  }
+
+  .infoBox {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--color-primary-gray-text);
+  }
+
+  .moreBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 44px;
+    padding: 0 10px;
+    border-radius: 8px;
+    background-color: var(--color-background);
   }
 }
 
 @include desktop {
-  .cardBox {
-    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
-    grid-template-rows: repeat(2, 1fr);
-  }
-
   .title {
     white-space: nowrap;
   }
 }
 
 @include tablet {
-  .cardBox {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .title {
     white-space: wrap;
   }
 }
 
 @include mobile {
-  .cardBox {
-    grid-template-columns: 1fr;
-  }
-
   .title {
     white-space: wrap;
   }

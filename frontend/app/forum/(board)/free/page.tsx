@@ -1,4 +1,4 @@
-import { ResponseBoards, getBoards } from "@/api/board";
+import { ResponseBoard, getBoards } from "@/api/board";
 
 import Table from "@/components/forum/table";
 
@@ -11,7 +11,7 @@ const Free = async ({
   const count = Number(searchParams?.count) || 10;
   const keyword = searchParams?.keyword;
 
-  const boards: ResponseBoards = await getBoards({
+  const boards: ResponseBoard = await getBoards({
     count,
     page,
     kind: 2,

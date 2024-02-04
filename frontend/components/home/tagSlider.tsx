@@ -16,11 +16,6 @@ const TagSlider = ({ tags }: PropsType) => {
   const nowX = useRef<number>(0);
   const endX = useRef<number>(0);
 
-  const updateMoveBoxWidths = useCallback(() => {
-    scrollWidth.current = moveBoxRef.current?.scrollWidth ?? 0;
-    clientWidth.current = moveBoxRef.current?.clientWidth ?? 0;
-  }, []);
-
   const getClientX = useCallback((e: TouchEvent | MouseEvent) => {
     if (e instanceof MouseEvent) return e.clientX;
 
@@ -123,6 +118,7 @@ const TagSlider = ({ tags }: PropsType) => {
       navigator.userAgent.toLowerCase(),
     );
 
+    // mobile은 css overflow으로 해결
     if (currentMoveBoxRef && !isMobile) {
       bindEvents();
     }
@@ -149,13 +145,18 @@ const TagSlider = ({ tags }: PropsType) => {
   ]);
 
   useEffect(() => {
+    const updateMoveBoxWidths = () => {
+      scrollWidth.current = moveBoxRef.current?.scrollWidth ?? 0;
+      clientWidth.current = moveBoxRef.current?.clientWidth ?? 0;
+    };
+
     updateMoveBoxWidths();
     window.addEventListener("resize", updateMoveBoxWidths);
 
     return () => {
       window.removeEventListener("resize", updateMoveBoxWidths);
     };
-  }, [updateMoveBoxWidths]);
+  }, []);
 
   return (
     <div className={styles.tagBox}>

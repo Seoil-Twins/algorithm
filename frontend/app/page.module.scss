@@ -76,7 +76,7 @@
   }
 }
 
-.recommendAlgorithmBox {
+.cardTop {
   width: 100%;
   margin-top: 50px;
 
@@ -101,6 +101,29 @@
   }
 }
 
+.cardBox {
+  display: grid;
+  column-gap: 20px;
+  row-gap: 35px;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@include desktop {
+  .postCardBox {
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+@include tablet {
+  .postCardBox {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @include mobile {
   .brightImg {
     display: none;
@@ -111,6 +134,28 @@
 
     .title {
       justify-content: center;
+    }
+  }
+
+  .postCardBox {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .algorithmCardBox {
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .algorithmCardBox {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto auto;
+
+    .title {
+      text-wrap: wrap !important;
     }
   }
 }
