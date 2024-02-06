@@ -175,6 +175,10 @@ input[type="checkbox"]:checked {
   background-position-y: 60%;
 }
 
+input:disabled {
+  cursor: not-allowed;
+}
+
 button {
   overflow: visible;
   padding: 0;

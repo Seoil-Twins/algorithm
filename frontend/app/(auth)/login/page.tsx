@@ -9,7 +9,9 @@ import styles from "./login.module.scss";
 import Input from "@/components/common/input";
 
 import {
+  Info,
   ValidationError,
+  changeErrorInfo,
   validationEmail,
   validationPassword,
 } from "@/utils/validation";
@@ -17,24 +19,23 @@ import {
 import { useAuth } from "@/providers/authProvider";
 
 interface LoginProperty {
-  email?: string;
-  password?: string;
+  email: string;
+  password: string;
 }
 
 type LoginKeys = keyof LoginProperty;
 
-type Login = {
+type LoginInfo = {
   [key in LoginKeys]: {
-    value: NonNullable<LoginProperty[key]>;
+    value: LoginProperty[key];
   } & ValidationError;
 };
 
-// eslint-disable-next-line no-redeclare
 const Login = () => {
   const router = useRouter();
   const { login, mutate } = useAuth()!;
 
-  const [loginInfo, setLoginInfo] = useState<Login>({
+  const [loginInfo, setLoginInfo] = useState<LoginInfo>({
     email: {
       value: "",
       isError: false,
@@ -51,7 +52,7 @@ const Login = () => {
 
   const handleLoginInfo = useCallback(
     (changedValue: string, name: LoginKeys) => {
-      setLoginInfo((prev: Login) => {
+      setLoginInfo((prev: LoginInfo) => {
         const { [name]: updatedField, ...rest } = prev;
 
         return {
@@ -60,7 +61,7 @@ const Login = () => {
             ...updatedField,
             value: changedValue,
           },
-        } as Login;
+        } as LoginInfo;
       });
     },
     [],
@@ -68,35 +69,26 @@ const Login = () => {
 
   const validation = useCallback(() => {
     let isValid = true;
-    let newLoginInfo: Login = {
-      ...loginInfo,
-    };
-    const changeErrorInfo = (
-      name: LoginKeys,
-      isError: boolean,
-      errMsg?: string,
-    ) => {
-      const { [name]: updatedField } = newLoginInfo;
-
-      newLoginInfo = {
-        ...newLoginInfo,
-        [name]: {
-          ...updatedField,
-          isError,
-          errMsg: errMsg ? errMsg : loginInfo[name].errMsg,
-        },
-      };
-
-      if (isError) isValid = false;
-    };
+    let newLoginInfo: Info<LoginInfo, LoginKeys> = { ...loginInfo };
 
     const isEmailValid = validationEmail(loginInfo.email.value);
-    changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
+    newLoginInfo = changeErrorInfo<LoginInfo, "email">(
+      newLoginInfo,
+      "email",
+      isEmailValid.isError,
+      isEmailValid.errMsg,
+    ) as LoginInfo;
 
     const isPasswordValid = validationPassword(loginInfo.password.value);
-    changeErrorInfo("password", isPasswordValid.isError);
+    newLoginInfo = changeErrorInfo<LoginInfo, "password">(
+      newLoginInfo,
+      "password",
+      isPasswordValid.isError,
+    ) as LoginInfo;
 
-    setLoginInfo(newLoginInfo);
+    if (isEmailValid.isError || isPasswordValid.isError) isValid = false;
+
+    setLoginInfo(newLoginInfo as LoginInfo);
     return isValid;
   }, [loginInfo]);
 
@@ -106,6 +98,7 @@ const Login = () => {
 
       const isValid = validation();
       if (!isValid) {
+        console.log(loginInfo.email);
         setIsfailedLogin(false);
         return;
       }
@@ -125,7 +118,7 @@ const Login = () => {
 
       window.location.replace("/");
     },
-    [router, login, mutate, validation],
+    [loginInfo.email, router, validation, login, mutate],
   );
 
   return (

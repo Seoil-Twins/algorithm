@@ -1,7 +1,15 @@
+interface Property {
+  value: string;
+}
+
 export interface ValidationError {
   isError: boolean;
   errMsg: string;
 }
+
+export type Info<T, K extends keyof T> = {
+  [key in K]: Property & ValidationError;
+};
 
 const notError: ValidationError = {
   isError: false,
@@ -63,4 +71,24 @@ export const validationPassword = (password?: string) => {
   }
 
   return notError;
+};
+
+export const changeErrorInfo = <T, K extends keyof T>(
+  info: Info<T, K>,
+  name: K,
+  isError: boolean,
+  errMsg?: string,
+): Info<T, K> => {
+  const { [name]: updatedField } = info;
+
+  const updatedInfo = {
+    ...info,
+    [name]: {
+      ...updatedField,
+      isError,
+      errMsg: errMsg ? errMsg : info[name].errMsg,
+    },
+  };
+
+  return updatedInfo;
 };

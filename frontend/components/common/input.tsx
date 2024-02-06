@@ -18,7 +18,6 @@ type BaseInputProps = {
   disabled?: boolean;
   length?: number;
   multiple?: boolean;
-  // eslint-disable-next-line no-unused-vars
   onChange?: (value: string) => void;
   onChangeFile?: (file: File | FileList) => void;
 };

@@ -10,7 +10,9 @@ import styles from "./signup.module.scss";
 import Input from "@/components/common/input";
 
 import {
+  Info,
   ValidationError,
+  changeErrorInfo,
   validationEmail,
   validationNickname,
   validationPassword,
@@ -19,28 +21,27 @@ import {
 import { useAuth } from "@/providers/authProvider";
 
 interface SignupProperty {
-  nickname?: string;
-  email?: string;
-  verifyCode?: string;
-  password?: string;
-  confirmPassword?: string;
+  nickname: string;
+  email: string;
+  verifyCode: string;
+  password: string;
+  confirmPassword: string;
 }
 
 type SignupKeys = keyof SignupProperty;
 
-type Signup = {
+type SignupInfo = {
   [key in SignupKeys]: {
-    value: NonNullable<SignupProperty[key]>;
+    value: SignupProperty[key];
     disabled?: boolean;
   } & ValidationError;
 };
 
-// eslint-disable-next-line no-redeclare
 const Signup = () => {
   const router = useRouter();
   const { login, mutate } = useAuth()!;
 
-  const [signupInfo, setSignupInfo] = useState<Signup>({
+  const [signupInfo, setSignupInfo] = useState<SignupInfo>({
     nickname: {
       value: "",
       errMsg: "",
@@ -75,7 +76,7 @@ const Signup = () => {
 
   const handleSignupInfo = useCallback(
     (changedValue: string, name: SignupKeys) => {
-      setSignupInfo((prev: Signup) => {
+      setSignupInfo((prev: SignupInfo) => {
         const { [name]: updatedField, ...rest } = prev;
 
         return {
@@ -84,39 +85,22 @@ const Signup = () => {
             ...updatedField,
             value: changedValue,
           },
-        } as Signup;
+        } as SignupInfo;
       });
     },
     [],
   );
 
   const sendVerifyCode = useCallback(() => {
-    const changeErrorInfo = (
-      name: SignupKeys,
-      isError: boolean,
-      errMsg?: string,
-    ) => {
-      const { [name]: updatedField } = signupInfo;
-      const newSignupInfo = {
-        ...signupInfo,
-        [name]: {
-          ...updatedField,
-          isError,
-          errMsg,
-        },
-      };
-
-      return newSignupInfo;
-    };
-
     const isEmailValid = validationEmail(signupInfo.email.value);
 
     if (isEmailValid.isError) {
       const newProfileInfo = changeErrorInfo(
+        signupInfo,
         "email",
         isEmailValid.isError,
         isEmailValid.errMsg,
-      );
+      ) as SignupInfo;
       setSignupInfo(newProfileInfo);
       return;
     } else if (!signupInfo.verifyCode.disabled || isVerified) return;
@@ -172,47 +156,56 @@ const Signup = () => {
 
   const validation = useCallback(() => {
     let isValid = true;
-    let newSignupInfo: Signup = {
+    let newSignupInfo: Info<SignupInfo, SignupKeys> = {
       ...signupInfo,
     };
 
-    const changeErrorInfo = (
-      name: SignupKeys,
-      isError: boolean,
-      errMsg?: string,
-    ) => {
-      const { [name]: updatedField } = newSignupInfo;
-
-      newSignupInfo = {
-        ...newSignupInfo,
-        [name]: {
-          ...updatedField,
-          isError,
-          errMsg: errMsg ? errMsg : signupInfo[name].errMsg,
-        },
-      };
-
-      if (isError) isValid = false;
-    };
-
     const isNicknameValid = validationNickname(signupInfo.nickname.value);
-    changeErrorInfo(
+    newSignupInfo = changeErrorInfo<SignupInfo, "nickname">(
+      newSignupInfo,
       "nickname",
       isNicknameValid.isError,
       isNicknameValid.errMsg,
-    );
+    ) as SignupInfo;
 
     const isEmailValid = validationEmail(signupInfo.email.value);
-    changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
+    newSignupInfo = changeErrorInfo<SignupInfo, "email">(
+      newSignupInfo,
+      "email",
+      isEmailValid.isError,
+      isEmailValid.errMsg,
+    ) as SignupInfo;
 
     const isPasswordValid = validationPassword(signupInfo.password.value);
-    changeErrorInfo("password", isPasswordValid.isError);
+    newSignupInfo = changeErrorInfo<SignupInfo, "password">(
+      newSignupInfo,
+      "password",
+      isPasswordValid.isError,
+    ) as SignupInfo;
 
-    if (signupInfo.password.value !== signupInfo.confirmPassword.value)
-      changeErrorInfo("confirmPassword", true);
-    else changeErrorInfo("confirmPassword", false);
+    const notMatchedPassword =
+      signupInfo.password.value !== signupInfo.confirmPassword.value;
+    newSignupInfo = changeErrorInfo<SignupInfo, "confirmPassword">(
+      newSignupInfo,
+      "confirmPassword",
+      notMatchedPassword,
+    ) as SignupInfo;
 
-    if (!isVerified) changeErrorInfo("verifyCode", true, "인증이 필요합니다.");
+    newSignupInfo = changeErrorInfo<SignupInfo, "verifyCode">(
+      newSignupInfo,
+      "verifyCode",
+      !isVerified,
+      "인증이 필요합니다.",
+    ) as SignupInfo;
+
+    if (
+      isNicknameValid.isError ||
+      isEmailValid.isError ||
+      isPasswordValid.isError ||
+      notMatchedPassword
+    ) {
+      isValid = false;
+    }
 
     setSignupInfo(newSignupInfo);
     return isValid;
