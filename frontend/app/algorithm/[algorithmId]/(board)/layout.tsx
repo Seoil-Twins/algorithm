@@ -20,15 +20,15 @@ const Board = async ({
   const navItems: NavItem[] = [
     {
       title: "전체",
-      link: `/algorithm/detail/${algorithmId}/all`,
+      link: `/algorithm/${algorithmId}/all`,
     },
     {
       title: "질문",
-      link: `/algorithm/detail/${algorithmId}/question`,
+      link: `/algorithm/${algorithmId}/question`,
     },
     {
       title: "피드백",
-      link: `/algorithm/detail/${algorithmId}/feedback`,
+      link: `/algorithm/${algorithmId}/feedback`,
     },
   ];
 

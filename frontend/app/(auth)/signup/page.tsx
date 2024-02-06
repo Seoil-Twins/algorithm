@@ -7,8 +7,6 @@ import Link from "next/link";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./signup.module.scss";
 
-import Input from "@/components/common/input";
-
 import {
   Info,
   ValidationError,
@@ -19,6 +17,9 @@ import {
 } from "@/utils/validation";
 
 import { useAuth } from "@/providers/authProvider";
+
+import Input from "@/components/common/input";
+import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 
 interface SignupProperty {
   nickname: string;
@@ -254,58 +255,15 @@ const Signup = () => {
         />
       </div>
       <div className={styles.mb20}>
-        <div className={styles.mb20}>
-          <Input
-            type="email"
-            title="이메일"
-            placeholder="이메일 입력"
-            value={signupInfo.email.value}
-            disabled={signupInfo.email.disabled}
-            isError={signupInfo.email.isError}
-            errorMsg={signupInfo.email.errMsg}
-            onChange={(changedValue: string) =>
-              handleSignupInfo(changedValue, "email")
-            }
-          />
-          <button
-            type="button"
-            className={`
-            ${signupInfo.email.disabled ? styles.disabledBtn : styles.activeBtn}
-            ${styles.codeBtn}
-          `}
-            onClick={sendVerifyCode}
-          >
-            인증 번호 발송
-          </button>
-        </div>
-        <div className={styles.mb10}>
-          <Input
-            placeholder="인증 번호 입력"
-            length={6}
-            value={signupInfo.verifyCode.value}
-            disabled={signupInfo.verifyCode.disabled}
-            isError={signupInfo.verifyCode.isError}
-            errorMsg={signupInfo.verifyCode.errMsg}
-            onChange={(changedValue: string) =>
-              handleSignupInfo(changedValue, "verifyCode")
-            }
-          />
-        </div>
-        <button
-          type="button"
-          className={`
-            ${
-              signupInfo.verifyCode.disabled
-                ? styles.disabledBtn
-                : styles.activeBtn
-            }
-            ${isVerified && styles.verifiedBtn}
-            ${styles.verifyBtn}
-          `}
-          onClick={checkVerifyCode}
-        >
-          {isVerified ? "인증 완료" : "인증 번호 확인"}
-        </button>
+        <EmailVerify
+          emailInfo={signupInfo as EmailInfo}
+          isVerified={isVerified}
+          onChange={(changedValue: string, name: string) =>
+            handleSignupInfo(changedValue, name as SignupKeys)
+          }
+          onSend={sendVerifyCode}
+          onCheck={checkVerifyCode}
+        />
       </div>
       <div className={styles.mb20}>
         <div className={styles.mb10}>

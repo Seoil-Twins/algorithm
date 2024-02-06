@@ -47,16 +47,16 @@ const Share = ({ algorithmId, title, description, thumbnail }: ShareProps) => {
           ? thumbnail
           : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbV4d7vhKXWp6RMvWRuhcWde75m2CFgRpC7g&usqp=CAU",
         link: {
-          mobileWebUrl: `http://localhost:3000/algorithm/detail/${algorithmId}`,
-          webUrl: `http://localhost:3000/algorithm/detail/${algorithmId}`,
+          mobileWebUrl: `http://localhost:3000/algorithm/${algorithmId}`,
+          webUrl: `http://localhost:3000/algorithm/${algorithmId}`,
         },
       },
       buttons: [
         {
           title: "웹으로 이동",
           link: {
-            mobileWebUrl: `http://localhost:3000/algorithm/detail/${algorithmId}`,
-            webUrl: `http://localhost:3000/algorithm/detail/${algorithmId}`,
+            mobileWebUrl: `http://localhost:3000/algorithm/${algorithmId}`,
+            webUrl: `http://localhost:3000/algorithm/${algorithmId}`,
           },
         },
       ],

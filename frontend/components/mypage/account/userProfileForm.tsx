@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 import { notosansBold } from "@/styles/_font";
@@ -13,24 +13,26 @@ import { updateProfileImg, updateProfileUser } from "@/api/user";
 import { useAuth } from "@/providers/authProvider";
 
 import Input from "@/components/common/input";
+import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 
 import {
   ValidationError,
+  changeErrorInfo,
   validationEmail,
   validationNickname,
 } from "@/utils/validation";
 
 interface UserProfileProperty {
-  nickname?: string;
-  email?: string;
-  verifyCode?: string;
+  nickname: string;
+  email: string;
+  verifyCode: string;
 }
 
 type UserProfileKeys = keyof UserProfileProperty;
 
 type UserProfile = {
   [key in UserProfileKeys]: {
-    value: NonNullable<UserProfileProperty[key]>;
+    value: UserProfileProperty[key];
     disabled?: boolean;
   } & ValidationError;
 };
@@ -90,37 +92,35 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       ...profileInfo,
     };
 
-    const changeErrorInfo = (
-      name: UserProfileKeys,
-      isError: boolean,
-      errMsg?: string,
-    ) => {
-      const { [name]: updatedField } = profileInfo;
-
-      newProfileInfo = {
-        ...newProfileInfo,
-        [name]: {
-          ...updatedField,
-          isError,
-          errMsg,
-        },
-      };
-
-      if (isError) isValid = false;
-    };
-
     const isNicknameValid = validationNickname(profileInfo.nickname.value);
-    changeErrorInfo(
+    newProfileInfo = changeErrorInfo<UserProfile, "nickname">(
+      newProfileInfo,
       "nickname",
       isNicknameValid.isError,
       isNicknameValid.errMsg,
-    );
+    ) as UserProfile;
 
     const isEmailValid = validationEmail(profileInfo.email.value);
-    changeErrorInfo("email", isEmailValid.isError, isEmailValid.errMsg);
+    newProfileInfo = changeErrorInfo<UserProfile, "email">(
+      newProfileInfo,
+      "email",
+      isEmailValid.isError,
+      isEmailValid.errMsg,
+    ) as UserProfile;
 
-    if (!isVerified && user?.email != profileInfo.email.value)
-      changeErrorInfo("verifyCode", true, "인증이 필요합니다.");
+    const isNotVerifiedEmail =
+      !isVerified && user?.email != profileInfo.email.value;
+    if (isNotVerifiedEmail) {
+      newProfileInfo = changeErrorInfo<UserProfile, "verifyCode">(
+        newProfileInfo,
+        "verifyCode",
+        true,
+        "인증이 필요합니다.",
+      ) as UserProfile;
+    }
+
+    if (isNicknameValid.isError || isEmailValid.isError || isNotVerifiedEmail)
+      isValid = false;
 
     setProfileInfo(newProfileInfo);
     return isValid;
@@ -131,7 +131,11 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       event.preventDefault();
 
       const isValid = validationProfile();
-      if (!isValid) return;
+      if (!isValid) {
+        profileInfo.nickname.value = user.nickname;
+        profileInfo.email.value = user.email;
+        return;
+      }
 
       const response = await updateProfileUser(
         profileInfo.nickname.value!,
@@ -161,8 +165,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
           } as UserProfile;
         });
 
-        user.nickname = response.updateUser.nickname;
-        user.email = response.updateUser.email;
         await mutate();
       } else {
         alert("에러 발생");
@@ -171,10 +173,11 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       setIsProfileDisabled(true);
     },
     [
-      profileInfo.nickname.value,
-      profileInfo.email.value,
-      user,
       validationProfile,
+      profileInfo.nickname,
+      profileInfo.email,
+      user.nickname,
+      user.email,
       mutate,
     ],
   );
@@ -387,58 +390,28 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
             handleProfileInfo(changedValue, "nickname")
           }
         />
-        <Input
-          title="이메일"
-          type="email"
-          value={profileInfo.email.value}
-          disabled={profileInfo.email.disabled}
-          isError={profileInfo.email.isError}
-          errorMsg={profileInfo.email.errMsg}
-          onChange={(changedValue: string) =>
-            handleProfileInfo(changedValue, "email")
-          }
-        />
-        {isProfileDisabled && !isVerified ? null : (
-          <>
-            <button
-              type="button"
-              className={`${
-                profileInfo.verifyCode.disabled === true &&
-                profileInfo.email.value != user.email
-                  ? styles.activeBtn
-                  : styles.disabledBtn
-              } ${styles.codeBtn} `}
-              onClick={sendVerifyCode}
-            >
-              인증 번호 발송
-            </button>
-            <div>
-              <Input
-                placeholder="인증 번호 입력"
-                length={6}
-                value={profileInfo.verifyCode.value}
-                disabled={profileInfo.verifyCode.disabled}
-                isError={profileInfo.verifyCode.isError}
-                errorMsg={profileInfo.verifyCode.errMsg}
-                onChange={(changedValue: string) =>
-                  handleProfileInfo(changedValue, "verifyCode")
-                }
-              />
-            </div>
-            <button
-              type="button"
-              className={`${
-                profileInfo.verifyCode.disabled
-                  ? styles.disabledBtn
-                  : styles.activeBtn
-              }
-          ${isVerified && styles.verifiedBtn}
-          ${styles.verifyBtn}`}
-              onClick={checkVerifyCode}
-            >
-              {isVerified ? "인증 완료" : "인증 번호 확인"}
-            </button>
-          </>
+        {isProfileDisabled && !isVerified ? (
+          <Input
+            title="이메일"
+            type="email"
+            value={profileInfo.email.value}
+            disabled={profileInfo.email.disabled}
+            isError={profileInfo.email.isError}
+            errorMsg={profileInfo.email.errMsg}
+            onChange={(changedValue: string) =>
+              handleProfileInfo(changedValue, "email")
+            }
+          />
+        ) : (
+          <EmailVerify
+            emailInfo={profileInfo as EmailInfo}
+            isVerified={isVerified}
+            onChange={(changedValue: string, name: string) =>
+              handleProfileInfo(changedValue, name as UserProfileKeys)
+            }
+            onSend={sendVerifyCode}
+            onCheck={checkVerifyCode}
+          />
         )}
         <div className={styles.btnBox}>
           {isProfileDisabled ? (

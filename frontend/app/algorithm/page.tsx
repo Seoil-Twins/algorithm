@@ -78,7 +78,7 @@ const Algorithm = async ({
           <span>{algorithm.kinds[0]}</span>,
           <span>{algorithm.solvedRate}%</span>,
         ],
-        link: `/algorithm/detail/${algorithm.algorithmId}`,
+        link: `/algorithm/${algorithm.algorithmId}`,
       };
     },
   );

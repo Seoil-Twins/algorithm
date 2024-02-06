@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { SessionData, sessionOptions } from "./app/api/sessionConfig";
 import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 
-const routes = ["/algorithm/detail/*"];
+const routes = ["/algorithm/*"];
 
 export default async function middleware(req: NextRequest) {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);

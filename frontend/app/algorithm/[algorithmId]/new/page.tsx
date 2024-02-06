@@ -41,7 +41,7 @@ const New = ({ params }: { params: NewParams }) => {
 
   const handleSubmit = useCallback(() => {
     console.log(request);
-    router.push(`/algorithm/detail/${algorithmId}/all`);
+    router.push(`/algorithm/${algorithmId}/all`);
   }, [algorithmId, request, router]);
 
   return (

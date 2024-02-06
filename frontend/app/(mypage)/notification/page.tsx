@@ -13,7 +13,7 @@ import { useDebouncedCallback } from "use-debounce";
 type NotificationSettings = {
   title: string;
   contents: string;
-  param: keyof ResponseNotification;
+  paramKey: keyof ResponseNotification;
   value?: boolean;
 };
 
@@ -21,35 +21,35 @@ const defaultNotifications: NotificationSettings[] = [
   {
     title: "공지사항 알림",
     contents: "공지사항 알림을 받겠습니다.",
-    param: "annoNofi",
+    paramKey: "annoNofi",
   },
   {
     title: "소스 코드 알림",
     contents: "다른 사람이 내 소스 코드를 읽었을 때 알림이 발생합니다.",
-    param: "postNofi",
+    paramKey: "postNofi",
   },
   {
     title: "댓글 알림",
     contents:
       "내가 쓴 글 또는 내가 단 갯글에 댓글이 달렸을 때 알람이 발생합니다.",
-    param: "commentNofi",
+    paramKey: "commentNofi",
   },
   {
     title: "좋아요 알림",
     contents:
       "내가 쓴 글 또는 내가 단 댓글에 좋아요가 발생하였을 때 알림이 발생합니다.",
-    param: "likeNofi",
+    paramKey: "likeNofi",
   },
   {
     title: "답변 알림",
     contents:
       "질문 게시판, 문제 질문, 질문 피드백에 답변이 달렸을 때 알람이 발생합니다.",
-    param: "answerNofi",
+    paramKey: "answerNofi",
   },
   {
     title: "마케팅 활용 및 광고 수신 알림",
     contents: "각종 이벤트, 혜택, 할인 행사 등 마케팅 관련 알림이 발생합니다.",
-    param: "eventNofi",
+    paramKey: "eventNofi",
   },
 ];
 
@@ -90,7 +90,7 @@ const Notification = () => {
       setNotifications((prev) =>
         prev.map((notification: NotificationSettings) => ({
           ...notification,
-          value: response[notification.param],
+          value: response[notification.paramKey],
         })),
       );
     } catch (error) {
@@ -110,7 +110,7 @@ const Notification = () => {
         {!isLoading ? (
           <>
             {notifications.map((notification, idx) => (
-              <div className={styles.item} key={notification.param}>
+              <div className={styles.item} key={notification.paramKey}>
                 <div className={styles.title}>{notification.title}</div>
                 <div className={styles.bottom}>
                   <div className={styles.contents}>{notification.contents}</div>

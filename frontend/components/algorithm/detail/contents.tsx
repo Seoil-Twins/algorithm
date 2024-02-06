@@ -289,7 +289,7 @@ const Contents = ({ algorithm }: DetailProps) => {
         </button>
         <button className={styles.btn}>
           <Link
-            href={`/algorithm/detail/${algorithm.algorithmId}/all?page=1&count=10`}
+            href={`/algorithm/${algorithm.algorithmId}/all?page=1&count=10`}
           >
             질문 및 피드백
           </Link>
@@ -297,7 +297,7 @@ const Contents = ({ algorithm }: DetailProps) => {
         <div className={styles.blank}></div>
         <button className={styles.btn}>
           <Link
-            href={`/algorithm/detail/${
+            href={`/algorithm/${
               algorithm.algorithmId
             }/other-answers?language=${findMyTitle(type)}`}
           >
@@ -305,7 +305,7 @@ const Contents = ({ algorithm }: DetailProps) => {
           </Link>
         </button>
         <button className={styles.btn}>
-          <Link href={`/algorithm/detail/${algorithm.algorithmId}/explain`}>
+          <Link href={`/algorithm/${algorithm.algorithmId}/explain`}>
             해설보기
           </Link>
         </button>
