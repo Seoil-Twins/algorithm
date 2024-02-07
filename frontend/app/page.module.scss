@@ -1,0 +1,179 @@
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 50px;
+
+  .topBox {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 14px 20px;
+    border-radius: 11px;
+    background-color: var(--color-modal-background);
+
+    .brightImg {
+      position: absolute;
+      top: -30px;
+      left: -26px;
+      width: auto;
+      height: auto;
+    }
+
+    .imgBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 14px;
+      border-radius: 6px;
+      background-color: #fff4e5;
+    }
+
+    .title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 20px;
+    }
+
+    .emphasis {
+      margin-right: 5px;
+      color: $primaryColor;
+    }
+  }
+
+  .ft24 {
+    font-size: 24px;
+    margin-bottom: 60px;
+  }
+
+  .algorithmBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 24px;
+    border-radius: 8px;
+    color: $white;
+    background-color: $primaryColor;
+  }
+}
+
+.videoBox {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-top: 56%;
+  margin-bottom: 50px;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+}
+
+.cardTop {
+  width: 100%;
+  margin-top: 50px;
+
+  .topBox {
+    display: flex;
+    margin-bottom: 35px;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    .ft24 {
+      font-size: 24px;
+    }
+
+    .moreBtn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background-color: var(--color-modal-background);
+    }
+  }
+}
+
+.cardBox {
+  display: grid;
+  column-gap: 20px;
+  row-gap: 35px;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@include desktop {
+  .postCardBox {
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+@include tablet {
+  .postCardBox {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@include mobile {
+  .brightImg {
+    display: none;
+  }
+
+  .topBox {
+    justify-content: center;
+
+    .title {
+      justify-content: center;
+    }
+  }
+
+  .postCardBox {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .algorithmCardBox {
+    grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .algorithmCardBox {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto auto;
+
+    .title {
+      text-wrap: wrap !important;
+    }
+  }
+}
+
+@media (min-width: 406px) {
+  .topBox {
+    .imgBox {
+      margin-right: 10px;
+    }
+  }
+}
+
+@media (max-width: 405px) {
+  .imgBox {
+    flex-direction: column;
+    width: 64px;
+    height: 64px;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}

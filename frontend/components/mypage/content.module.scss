@@ -1,0 +1,26 @@
+.content {
+  .title {
+    margin-bottom: 15px;
+    font-size: 18px;
+  }
+
+  .item {
+    margin-bottom: 25px;
+    padding: 1.5625rem 2.8125rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-modal-background);
+  }
+}
+
+@include tablet {
+  .item {
+    padding: calc($padding-mobile + 10px) !important;
+  }
+}
+
+@include mobile {
+  .item {
+    padding: calc($padding-mobile + 5px) !important;
+  }
+}

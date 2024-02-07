@@ -1,0 +1,84 @@
+.comment {
+  display: flex;
+  align-items: flex-start;
+
+  .contentBox {
+    width: 100%;
+
+    .top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .recommend {
+      display: flex;
+      align-items: center;
+
+      div {
+        text-align: center;
+      }
+
+      img {
+        display: block;
+      }
+
+      .recommendBtnBox {
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        border: 1px solid var(--color-border);
+
+        .count {
+          margin: 0 10px;
+        }
+
+        .btn {
+          padding: 10px;
+
+          &:first-child {
+            border-right: 1px solid var(--color-border);
+          }
+
+          &:last-child {
+            border-left: 1px solid var(--color-border);
+          }
+        }
+      }
+
+      .solved {
+        margin-left: 5px;
+      }
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+
+      .profileImg {
+        border-radius: 100px;
+        margin-right: 10px;
+      }
+    }
+
+    .fs14 {
+      font-size: 0.875rem;
+    }
+
+    .createdTime {
+      margin-right: 10px;
+      color: var(--color-primary-gray-text);
+      font-size: 0.875rem;
+    }
+
+    .blue {
+      color: $blueLight;
+    }
+
+    .red {
+      color: $red;
+    }
+  }
+}

@@ -1,0 +1,108 @@
+.centerBox {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      cursor: pointer;
+
+      & > img {
+        margin-right: 10px;
+      }
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      .themeBtn {
+        margin-right: 15px;
+      }
+
+      .alramImgBox {
+        margin-right: 15px;
+      }
+    }
+
+    .hamburger {
+      cursor: pointer;
+    }
+  }
+
+  .menuModal {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--color-background);
+    z-index: 100;
+
+    .close {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      height: $headerHeight;
+      cursor: pointer;
+    }
+
+    .menuItemBox {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.125rem;
+
+      .menuItem {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 7.5rem;
+        height: 4.25rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .active {
+        color: $primaryColor;
+        border-bottom: 1px solid $primaryColor;
+      }
+    }
+
+    .authBtn {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      color: var(--color-primary-gray-text);
+      cursor: pointer;
+
+      .mlr10 {
+        margin: 0 10px;
+      }
+    }
+  }
+}
+
+@include tablet {
+  .centerBox,
+  .menuModal {
+    @include tablet-padding;
+  }
+}
+
+@include mobile {
+  .centerBox,
+  .menuModal {
+    @include mobile-padding;
+  }
+}

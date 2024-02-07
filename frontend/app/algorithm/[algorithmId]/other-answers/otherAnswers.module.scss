@@ -1,0 +1,16 @@
+.otherAnswers {
+  .mb35 {
+    margin-bottom: 35px;
+  }
+
+  .answers {
+    padding: 20px 25px;
+    background-color: var(--color-modal-background);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+
+    & > div:not(:last-child) {
+      margin-bottom: 40px;
+    }
+  }
+}

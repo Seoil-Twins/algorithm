@@ -1,0 +1,24 @@
+.headerBox {
+  position: sticky;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: $headerHeight;
+  box-shadow: 1px 1px 4px rgb(var(--color-primary-text) / 5%);
+  background-color: var(--color-header-background);
+  z-index: 99;
+}
+
+@include tablet {
+  .centerBox {
+    @include tablet-padding;
+  }
+}
+
+@include mobile {
+  .centerBox {
+    @include mobile-padding;
+  }
+}

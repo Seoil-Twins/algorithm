@@ -1,0 +1,47 @@
+.modal {
+  position: absolute;
+  top: 50px;
+  max-width: 360px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-modal-background);
+  z-index: 999;
+
+  .box {
+    margin-bottom: 15px;
+
+    .title {
+      margin-bottom: 5px;
+      font-size: 0.875rem;
+    }
+
+    & > div > div {
+      width: 320px;
+      border-radius: 3px !important;
+      min-width: auto !important;
+    }
+
+    input {
+      color: #222222 !important;
+    }
+  }
+
+  .modalBtnBox {
+    display: flex;
+    justify-content: flex-end;
+
+    button:first-child {
+      margin-right: 10px;
+    }
+
+    .cancelBtn {
+      @include disabledBtn(10px, 8px);
+      cursor: pointer;
+    }
+
+    .activeBtn {
+      @include activeBtn(10px, 8px);
+    }
+  }
+}

@@ -1,0 +1,32 @@
+.recommendWrapper {
+  display: flex;
+
+  .recommend {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+
+    .count {
+      position: relative;
+      top: -1px;
+      padding: 0 15px;
+    }
+
+    .active {
+      color: $primaryColor;
+    }
+
+    .btn {
+      padding: 12px;
+
+      &:first-child {
+        border-right: 1px solid var(--color-border);
+      }
+
+      &:last-child {
+        border-left: 1px solid var(--color-border);
+      }
+    }
+  }
+}

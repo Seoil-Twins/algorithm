@@ -1,0 +1,42 @@
+.explain {
+  border-radius: 8px;
+  background-color: var(--color-modal-background);
+
+  .top {
+    margin-bottom: 25px;
+
+    .title {
+      margin-bottom: 5px;
+      font-size: 1.625rem;
+    }
+
+    .ft14 {
+      font-size: 0.875rem;
+    }
+
+    .kind {
+      margin-left: 5px;
+      color: var(--color-primary-gray-text);
+    }
+  }
+}
+
+@mixin desktopAndTablet {
+  .explain {
+    padding: 25px 45px;
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet;
+}
+
+@include tablet {
+  @include desktopAndTablet;
+}
+
+@include mobile {
+  .explain {
+    padding: 10px 20px;
+  }
+}

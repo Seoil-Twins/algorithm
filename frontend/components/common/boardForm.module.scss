@@ -1,0 +1,58 @@
+.form {
+  display: grid;
+  row-gap: 25px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr auto;
+
+  .boardTitle {
+    margin-bottom: 10px;
+    font-size: 0.875rem;
+
+    .required {
+      margin-left: 5px;
+      color: $red;
+    }
+  }
+
+  .dropdown {
+    & > div {
+      height: 45px !important;
+      padding: 12px 20px;
+
+      & > div {
+        top: 50px;
+      }
+    }
+  }
+
+  .title {
+    & > div > div:first-child {
+      height: 45px !important;
+      border: 1px solid var(--color-border) !important;
+      background-color: var(--color-modal-background) !important;
+    }
+  }
+
+  .editor {
+    padding: 10px;
+
+    & > div {
+      min-height: 300px;
+    }
+  }
+
+  .btnBox {
+    display: flex;
+    justify-content: flex-end;
+
+    .cancel {
+      @include disabledBtn(20px, 10px);
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .submit {
+      @include activeBtn(20px, 10px);
+    }
+  }
+}
