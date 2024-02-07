@@ -16,14 +16,20 @@ import org.algorithm.algorithm.repository.EmailVerifyRepository;
 import org.algorithm.algorithm.repository.UserRepository;
 import org.algorithm.algorithm.util.Const;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.beans.PropertyDescriptor;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.algorithm.algorithm.util.Const.EMAILSENDER;
 
@@ -38,8 +44,11 @@ public class UserService {
 
     public void save(UserDTO userDTO) {
         // repsitory의 save 메서드 호출
+        System.out.println("userDTO :: " + userDTO);
         UserEntity userEntity = UserEntity.toUserEntity(userDTO);
+        System.out.println("userDTO :: " + userDTO);
         userRepository.save(userEntity);
+        System.out.println("userDTO :: " + userDTO);
         //Repository의 save메서드 호출 (조건. entity객체를 넘겨줘야 함)
 
     }
@@ -376,6 +385,41 @@ public class UserService {
         else
             return " Code Not Equals ! ";
 
+    }
+
+    public UserEntity userUpdate(UserDTO userDTO, int userId) throws MessagingException {
+        UserEntity existingUser = userRepository.findByUserId(userId);
+        UserEntity patchRequestUser = UserEntity.toUserEntity(userDTO);
+        patchRequestUser.setUserId(userId);
+
+        System.out.println(userDTO);
+        BeanUtils.copyProperties(patchRequestUser, existingUser, getNullPropertyNames(patchRequestUser));
+
+        userRepository.save(existingUser);
+
+        return existingUser;
+    }
+
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
+
+    public String userDelete(int userId) throws MessagingException {
+        UserEntity existingUser = userRepository.findByUserId(userId);
+
+        userRepository.delete(existingUser);
+
+        return "delete";
     }
 
 }

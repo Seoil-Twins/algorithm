@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     UserEntity findByEmail(String email);
+    UserEntity findByUserId(long userId);
 
     @Query(value = "SELECT anno_nofi,post_nofi,comment_nofi,like_nofi,answer_nofi,event_nofi" +
             " FROM user " +

@@ -23,9 +23,9 @@ public class EmailVerifyDTO {
 
     public static EmailVerifyDTO toEmailVerifyDTO(EmailVerifyEntity emailVerifyEntity) {
         EmailVerifyDTO emailVerifyDTO = new EmailVerifyDTO();
-        emailVerifyEntity.setVerifyCode(emailVerifyEntity.getVerifyCode());
-        emailVerifyEntity.setEmail(emailVerifyEntity.getEmail());
-        emailVerifyEntity.setExpirationTime(emailVerifyEntity.getExpirationTime());
+        emailVerifyDTO.setVerifyCode(emailVerifyEntity.getVerifyCode());
+        emailVerifyDTO.setEmail(emailVerifyEntity.getEmail());
+        emailVerifyDTO.setExpirationTime(emailVerifyEntity.getExpirationTime());
         return emailVerifyDTO;
     }
 

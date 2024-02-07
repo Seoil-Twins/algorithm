@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.EmailVerifyDTO;
 import org.algorithm.algorithm.dto.UserDTO;
+import org.algorithm.algorithm.entity.UserEntity;
 import org.algorithm.algorithm.service.UserService;
 import org.algorithm.algorithm.util.Const;
 import org.springframework.http.HttpStatus;
@@ -187,14 +188,22 @@ public class UserController {
         }
     }
 
+    @PostMapping("/user/verify/compare")
+    @ResponseBody
+    public String CompareVerifyCode(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
+        System.out.println(emailVerifyDTO);
+        String result = userService.compareCode(emailVerifyDTO);
+
+        return result;
+    }
+
 
     @PostMapping("/user")
     public String processForm(@RequestBody UserDTO userDTO) {
         userDTO.setUserPw(passwordEncoder.encode(userDTO.getUserPw()));
         // 사용자 정보를 모델에 추가합니다.
-        System.out.println("userDTO :: " + userDTO);
         userService.save(userDTO);
-        return "/index.html";
+        return "success";
     }
 
     @PostMapping("/login")
@@ -212,6 +221,7 @@ public class UserController {
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
+        session.setMaxInactiveInterval(5);
         System.out.println(session.getAttribute(Const.LOGIN_USER_KEY));
         return "success";
     }
@@ -219,6 +229,7 @@ public class UserController {
     @PostMapping("/user/verify/send")
     public String MailSend(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
         System.out.println(emailVerifyDTO);
+        System.out.println("sendsendsendsendsendsendsendsend");
         String number = userService.sendEmail(emailVerifyDTO);
 
         System.out.println(number);
@@ -226,13 +237,82 @@ public class UserController {
         return null;
     }
 
+    @PatchMapping("/user/{user_id}")
+    public ResponseEntity<Object> patchUser(@PathVariable("user_id") int userId,@RequestBody UserDTO userDTO, HttpServletRequest request) throws JsonProcessingException {
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
 
-    @GetMapping("/user/verify/compare")
-    @ResponseBody
-    public String CompareVerifyCode(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
-        System.out.println(emailVerifyDTO);
-        String result = userService.compareCode(emailVerifyDTO);
+        if (loginUser != null) {
 
-        return result;
+            if(loginUser.getUserId() != userId)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+
+            UserEntity result = null;
+            try {
+                result = userService.userUpdate(userDTO,userId);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+            return ResponseEntity.ok(result);
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
     }
+
+    @PatchMapping("/user/nofi/{user_id}")
+    public ResponseEntity<Object> patchUserNofi(@PathVariable("user_id") int userId,@RequestBody UserDTO userDTO, HttpServletRequest request) throws JsonProcessingException {
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+
+        if (loginUser != null) {
+
+            if(loginUser.getUserId() != userId)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+
+            UserEntity result = null;
+            try {
+                result = userService.userUpdate(userDTO,userId);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+            return ResponseEntity.ok(result);
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
+    @DeleteMapping("/user/{user_id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable("user_id") int userId, HttpServletRequest request) throws JsonProcessingException {
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+
+        if (loginUser != null) {
+
+            if(loginUser.getUserId() != userId)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+
+            String result = null;
+            try {
+                result = userService.userDelete(userId);
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+            return ResponseEntity.ok(result);
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
 }
