@@ -1,0 +1,57 @@
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-modal-background);
+  cursor: pointer;
+
+  .button {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    & > img {
+      position: relative;
+      top: 2px;
+      margin-left: 5px;
+    }
+
+    span {
+      text-align: left;
+      word-break: keep-all;
+    }
+  }
+
+  .modal {
+    position: absolute;
+    left: 0;
+    top: 45px;
+    width: 100%;
+    z-index: 55;
+
+    .itemBox {
+      overflow: hidden;
+      overflow-y: auto;
+      max-height: 266px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-modal-background);
+
+      .item {
+        width: 100%;
+        padding: 10px 15px;
+        cursor: pointer;
+
+        button {
+          text-align: left;
+        }
+      }
+    }
+  }
+}

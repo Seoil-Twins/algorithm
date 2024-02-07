@@ -1,0 +1,49 @@
+.form {
+  display: grid;
+  row-gap: 15px;
+  grid-template-rows: repeat(auto-fill, 1fr);
+  font-size: 14px;
+  color: #656567;
+
+  .terms {
+    color: $blueDark;
+    text-decoration: underline;
+  }
+
+  .submit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    .alignCenter {
+      display: flex;
+      align-items: center;
+    }
+
+    label {
+      padding-left: 10px;
+    }
+
+    .delete {
+      @include warningBtn;
+      border-width: 2px;
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .form {
+    color: #b1b1b1;
+  }
+}
+
+@include mobile {
+  .alignCenter {
+    margin-bottom: 10px;
+  }
+
+  .delete {
+    width: 100%;
+  }
+}

@@ -1,0 +1,96 @@
+.contentBox {
+  margin-top: 2.1875rem;
+  padding: 1.5625rem 2.8125rem;
+  border-radius: 8px;
+  background-color: var(--color-modal-background);
+
+  .user {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+
+    .profileImg {
+      margin-right: 10px;
+      border-radius: 100px;
+    }
+
+    .createdTime {
+      font-size: 0.875rem;
+      color: var(--color-primary-gray-text);
+    }
+  }
+
+  .solved {
+    color: #1cca00;
+    font-size: 0.875rem;
+  }
+
+  .notSolved {
+    color: $red;
+    font-size: 0.875rem;
+  }
+
+  .title {
+    font-size: 1.875rem;
+    margin-bottom: 1.5625rem;
+  }
+
+  .content {
+    margin-bottom: 1.5625rem;
+  }
+
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+
+    .tagBox {
+      display: flex;
+      font-size: 0.875rem;
+      user-select: none;
+
+      .tag {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: 0 15px;
+        border-radius: 8px;
+        background-color: var(--color-background);
+
+        &:not(:last-child) {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
+  .line {
+    margin: 3.4375rem 0;
+    height: 1px;
+    border: none;
+    background-color: #bbc1cc;
+  }
+
+  .commentTotal {
+    margin-bottom: 25px;
+  }
+
+  .commentBox {
+    display: grid;
+    row-gap: 25px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto, minmax(98px, auto));
+    margin-top: 25px;
+  }
+}
+
+@include mobile {
+  .contentBox {
+    padding: 20px 15px;
+
+    .content img {
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+}

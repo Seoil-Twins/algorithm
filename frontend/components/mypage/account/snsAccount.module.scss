@@ -1,0 +1,39 @@
+.linking {
+  display: grid;
+  row-gap: 40px;
+
+  .sns {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 20px;
+    align-items: center;
+    height: 45px;
+  }
+
+  .linkingBtn {
+    @include activeBtn;
+  }
+
+  .disabledBtn {
+    @include disabledBtn;
+  }
+}
+
+.loading {
+  @include loading(352px);
+}
+
+@include mobile {
+  .sns {
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: 1fr 1fr;
+    row-gap: 10px;
+    height: auto !important;
+
+    button {
+      grid-row-start: 2;
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+  }
+}

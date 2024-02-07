@@ -1,0 +1,87 @@
+.form {
+  display: grid;
+  grid-template-rows: auto-fill 1fr;
+  row-gap: 15px;
+  width: 100%;
+
+  .profile {
+    position: relative;
+    margin-bottom: 15px;
+    justify-self: center;
+
+    .profileImg {
+      border-radius: 100px;
+      box-shadow: 1px 1px 2px var(--color-border);
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      width: 0;
+      height: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+    }
+
+    .edit {
+      position: absolute;
+      bottom: 8px;
+      right: 5px;
+      height: 25px;
+      border-radius: 100px;
+      box-shadow: 1px 1px 3px #000;
+      cursor: pointer;
+    }
+  }
+
+  .flexBox {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .codeBtn {
+    padding: 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .verifyBtn {
+    width: 100%;
+    padding: 10px 20px;
+    border-radius: 6px;
+  }
+
+  .verifiedBtn {
+    border: 0 !important;
+    background-color: #47bd35;
+    color: $white !important;
+    cursor: default;
+  }
+
+  .activeBtn {
+    border: 1px solid $primaryColor;
+    color: $primaryColor;
+  }
+
+  .disabledBtn {
+    border: 1px solid var(--color-primary-gray-text);
+    color: var(--color-primary-gray-text);
+    cursor: default;
+  }
+
+  .btnBox {
+    display: flex;
+    justify-content: right;
+
+    .update {
+      @include activeBtn;
+    }
+
+    .cancel {
+      @include disabledBtn;
+      cursor: pointer !important;
+      margin-right: 8px;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.notFound {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-bottom: 50px;
+  background-color: var(--color-background);
+
+  .grayText {
+    color: var(--color-primary-gray-text);
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+
+  .ft22 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .mb35 {
+    margin-bottom: 35px;
+  }
+}

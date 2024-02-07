@@ -1,0 +1,329 @@
+"use client";
+
+import React, { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+import { notosansBold, notosansMedium } from "@/styles/_font";
+import styles from "./signup.module.scss";
+
+import {
+  Info,
+  ValidationError,
+  changeErrorInfo,
+  validationEmail,
+  validationNickname,
+  validationPassword,
+} from "@/utils/validation";
+
+import { useAuth } from "@/providers/authProvider";
+
+import Input from "@/components/common/input";
+import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
+
+interface SignupProperty {
+  nickname: string;
+  email: string;
+  verifyCode: string;
+  password: string;
+  confirmPassword: string;
+}
+
+type SignupKeys = keyof SignupProperty;
+
+type SignupInfo = {
+  [key in SignupKeys]: {
+    value: SignupProperty[key];
+    disabled?: boolean;
+  } & ValidationError;
+};
+
+const Signup = () => {
+  const router = useRouter();
+  const { login, mutate } = useAuth()!;
+
+  const [signupInfo, setSignupInfo] = useState<SignupInfo>({
+    nickname: {
+      value: "",
+      errMsg: "",
+      isError: false,
+    },
+    email: {
+      value: "",
+      errMsg: "",
+      isError: false,
+      disabled: false,
+    },
+    verifyCode: {
+      value: "",
+      errMsg: "인증 번호가 맞지 않습니다.",
+      isError: false,
+      disabled: true,
+    },
+    password: {
+      value: "",
+      errMsg: "올바른 비밀번호 형식이 아닙니다.",
+      isError: false,
+    },
+    confirmPassword: {
+      value: "",
+      errMsg: "비밀번호가 맞지 않습니다.",
+      isError: false,
+    },
+  });
+
+  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isCheck, setIsCheck] = useState<boolean>(false);
+
+  const handleSignupInfo = useCallback(
+    (changedValue: string, name: SignupKeys) => {
+      setSignupInfo((prev: SignupInfo) => {
+        const { [name]: updatedField, ...rest } = prev;
+
+        return {
+          ...rest,
+          [name]: {
+            ...updatedField,
+            value: changedValue,
+          },
+        } as SignupInfo;
+      });
+    },
+    [],
+  );
+
+  const sendVerifyCode = useCallback(() => {
+    const isEmailValid = validationEmail(signupInfo.email.value);
+
+    if (isEmailValid.isError) {
+      const newProfileInfo = changeErrorInfo(
+        signupInfo,
+        "email",
+        isEmailValid.isError,
+        isEmailValid.errMsg,
+      ) as SignupInfo;
+      setSignupInfo(newProfileInfo);
+      return;
+    } else if (!signupInfo.verifyCode.disabled || isVerified) return;
+
+    // 이메일 전송 API 구현
+    const {
+      ["email"]: emailField,
+      ["verifyCode"]: verifyCodeField,
+      ...prev
+    } = signupInfo;
+
+    setSignupInfo({
+      ...prev,
+      email: {
+        ...emailField,
+        isError: false,
+        errMsg: "",
+        disabled: true,
+      },
+      verifyCode: {
+        ...verifyCodeField,
+        disabled: false,
+      },
+    });
+  }, [isVerified, signupInfo]);
+
+  const checkVerifyCode = useCallback(() => {
+    if (signupInfo.verifyCode.disabled || isVerified) return;
+
+    let isError = false;
+    const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
+
+    if (signupInfo.verifyCode.value === "1234") {
+      setIsVerified(true);
+    } else {
+      isError = true;
+    }
+
+    setSignupInfo({
+      ...prev,
+      verifyCode: {
+        ...verifyCodeField,
+        isError,
+        disabled: !isError,
+        errMsg: "인증 번호가 맞지 않습니다.",
+      },
+    });
+  }, [isVerified, signupInfo]);
+
+  const handleClickCheckBox = useCallback(() => {
+    setIsCheck((prev) => !prev);
+  }, []);
+
+  const validation = useCallback(() => {
+    let isValid = true;
+    let newSignupInfo: Info<SignupInfo, SignupKeys> = {
+      ...signupInfo,
+    };
+
+    const isNicknameValid = validationNickname(signupInfo.nickname.value);
+    newSignupInfo = changeErrorInfo<SignupInfo, "nickname">(
+      newSignupInfo,
+      "nickname",
+      isNicknameValid.isError,
+      isNicknameValid.errMsg,
+    ) as SignupInfo;
+
+    const isEmailValid = validationEmail(signupInfo.email.value);
+    newSignupInfo = changeErrorInfo<SignupInfo, "email">(
+      newSignupInfo,
+      "email",
+      isEmailValid.isError,
+      isEmailValid.errMsg,
+    ) as SignupInfo;
+
+    const isPasswordValid = validationPassword(signupInfo.password.value);
+    newSignupInfo = changeErrorInfo<SignupInfo, "password">(
+      newSignupInfo,
+      "password",
+      isPasswordValid.isError,
+    ) as SignupInfo;
+
+    const notMatchedPassword =
+      signupInfo.password.value !== signupInfo.confirmPassword.value;
+    newSignupInfo = changeErrorInfo<SignupInfo, "confirmPassword">(
+      newSignupInfo,
+      "confirmPassword",
+      notMatchedPassword,
+    ) as SignupInfo;
+
+    newSignupInfo = changeErrorInfo<SignupInfo, "verifyCode">(
+      newSignupInfo,
+      "verifyCode",
+      !isVerified,
+      "인증이 필요합니다.",
+    ) as SignupInfo;
+
+    if (
+      isNicknameValid.isError ||
+      isEmailValid.isError ||
+      isPasswordValid.isError ||
+      notMatchedPassword
+    ) {
+      isValid = false;
+    }
+
+    setSignupInfo(newSignupInfo);
+    return isValid;
+  }, [signupInfo, isVerified]);
+
+  const handleClickSignup = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      const isValid = validation();
+      if (!isValid) return;
+      else if (!isCheck) {
+        alert("약관에 동의해주세요.");
+        return;
+      }
+
+      // 회원가입 API 호출 및 처리 로직
+      await login("1234");
+      await mutate();
+
+      router.refresh();
+      window.location.replace("/");
+    },
+    [validation, login, mutate, isCheck, router],
+  );
+
+  return (
+    <form className={styles.formBox} onSubmit={handleClickSignup}>
+      <div className={`${styles.title} ${notosansMedium.className}`}>
+        회원가입
+      </div>
+      <div className={styles.desc}>
+        원할한 서비스 이용을 위해 회원가입을 진행해주세요.
+      </div>
+      <div className={styles.mb20}>
+        <Input
+          type="text"
+          title="닉네임"
+          placeholder="닉네임 입력"
+          value={signupInfo.nickname.value}
+          isError={signupInfo.nickname.isError}
+          errorMsg={signupInfo.nickname.errMsg}
+          onChange={(changedValue: string) =>
+            handleSignupInfo(changedValue, "nickname")
+          }
+        />
+      </div>
+      <div className={styles.mb20}>
+        <EmailVerify
+          emailInfo={signupInfo as EmailInfo}
+          isVerified={isVerified}
+          onChange={(changedValue: string, name: string) =>
+            handleSignupInfo(changedValue, name as SignupKeys)
+          }
+          onSend={sendVerifyCode}
+          onCheck={checkVerifyCode}
+        />
+      </div>
+      <div className={styles.mb20}>
+        <div className={styles.mb10}>
+          <Input
+            type="password"
+            title="비밀번호"
+            placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
+            value={signupInfo.password.value}
+            isError={signupInfo.password.isError}
+            errorMsg={signupInfo.password.errMsg}
+            onChange={(changedValue: string) =>
+              handleSignupInfo(changedValue, "password")
+            }
+            usePasswordToggle
+          />
+        </div>
+        <Input
+          type="password"
+          placeholder="비밀번호 확인 입력"
+          value={signupInfo.confirmPassword.value}
+          isError={signupInfo.confirmPassword.isError}
+          errorMsg={signupInfo.confirmPassword.errMsg}
+          onChange={(changedValue: string) =>
+            handleSignupInfo(changedValue, "confirmPassword")
+          }
+          usePasswordToggle
+        />
+      </div>
+      <div className={styles.termsBox}>
+        <input
+          type="checkbox"
+          id="terms"
+          className={styles.checkBox}
+          onChange={handleClickCheckBox}
+        />
+        <Link
+          href="/terms-of-use"
+          style={{ textDecoration: "underline" }}
+          replace
+        >
+          이용약관
+        </Link>
+        <label htmlFor="terms" className={styles.pr5}>
+          과
+        </label>
+        <Link href="/privacy-policy" style={{ textDecoration: "underline" }}>
+          개인정보처리방침
+        </Link>
+        <label htmlFor="terms" className={styles.pl5}>
+          동의합니다.
+        </label>
+      </div>
+      <button
+        type="submit"
+        className={`${styles.button} ${notosansBold.className}`}
+      >
+        회원가입
+      </button>
+    </form>
+  );
+};
+
+export default Signup;

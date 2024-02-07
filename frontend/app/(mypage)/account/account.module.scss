@@ -1,0 +1,15 @@
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .emphasis {
+    text-decoration: underline;
+    color: $red;
+  }
+
+  .dynamicImg {
+    @include dynamicImg;
+    max-width: 600px;
+  }
+}

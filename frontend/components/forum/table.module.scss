@@ -1,0 +1,131 @@
+.table {
+  display: grid;
+  row-gap: 15px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto-fit repeat(100px, auto);
+
+  .item {
+    display: flex;
+    background-color: var(--color-modal-background);
+    border-radius: 8px;
+
+    .profileImg {
+      margin-right: 35px;
+      border-radius: 100px;
+    }
+
+    .contentBox {
+      flex: 1;
+
+      .content {
+        flex: 1;
+
+        .boardType {
+          font-size: 0.875rem;
+          color: var(--color-primary-gray-text);
+        }
+
+        .etc {
+          display: flex;
+          align-items: center;
+          font-size: 0.875rem;
+
+          .line {
+            width: 1px;
+            height: 14px;
+            margin: 0 10px;
+            border: 1px solid var(--color-border);
+          }
+        }
+      }
+
+      .infoWrapper {
+        font-size: 0.875rem;
+
+        .infoBox {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: var(--color-border);
+
+          .active {
+            color: #1cca00;
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin desktopAndTablet {
+  .item {
+    padding: 25px 45px;
+
+    .contentBox {
+      display: flex;
+
+      .content {
+        display: grid;
+        margin-right: 15px;
+
+        .title {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+
+      .infoWrapper {
+        display: flex;
+        align-items: center;
+
+        .line {
+          width: 1px;
+          height: 48px;
+          margin: 0 25px;
+          border: 1px solid var(--color-border);
+        }
+      }
+    }
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet;
+}
+
+@include tablet {
+  @include desktopAndTablet;
+}
+
+@include mobile {
+  .item {
+    padding: 20px;
+
+    .content {
+      margin-bottom: 15px;
+    }
+
+    .infoWrapper {
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+      justify-content: end;
+      column-gap: 5px;
+      font-size: 0.875rem !important;
+
+      img {
+        width: 24px !important;
+        height: 24px !important;
+      }
+
+      .line {
+        display: none;
+      }
+
+      .answer {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}

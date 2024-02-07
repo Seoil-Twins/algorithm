@@ -1,0 +1,71 @@
+.detailNav {
+  display: grid;
+
+  .back {
+    @include disabledBtn(20px, 10px);
+    border: none;
+    background-color: #e8e8e8;
+    color: var(--color-primary-reverse);
+    cursor: pointer;
+  }
+
+  .editable {
+    display: grid;
+
+    .update {
+      @include disabledBtn(20px, 10px);
+      text-align: center;
+      font-size: 0.83125rem;
+      cursor: pointer;
+    }
+
+    .delete {
+      @include warningBtn(20px, 10px);
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .back {
+    background-color: #555555;
+  }
+}
+
+@mixin desktopAndTablet {
+  .detailNav {
+    grid-template-rows: 1fr;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+
+    .editable {
+      column-gap: 10px;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet;
+}
+
+@include tablet {
+  @include desktopAndTablet;
+}
+
+@include mobile {
+  .detailNav {
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--color-modal-background);
+
+    .editable {
+      row-gap: 10px;
+      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr;
+    }
+  }
+}
