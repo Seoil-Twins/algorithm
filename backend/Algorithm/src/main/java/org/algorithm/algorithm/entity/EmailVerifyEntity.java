@@ -16,7 +16,7 @@ public class EmailVerifyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "verify_id")
+    @Column(name = "verify_id", columnDefinition = "INT UNSIGNED")
     private long verifyId;
     @Column(name = "email")
     private String email;

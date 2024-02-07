@@ -15,15 +15,15 @@ public class CodeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "code_id")
+    @Column(name = "code_id", columnDefinition = "INT UNSIGNED")
     private Long codeId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     private Long userId;
-    @Column(name = "algorithm_id")
+    @Column(name = "algorithm_id", columnDefinition = "INT UNSIGNED")
     private Long algorithmId;
     @Column(name = "code")
     private String code;
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "INT UNSIGNED")
     private Long type;
     @Column(name = "solved")
     private Boolean solved;

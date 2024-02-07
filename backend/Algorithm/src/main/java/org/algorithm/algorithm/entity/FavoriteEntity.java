@@ -14,14 +14,14 @@ public class FavoriteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "favorite_id ")
+    @Column(name = "favorite_id", columnDefinition = "INT UNSIGNED")
     private long favoriteId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     private long userId;
-    @Column(name = "target_id")
+    @Column(name = "target_id", columnDefinition = "INT UNSIGNED")
     private long targetId;
-    @Column(name = "target_type")
-    private String targetType;
+    @Column(name = "target_type", columnDefinition = "INT UNSIGNED")
+    private long targetType;
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 }

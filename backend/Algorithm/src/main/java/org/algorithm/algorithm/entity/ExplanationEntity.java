@@ -14,10 +14,10 @@ public class ExplanationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "explanation_id")
+    @Column(name = "explanation_id", columnDefinition = "INT UNSIGNED")
     private long explanationId;
 
-    @Column(name = "algorithm_id")
+    @Column(name = "algorithm_id", columnDefinition = "INT UNSIGNED")
     private long algorithmId;
 
     @Column(name = "content")

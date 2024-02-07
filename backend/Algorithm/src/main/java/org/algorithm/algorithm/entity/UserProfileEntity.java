@@ -18,11 +18,11 @@ public class UserProfileEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_profile_id")
+    @Column(name = "user_profile_id", columnDefinition = "INT UNSIGNED")
     private long userProfileId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     private long userId;
-    @Column(name = "size")
+    @Column(name = "size", columnDefinition = "INT UNSIGNED")
     private long size;
     @Column(name = "type")
     private String type;

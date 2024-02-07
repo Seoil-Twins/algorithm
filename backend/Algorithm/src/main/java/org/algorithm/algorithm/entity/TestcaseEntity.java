@@ -11,9 +11,9 @@ import lombok.Setter;
 public class TestcaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "testcase_id")
+    @Column(name = "testcase_id", columnDefinition = "INT UNSIGNED")
     private long testcaseId;
-    @Column(name = "algorithm_id")
+    @Column(name = "algorithm_id", columnDefinition = "INT UNSIGNED")
     private long algorithmId;
     @Column(name = "input")
     private String input;

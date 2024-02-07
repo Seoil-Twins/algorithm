@@ -20,17 +20,17 @@ public class AlgorithmEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "algorithm_id")
+    @Column(name = "algorithm_id", columnDefinition = "INT UNSIGNED")
     private long algorithmId;
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     private long userId;
     @Column(name = "title")
     private String title;
     @Column(name = "level")
     private String level;
-    @Column(name = "algorithm_kind")
+    @Column(name = "algorithm_kind", columnDefinition = "INT UNSIGNED")
     private Long algorithmKind;
-    @Column(name = "algorithm_compe", nullable = true)
+    @Column(name = "algorithm_compe", nullable = true, columnDefinition = "INT UNSIGNED")
     private Long algorithmCompe;
     @Column(name = "content")
     private String content;

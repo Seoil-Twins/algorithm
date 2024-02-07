@@ -19,7 +19,7 @@ public class ResponseUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     private long userId;
     @Column(name = "nickname")
     private String nickname;
