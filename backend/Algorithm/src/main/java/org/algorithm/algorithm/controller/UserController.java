@@ -199,15 +199,15 @@ public class UserController {
 
 
     @PostMapping("/user")
-    public String processForm(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> processForm(@RequestBody UserDTO userDTO) {
         userDTO.setUserPw(passwordEncoder.encode(userDTO.getUserPw()));
         // 사용자 정보를 모델에 추가합니다.
         userService.save(userDTO);
-        return "success";
+        return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
 
     @PostMapping("/login")
-    public String loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
+    public ResponseEntity<String> loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
         HttpSession session = request.getSession(true); // default true
 
         UserDTO login = userService.userLogin(userDTO);
@@ -217,24 +217,21 @@ public class UserController {
         if (login == null) {
             rttr.addFlashAttribute("loginFail", failMessage);
 //            return "redirect:/login";
-            return "fail";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("fail");
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
         session.setMaxInactiveInterval(5);
-        System.out.println(session.getAttribute(Const.LOGIN_USER_KEY));
-        return "success";
+
+        return ResponseEntity.status(HttpStatus.OK).body("successs");
     }
     @ResponseBody
     @PostMapping("/user/verify/send")
-    public String MailSend(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
-        System.out.println(emailVerifyDTO);
-        System.out.println("sendsendsendsendsendsendsendsend");
+    public ResponseEntity<String> MailSend(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
         String number = userService.sendEmail(emailVerifyDTO);
-
         System.out.println(number);
 
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body("successs");
     }
 
     @PatchMapping("/user/{user_id}")
