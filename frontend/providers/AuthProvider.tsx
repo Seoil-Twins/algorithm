@@ -5,58 +5,79 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
+import CryptoJS from "crypto-js";
 
+import { axiosInstance } from "@/api";
 import { getUser } from "@/api/user";
-import { SessionResponse } from "@/app/api/sessionConfig";
 import { User } from "@/interfaces/user";
-import useSession from "@/utils/clientSideSession";
-import { useRouter } from "next/navigation";
+
+type LoginData = {
+  email: string;
+  userPw: string;
+};
 
 type AuthProviderContext = {
   user?: User;
-} & SessionResponse;
+  login: (data: LoginData) => void;
+  logout: () => void;
+};
 
-const AuthContext = createContext<AuthProviderContext | undefined>(undefined);
+const AuthContext = createContext<AuthProviderContext>({
+  user: undefined,
+  login: () => {},
+  logout: () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const {
-    session,
-    isLoading,
-    isValidating,
-    mutate,
-    login,
-    logout: sessionLogout,
-  } = useSession();
-  const router = useRouter();
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const secretKey = process.env.NEXT_PUBLIC_COOKIE_VALUE_SECRET_KEY;
+
+  const [user, setUser] = useState<User | undefined>(() => {
+    if (typeof window === "undefined" || !secretKey) return undefined;
+
+    const encryptedUserDataFromLocalStorage = localStorage.getItem("user");
+    if (!encryptedUserDataFromLocalStorage) return undefined;
+
+    const decryptedUserDataBytes = CryptoJS.AES.decrypt(
+      encryptedUserDataFromLocalStorage,
+      secretKey,
+    );
+    const decryptedUserData = JSON.parse(
+      decryptedUserDataBytes.toString(CryptoJS.enc.Utf8),
+    );
+    return decryptedUserData;
+  });
+
+  const login = useCallback(
+    async (data: LoginData) => {
+      if (!secretKey) return;
+      const loginResponse = await axiosInstance.post("/login", data);
+
+      if (loginResponse.status === 200) {
+        const userResponse = await getUser();
+        const user = userResponse.data;
+        const encryptedUserData = CryptoJS.AES.encrypt(
+          JSON.stringify(user),
+          secretKey,
+        ).toString();
+
+        setUser(user);
+        localStorage.setItem("user", encryptedUserData);
+      }
+    },
+    [secretKey],
+  );
 
   const logout = useCallback(async () => {
-    await sessionLogout();
-    await router.refresh();
-  }, [router, sessionLogout]) as any;
-
-  const fetchUser = useCallback(async () => {
-    if (isLoading || isValidating) return;
-
-    const user = await getUser(session.sessionId);
-    setUser(user);
-  }, [isLoading, isValidating, session.sessionId]);
-
-  useEffect(() => {
-    if (session.sessionId) {
-      fetchUser();
-    }
-  }, [session.sessionId, isValidating, fetchUser]);
+    // logout API를 호출하여 Cookie 삭제
+    setUser(undefined);
+    localStorage.removeItem("user");
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        session,
-        isLoading,
-        mutate,
         login,
         logout,
         user,

@@ -31,7 +31,7 @@ type NavbarProps = {
 };
 
 const Navbar = ({ menuItems }: NavbarProps) => {
-  const { session, isLoading, user, logout } = useAuth()!;
+  const { user, logout } = useAuth();
   const path: string = usePathname();
 
   const alramImgRef = useRef<HTMLButtonElement>(null);
@@ -42,6 +42,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     menuItems.map(() => createRef()),
   );
 
+  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isVisibleAlramModal, setIsVisibleAlramModal] =
     useState<boolean>(false);
   const [isVisibleProfileModal, setIsVisibleProfileModal] =
@@ -115,6 +116,10 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     };
   }, [onAlramClick, onProfileClick]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <div className={styles.centerBox}>
       <div className={styles.content}>
@@ -148,9 +153,9 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             );
           })}
         </div>
-        {!isLoading && (
+        {isMounted && (
           <>
-            {session.sessionId && user ? (
+            {user ? (
               <div className={styles.headerItem}>
                 <ThemeSwitch className={styles.theme} />
                 <button
@@ -171,21 +176,16 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   ref={profileImgRef}
                   onClick={openProfileModal}
                 >
-                  {user.profile ? (
-                    <Image
-                      src="/svgs/user_profile_default.svg"
-                      alt="유저 아이콘"
-                      width={38}
-                      height={38}
-                    />
-                  ) : (
-                    <Image
-                      src="/svgs/user_profile_default.svg"
-                      alt="유저 아이콘"
-                      width={38}
-                      height={38}
-                    />
-                  )}
+                  <Image
+                    src={
+                      user.profile
+                        ? user.profile
+                        : "/svgs/user_profile_default.svg"
+                    }
+                    alt="유저 아이콘"
+                    width={38}
+                    height={38}
+                  />
                 </button>
               </div>
             ) : (
@@ -211,21 +211,14 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               내 정보
             </div>
             <div className={styles.imgBox}>
-              {user.profile ? (
-                <Image
-                  src={user.profile}
-                  alt="유저 아이콘"
-                  width={80}
-                  height={80}
-                />
-              ) : (
-                <Image
-                  src="/svgs/user_profile_default.svg"
-                  alt="유저 기본 아이콘"
-                  width={80}
-                  height={80}
-                />
-              )}
+              <Image
+                src={
+                  user.profile ? user.profile : "/svgs/user_profile_default.svg"
+                }
+                alt="유저 아이콘"
+                width={80}
+                height={80}
+              />
             </div>
             <div className={styles.infoBox}>
               <div className={`${styles.nickname} ${notosansMedium.className}`}>
@@ -233,13 +226,13 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
               <div className={styles.algorithmBox}>
                 <div className={styles.algorithmItem}>
-                  맞춘 문제 <span className={styles.correct}>512</span>
+                  맞춘 문제 <span className={styles.correct}>123</span>
                 </div>
                 <div className={styles.algorithmItem}>
-                  틀린 문제 <span className={styles.wrong}>555</span>
+                  틀린 문제 <span className={styles.wrong}>123</span>
                 </div>
                 <div className={styles.algorithmItem}>
-                  시도한 문제 <span className={styles.try}>1067</span>
+                  시도한 문제 <span className={styles.try}>123</span>
                 </div>
               </div>
             </div>

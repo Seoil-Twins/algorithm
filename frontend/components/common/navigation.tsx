@@ -2,13 +2,14 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 import styles from "./navigation.module.scss";
 
-import { AUTH_PATHS } from "@/constants";
-import { useAuth } from "@/providers/authProvider";
 import Sidebar from "./sidebar";
 import Navbar from "./navbar";
+import { AUTH_PATHS } from "@/constants";
+import { useAuth } from "@/providers/authProvider";
 
 export type MenuItems = {
   title: string;
@@ -39,7 +40,7 @@ const Navigation = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const { session, isLoading } = useAuth()!;
+  const { user } = useAuth();
 
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -69,10 +70,10 @@ const Navigation = () => {
    * 그렇기 때문에 페이지 이동마다 session을 체크해야 함.
    */
   useEffect(() => {
-    if (!isLoading && !session.sessionId && AUTH_PATHS.includes(pathname)) {
+    if (!user && AUTH_PATHS.includes(pathname)) {
       router.replace("/");
     }
-  }, [session.sessionId, pathname, isLoading, router]);
+  }, [user, pathname, router]);
 
   return (
     <>

@@ -1,5 +1,5 @@
-import API_URL from ".";
 import { User } from "@/interfaces/user";
+import { axiosInstance } from ".";
 
 let user: User | undefined = {
   userId: 1,
@@ -20,20 +20,12 @@ let user: User | undefined = {
 };
 
 // 해당 API는 캐싱이 필요합니다.
-export const getUser = async (sessionId?: string) => {
-  if (!sessionId) return;
-
-  if (sessionId && !user) {
-    await fetch(`${API_URL}/auth`, { method: "DELETE" });
-    return undefined;
-  }
-
-  return user;
+export const getUser = async () => {
+  const response = await axiosInstance.get("/user/me");
+  return response;
 };
 
 export const updateProfileUser = async (nickname: string, email: string) => {
-  console.log(nickname, email);
-
   let updateUser = user!;
   updateUser = {
     ...updateUser,

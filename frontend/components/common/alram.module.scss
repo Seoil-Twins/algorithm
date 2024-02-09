@@ -4,7 +4,7 @@
   right: 0;
   width: 360px;
   border-radius: 8px;
-  box-shadow: 1px 4px 4px rgba($color: var(--color-primary-text), $alpha: 0.4);
+  box-shadow: 1px 4px 4px rgba(#222222, 0.4);
   font-size: 14px;
 
   .title {
@@ -53,6 +53,12 @@
         grid-column-end: 4;
       }
     }
+  }
+}
+
+[data-theme="dark"] {
+  .alramModalBox {
+    box-shadow: 1px 4px 4px rgba(#b8b8b8, 0.4);
   }
 }
 
