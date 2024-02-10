@@ -120,7 +120,7 @@ const Login = () => {
         }
       }
     },
-    [loginInfo.email.value, loginInfo.password.value, login, validation],
+    [validation, login, loginInfo.email.value, loginInfo.password.value],
   );
 
   return (

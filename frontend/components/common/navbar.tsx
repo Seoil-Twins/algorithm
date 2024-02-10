@@ -31,7 +31,7 @@ type NavbarProps = {
 };
 
 const Navbar = ({ menuItems }: NavbarProps) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading, isValidating } = useAuth();
   const path: string = usePathname();
 
   const alramImgRef = useRef<HTMLButtonElement>(null);
@@ -42,7 +42,6 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     menuItems.map(() => createRef()),
   );
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isVisibleAlramModal, setIsVisibleAlramModal] =
     useState<boolean>(false);
   const [isVisibleProfileModal, setIsVisibleProfileModal] =
@@ -116,10 +115,6 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     };
   }, [onAlramClick, onProfileClick]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return (
     <div className={styles.centerBox}>
       <div className={styles.content}>
@@ -153,7 +148,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             );
           })}
         </div>
-        {isMounted && (
+        {!isLoading && !isValidating && (
           <>
             {user ? (
               <div className={styles.headerItem}>

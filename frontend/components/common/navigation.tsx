@@ -2,13 +2,14 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 import styles from "./navigation.module.scss";
 
 import Sidebar from "./sidebar";
 import Navbar from "./navbar";
+
 import { AUTH_PATHS } from "@/constants";
+
 import { useAuth } from "@/providers/authProvider";
 
 export type MenuItems = {
@@ -40,7 +41,7 @@ const Navigation = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, isValidating, isLoading } = useAuth();
 
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -68,11 +69,18 @@ const Navigation = () => {
    * 브라우저 뒤로 가기를 하면 캐시된 페이지를 보여주기 때문에
    * middleware가 작동하지가 않음.
    * 그렇기 때문에 페이지 이동마다 session을 체크해야 함.
+   *
+   * user가 바뀔 때만 isLoading과 isValidating이 변경되도록 함.
+   * setUser가 비동기이기 때문
    */
   useEffect(() => {
+    if (isLoading || isValidating) return;
+
     if (!user && AUTH_PATHS.includes(pathname)) {
+      console.log(user);
       router.replace("/");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, pathname, router]);
 
   return (

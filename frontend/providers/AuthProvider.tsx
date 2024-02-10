@@ -1,16 +1,18 @@
 "use client";
 
+import { AxiosError } from "axios";
 import React, {
   ReactNode,
   createContext,
-  useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import CryptoJS from "crypto-js";
+import useSWR from "swr";
 
 import { axiosInstance } from "@/api";
 import { getUser } from "@/api/user";
+
 import { User } from "@/interfaces/user";
 
 type LoginData = {
@@ -19,68 +21,78 @@ type LoginData = {
 };
 
 type AuthProviderContext = {
-  user?: User;
-  login: (data: LoginData) => void;
+  user: User | null;
+  login: (user: LoginData) => void;
   logout: () => void;
+  isLoading: boolean;
+  isValidating: boolean;
 };
 
 const AuthContext = createContext<AuthProviderContext>({
-  user: undefined,
+  user: null,
   login: () => {},
   logout: () => {},
+  isLoading: false,
+  isValidating: false,
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const secretKey = process.env.NEXT_PUBLIC_COOKIE_VALUE_SECRET_KEY;
+  const {
+    data: responseUser,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  } = useSWR("getUser", getUser, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
+  const [user, setUser] = useState<User | null>(() => {
+    if (responseUser?.status !== 200 || error) {
+      return null;
+    }
 
-  const [user, setUser] = useState<User | undefined>(() => {
-    if (typeof window === "undefined" || !secretKey) return undefined;
-
-    const encryptedUserDataFromLocalStorage = localStorage.getItem("user");
-    if (!encryptedUserDataFromLocalStorage) return undefined;
-
-    const decryptedUserDataBytes = CryptoJS.AES.decrypt(
-      encryptedUserDataFromLocalStorage,
-      secretKey,
-    );
-    const decryptedUserData = JSON.parse(
-      decryptedUserDataBytes.toString(CryptoJS.enc.Utf8),
-    );
-    return decryptedUserData;
+    return responseUser.data;
   });
 
-  const login = useCallback(
-    async (data: LoginData) => {
-      if (!secretKey) return;
-      const loginResponse = await axiosInstance.post("/login", data);
+  const login = async (data: LoginData) => {
+    const loginResponse = await axiosInstance.post("/login", data);
 
-      if (loginResponse.status === 200) {
-        const userResponse = await getUser();
-        const user = userResponse.data;
-        const encryptedUserData = CryptoJS.AES.encrypt(
-          JSON.stringify(user),
-          secretKey,
-        ).toString();
+    if (loginResponse.status === 200) {
+      await mutate();
+    }
+  };
 
-        setUser(user);
-        localStorage.setItem("user", encryptedUserData);
-      }
-    },
-    [secretKey],
-  );
+  const logout = async () => {
+    setUser(null);
+    await axiosInstance.delete("/logout");
+  };
 
-  const logout = useCallback(async () => {
-    // logout API를 호출하여 Cookie 삭제
-    setUser(undefined);
-    localStorage.removeItem("user");
-  }, []);
+  useEffect(() => {
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      logout();
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isValidating &&
+      responseUser &&
+      responseUser.status === 200
+    ) {
+      setUser(responseUser.data);
+    }
+  }, [responseUser, error, isLoading, isValidating]);
 
   return (
     <AuthContext.Provider
       value={{
+        user,
+        isLoading,
+        isValidating,
         login,
         logout,
-        user,
       }}
     >
       {children}

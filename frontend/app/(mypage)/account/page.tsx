@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cookies } from "next/headers";
 
 import styles from "./account.module.scss";
 
@@ -13,7 +14,7 @@ import Content from "@/components/mypage/content";
 
 const Account = async () => {
   const sessionId = await getSessionId();
-  const user = await getUser(sessionId);
+  const user = await getUser();
   const snsInfo = await getUserSNSInfo(sessionId);
 
   if (!user || !snsInfo) {

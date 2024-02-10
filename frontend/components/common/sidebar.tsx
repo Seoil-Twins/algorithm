@@ -30,7 +30,7 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ menuItems }: SidebarProps) => {
-  const { user, logout } = useAuth()!;
+  const { user, isLoading, isValidating, logout } = useAuth()!;
   const path = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -39,7 +39,6 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     menuItems.map(() => createRef()),
   );
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isVisibleAlramModal, setIsVisibleAlramModal] =
     useState<boolean>(false);
@@ -104,10 +103,6 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
       callFetchAlrams();
     }
   }, [isVisibleAlramModal, callFetchAlrams]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   return (
     <div className={styles.centerBox}>
@@ -183,7 +178,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
               );
             })}
           </div>
-          {isMounted && (
+          {!isLoading && !isValidating && (
             <>
               {user ? (
                 <div className={styles.authBtn} onClick={handleLogout}>

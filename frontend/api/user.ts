@@ -1,5 +1,5 @@
 import { User } from "@/interfaces/user";
-import { axiosInstance } from ".";
+import { axiosInstance, createCookieConfig } from ".";
 
 let user: User | undefined = {
   userId: 1,
@@ -19,10 +19,13 @@ let user: User | undefined = {
   createdTime: "2023-12-12 12:12:12",
 };
 
-// 해당 API는 캐싱이 필요합니다.
 export const getUser = async () => {
-  const response = await axiosInstance.get("/user/me");
-  return response;
+  try {
+    const response = await axiosInstance.get("/user/me");
+    return response;
+  } catch (error) {
+    return null;
+  }
 };
 
 export const updateProfileUser = async (nickname: string, email: string) => {
