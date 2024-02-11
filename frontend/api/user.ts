@@ -1,5 +1,5 @@
 import { User } from "@/interfaces/user";
-import { axiosInstance, createCookieConfig } from ".";
+import { axiosInstance } from ".";
 
 let user: User | undefined = {
   userId: 1,
@@ -19,13 +19,49 @@ let user: User | undefined = {
   createdTime: "2023-12-12 12:12:12",
 };
 
+type SignupUser = {
+  email: string;
+  nickname: string;
+  userPw: string;
+};
+
 export const getUser = async () => {
-  try {
-    const response = await axiosInstance.get("/user/me");
-    return response;
-  } catch (error) {
-    return null;
-  }
+  const response = await axiosInstance.get("/user/me");
+  return response;
+};
+
+export const getUserSNSInfo = async (sessionId: string | undefined) => {
+  if (!sessionId) return;
+
+  return {
+    userId: 1,
+    links: [
+      {
+        linkId: 1,
+        linkKind: "1001",
+        domain: "https://github.com/dbstjdqls14",
+        createdTime: "2023-12-12 12:12:12",
+      },
+    ],
+  };
+};
+
+export const sendVerifyCode = async (data: { email: string }) => {
+  const response = await axiosInstance.post("/user/verify/send", data);
+  return response;
+};
+
+export const compareVerifyCode = async (data: {
+  email: string;
+  code: string;
+}) => {
+  const response = await axiosInstance.post("/user/verify/compare", data);
+  return response;
+};
+
+export const signup = async (data: SignupUser) => {
+  const response = await axiosInstance.post("/user", data);
+  return response;
 };
 
 export const updateProfileUser = async (nickname: string, email: string) => {
@@ -56,22 +92,6 @@ export const updateProfileImg = async (profile: File) => {
   return {
     statusCode: 204,
     updateUser,
-  };
-};
-
-export const getUserSNSInfo = async (sessionId: string | undefined) => {
-  if (!sessionId) return;
-
-  return {
-    userId: 1,
-    links: [
-      {
-        linkId: 1,
-        linkKind: "1001",
-        domain: "https://github.com/dbstjdqls14",
-        createdTime: "2023-12-12 12:12:12",
-      },
-    ],
   };
 };
 

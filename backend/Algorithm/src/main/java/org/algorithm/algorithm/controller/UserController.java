@@ -3,6 +3,7 @@ package org.algorithm.algorithm.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,9 @@ import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.entity.UserEntity;
 import org.algorithm.algorithm.service.UserService;
 import org.algorithm.algorithm.util.Const;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +38,9 @@ public class UserController {
     }
 
     @GetMapping("/user/me")
-    public ResponseEntity<String> getRUser(HttpServletRequest request) {
+    public ResponseEntity<?> getRUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // default true
+
         UserDTO loginUser = null;
         if(session != null){
             // 상수로 뺼 예정
@@ -44,7 +48,7 @@ public class UserController {
         }
         if (loginUser != null) {
             System.out.println(loginUser);
-            return ResponseEntity.ok("Authenticated");
+            return ResponseEntity.ok(loginUser);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
@@ -221,9 +225,10 @@ public class UserController {
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
-        session.setMaxInactiveInterval(5);
+        session.setMaxInactiveInterval(30 * 60);
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(false).path("/").domain("localhost").maxAge(30 * 60).build();
 
-        return ResponseEntity.status(HttpStatus.OK).body("successs");
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body("successs");
     }
     @ResponseBody
     @PostMapping("/user/verify/send")

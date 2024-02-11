@@ -107,7 +107,7 @@ const Notification = () => {
   return (
     <Content title="알림">
       <div className={styles.container}>
-        {!isLoading ? (
+        {!isLoading && (
           <>
             {notifications.map((notification, idx) => (
               <div className={styles.item} key={notification.paramKey}>
@@ -122,9 +122,8 @@ const Notification = () => {
               </div>
             ))}
           </>
-        ) : (
-          <Spinner />
         )}
+        <Spinner isVisible={isLoading} />
       </div>
     </Content>
   );

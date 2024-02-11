@@ -77,7 +77,6 @@ const Navigation = () => {
     if (isLoading || isValidating) return;
 
     if (!user && AUTH_PATHS.includes(pathname)) {
-      console.log(user);
       router.replace("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

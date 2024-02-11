@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     setUser(null);
-    await axiosInstance.delete("/logout");
+    // await axiosInstance.delete("/logout");
   };
 
   useEffect(() => {
