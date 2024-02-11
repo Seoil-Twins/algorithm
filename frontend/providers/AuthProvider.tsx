@@ -8,10 +8,10 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 import { axiosInstance } from "@/api";
-import { getUser } from "@/api/user";
+import { UserKeys, getUser } from "@/api/user";
 
 import { User } from "@/interfaces/user";
 
@@ -37,17 +37,19 @@ const AuthContext = createContext<AuthProviderContext>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const { mutate } = useSWRConfig();
+
   const {
     data: responseUser,
     error,
     isLoading,
     isValidating,
-    mutate,
-  } = useSWR("getUser", getUser, {
+  } = useSWR(UserKeys.getUser, getUser, {
     shouldRetryOnError: false,
     revalidateOnFocus: false,
   });
   const [user, setUser] = useState<User | null>(() => {
+    console.log(responseUser);
     if (responseUser?.status !== 200 || error) {
       return null;
     }
@@ -59,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const loginResponse = await axiosInstance.post("/login", data);
 
     if (loginResponse.status === 200) {
-      await mutate();
+      await mutate(UserKeys.getUser);
     }
   };
 

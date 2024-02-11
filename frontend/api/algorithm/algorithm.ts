@@ -30,20 +30,6 @@ export interface AlgorithmOptions {
   keyword?: string;
 }
 
-export interface AlgorithmCounts {
-  correct: number;
-  inCorrect: number;
-  bookmark: number;
-}
-
-export const getAlgorithmCounts = async (): Promise<AlgorithmCounts> => {
-  return {
-    correct: 55,
-    inCorrect: 44,
-    bookmark: 30,
-  };
-};
-
 export interface AlgorithmKind {
   kindId: string;
   kindName: string;

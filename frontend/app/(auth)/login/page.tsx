@@ -2,7 +2,6 @@
 
 import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from "swr";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./login.module.scss";

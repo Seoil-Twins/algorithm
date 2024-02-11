@@ -1,4 +1,5 @@
-import { getBoardTypes, getMyAnswers } from "@/api/board";
+import { getBoardTypes } from "@/api/board";
+import { getMyAnswers } from "@/api/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -15,10 +16,14 @@ const Answer = async ({
 
   return (
     <>
-      <Table items={answers.contents} boardTypes={boardTypes} />
+      <Table
+        items={answers.data.results}
+        boardTypes={boardTypes}
+        errorTitle="작성하신 답변이 없습니다."
+      />
       <Pagination
         count={count}
-        total={answers.total}
+        total={answers.data.totals}
         current={page}
         marginTop={25}
       />

@@ -20,6 +20,7 @@ import AlramType from "@/interfaces/alram";
 import { useAuth } from "@/providers/authProvider";
 
 import { fetchAlrams } from "@/api/alram";
+import { IMAGE_URL } from "@/api";
 
 import { MenuItems } from "./navigation";
 import ThemeSwitch from "./themeSwitch";
@@ -174,7 +175,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   <Image
                     src={
                       user.profile
-                        ? user.profile
+                        ? `${IMAGE_URL}/${user.profile}`
                         : "/svgs/user_profile_default.svg"
                     }
                     alt="유저 아이콘"
@@ -208,7 +209,9 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             <div className={styles.imgBox}>
               <Image
                 src={
-                  user.profile ? user.profile : "/svgs/user_profile_default.svg"
+                  user.profile
+                    ? `${IMAGE_URL}/${user.profile}`
+                    : "/svgs/user_profile_default.svg"
                 }
                 alt="유저 아이콘"
                 width={80}

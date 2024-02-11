@@ -7,6 +7,7 @@ import { AxiosError } from "axios";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./signup.module.scss";
+import { useDebouncedCallback } from "use-debounce";
 
 import {
   Info,
@@ -19,16 +20,15 @@ import {
 
 import { useAuth } from "@/providers/authProvider";
 
-import Input from "@/components/common/input";
-import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
-
 import {
   signup,
   sendVerifyCode as sendVerifyCodeAPI,
   compareVerifyCode,
 } from "@/api/user";
+
+import Input from "@/components/common/input";
+import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
-import { useDebouncedCallback } from "use-debounce";
 
 interface SignupProperty {
   nickname: string;
@@ -148,7 +148,7 @@ const Signup = () => {
       } catch (error) {
         if (
           error instanceof AxiosError &&
-          error.response?.data.errorCode === 40020
+          error.response?.data.errorCode === 40920
         ) {
           const { ["email"]: emailField, ...prev } = signupInfo;
 
@@ -181,7 +181,7 @@ const Signup = () => {
       try {
         const response = await compareVerifyCode({
           email: signupInfo.email.value,
-          code: signupInfo.verifyCode.value,
+          verifyCode: signupInfo.verifyCode.value,
         });
 
         if (response.status === 200) {
@@ -303,7 +303,7 @@ const Signup = () => {
         if (error instanceof AxiosError) {
           if (error.response?.status === 401) {
             router.replace("/login");
-          } else if (error.response?.data.errorCode === 40010) {
+          } else if (error.response?.data.errorCode === 40910) {
             const { ["nickname"]: nicknameField, ...prev } = signupInfo;
             setSignupInfo({
               ...prev,

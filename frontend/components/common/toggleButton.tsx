@@ -1,20 +1,17 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import styles from "./toggleButton.module.scss";
 
 type ToggleButtonProps = {
-  value?: boolean;
+  value: boolean;
   onChange: (value: boolean) => void;
 };
 
-const ToggleButton = (props: ToggleButtonProps) => {
-  const [value, setValue] = useState<boolean>(props.value || false);
-
+const ToggleButton = ({ value = false, onChange }: ToggleButtonProps) => {
   const handleChange = useCallback(() => {
-    setValue(!value);
-    props.onChange(!value);
-  }, [props, value]);
+    onChange(!value);
+  }, [value, onChange]);
 
   return (
     <button
