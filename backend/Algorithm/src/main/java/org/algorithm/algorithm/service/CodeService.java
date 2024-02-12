@@ -6,10 +6,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.CodeDTO;
 import org.algorithm.algorithm.dto.ResponseUserDTO;
+import org.algorithm.algorithm.dto.UserDTO;
+import org.algorithm.algorithm.entity.AlgorithmEntity;
 import org.algorithm.algorithm.entity.CodeEntity;
 import org.algorithm.algorithm.entity.ResponseUserEntity;
-import org.algorithm.algorithm.repository.CodeRepository;
-import org.algorithm.algorithm.repository.ResponseUserRepository;
+import org.algorithm.algorithm.entity.UserTryEntity;
+import org.algorithm.algorithm.exception.GlobalException;
+import org.algorithm.algorithm.exception.NotFoundException;
+import org.algorithm.algorithm.exception.SQLException;
+import org.algorithm.algorithm.repository.*;
 import org.algorithm.algorithm.util.CodeRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,15 +23,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class CodeService {
 
     public final CodeRepository codeRepository;
+    public final AlgorithmRepository algorithmRepository;
     public final ResponseUserRepository responseUserRepository;
+    public final TestcaseRepository testcaseRepository;
+    public final GlotService glotService;
+    public final UserTryRepository userTryRepository;
 
     public ObjectNode getAllCode(int pageNo, int pageSize) {
         try {
@@ -44,7 +55,7 @@ public class CodeService {
 
             return createResultNode(responseList);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get code.", e);
+            throw new SQLException("Failed to get code.");
         }
     }
 
@@ -52,16 +63,22 @@ public class CodeService {
         try {
             CodeEntity codeEntity = codeRepository.findCodeEntityByCodeId(codeId);
 
+            if(codeEntity == null)
+                throw new NotFoundException("Code Not Found By CodeId : " + codeId);
+
             CodeDTO codeDTO = CodeDTO.toCodeDTO(codeEntity);
             ObjectNode codeNode = createCodeNode(codeDTO);
 
             return codeNode;
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get code.", e);
+            throw new SQLException("Failed to get code.");
         }
     }
 
     public ObjectNode getCodeByAlgorithmId(int pageNo, int pageSize, Long algorithmId) {
+
+        if(algorithmRepository.findOneByAlgorithmId(algorithmId) == null)
+            throw new NotFoundException("Algorithm Not Found By AlgorithmId : " + algorithmId);
         try {
             Pageable pageable = PageRequest.of(pageNo, pageSize);
             Page<CodeEntity> codeEntities = codeRepository.findCodeEntitiesByAlgorithmId(pageable,algorithmId);
@@ -77,19 +94,60 @@ public class CodeService {
 
             return createResultNode(responseList);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get code.", e);
+            throw new SQLException("Failed to get code.");
         }
     }
 
-    public String postCode(CodeDTO codeDTO) {
+    public String postCode(CodeDTO codeDTO, UserDTO userDTO) {
         try {
-            CodeRunner codeRunner = new CodeRunner();
-//            codeRunner.runC(codeDTO);
-//            codeRunner.runCpp(codeDTO);
-            codeRunner.runPython(codeDTO);
+            System.out.println(codeDTO);
+            CodeRunner codeRunner = new CodeRunner(testcaseRepository);
+            Boolean codeResultSolved = false;
+
+            double startTime = System.currentTimeMillis();
+            switch (codeDTO.getType().toString()){
+                case "3001" : codeResultSolved = codeRunner.runCpp(codeDTO); break;
+                case "3002" : codeRunner.runPython(codeDTO); break;
+                case "3003" : codeRunner.runJava(codeDTO); break;
+                default: throw new GlobalException("Type이 잘못되었습니다,.");
+            }
+            double endTime = System.currentTimeMillis();
+
+            double excuteTime = ( endTime - startTime )/ 1000.0;
+
+            AlgorithmEntity algorithmEntity = algorithmRepository.findOneByAlgorithmId(codeDTO.getAlgorithmId());
+
+            Boolean solved = codeResultSolved && (Double.parseDouble(algorithmEntity.getLimitTime()) > excuteTime);
+
+            System.out.println(Double.parseDouble(algorithmEntity.getLimitTime()));
+            System.out.println(excuteTime);
+            System.out.println(solved);
+
+            CodeDTO postCodeDTO = new CodeDTO();
+            postCodeDTO.setUserId(userDTO.getUserId());
+            postCodeDTO.setAlgorithmId(codeDTO.getAlgorithmId());
+            postCodeDTO.setCode(codeDTO.getCode());
+            postCodeDTO.setType(codeDTO.getType());
+            postCodeDTO.setSolved(solved);
+            postCodeDTO.setCreatedTime(LocalDateTime.now());
+
+            CodeEntity savedEntity = codeRepository.save(CodeEntity.toCodeEntity(postCodeDTO));
+
+            UserTryEntity userTryEntity = new UserTryEntity();
+            userTryEntity.setUserId(userDTO.getUserId());
+            userTryEntity.setAlgorithmId(codeDTO.getAlgorithmId());
+            userTryEntity.setSolved(solved);
+            userTryEntity.setCodeId(savedEntity.getCodeId());
+            userTryEntity.setTryMem("128");
+            userTryEntity.setTryTime(String.valueOf(excuteTime));
+            userTryEntity.setCreatedTime(LocalDateTime.now());
+
+            userTryRepository.save(userTryEntity);
             return "created";
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get code.", e);
+            System.out.println(e);
+            throw new SQLException("Failed to post code.");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Failed to get code.", e);
         }
     }
 

@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.algorithm.algorithm.entity.UserEntity;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,6 +24,7 @@ public class UserDTO {
     private Boolean likeNofi;
     private Boolean answerNofi;
     private Boolean eventNofi;
+    private Timestamp createdTime;
 
     //lombok 어노테이션으로 getter,setter,생성자,toString 메서드 생략 가능
 
@@ -36,6 +39,7 @@ public class UserDTO {
         userDTO.setLikeNofi(userEntity.getLikeNofi());
         userDTO.setAnswerNofi(userEntity.getAnswerNofi());
         userDTO.setEventNofi(userEntity.getEventNofi());
+        userDTO.setCreatedTime(userEntity.getCreatedTime());
 
         return userDTO;
     }
@@ -51,6 +55,7 @@ public class UserDTO {
         userDTO.setLikeNofi(userEntity.getLikeNofi());
         userDTO.setAnswerNofi(userEntity.getAnswerNofi());
         userDTO.setEventNofi(userEntity.getEventNofi());
+        userDTO.setCreatedTime(userEntity.getCreatedTime());
 
         return userDTO;
     }

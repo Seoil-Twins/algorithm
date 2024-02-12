@@ -9,6 +9,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 
+import java.sql.Timestamp;
+
 @Getter
 @Setter
 @Entity
@@ -47,6 +49,8 @@ public class UserEntity {
     @Column(name = "event_nofi")
     @ColumnDefault("boolean default true")
     private Boolean eventNofi;
+    @Column(name = "created_time")
+    private Timestamp createdTime;
 
 
     // 생성자, getter, setter 등 필요한 메서드를 추가할 수 있습니다.
@@ -62,6 +66,7 @@ public class UserEntity {
         userEntity.setLikeNofi(userDTO.getLikeNofi());
         userEntity.setAnswerNofi(userDTO.getAnswerNofi());
         userEntity.setEventNofi(userDTO.getEventNofi());
+        userEntity.setCreatedTime(userDTO.getCreatedTime());
         return userEntity;
     }
 
