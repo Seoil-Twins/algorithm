@@ -1,6 +1,7 @@
 package org.algorithm.algorithm.dto;
 
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class ResponseAlgorithmDTO {
     private String content;
     private String limitTime;
     private String limitMem;
-    private ObjectNode testcase;
+    private ArrayNode testcase;
     private Boolean favorite;
     private LocalDateTime createdTime;
 
