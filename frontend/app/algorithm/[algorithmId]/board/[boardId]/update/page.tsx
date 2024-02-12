@@ -31,7 +31,6 @@ const Update = ({ params }: { params: UpdateParams }) => {
   const boardId = params.boardId;
   const router = useRouter();
 
-  const [isMounted, setIsMounted] = useState<boolean>(false);
   const [request, setRequest] = useState<RequestBoard>({
     boardType: BOARD_TYPE.ALGORITHM_QUESTION,
     title: "",
@@ -62,14 +61,6 @@ const Update = ({ params }: { params: UpdateParams }) => {
   useEffect(() => {
     fetchBoardDetail();
   }, [fetchBoardDetail]);
-
-  useEffect(() => {
-    if (!isMounted && request.content !== "" && request.content !== "") {
-      setIsMounted(true);
-    }
-  }, [isMounted, request]);
-
-  if (!isMounted) return null;
 
   return (
     <BoardForm

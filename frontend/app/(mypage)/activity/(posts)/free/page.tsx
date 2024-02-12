@@ -1,4 +1,5 @@
-import { getBoardTypes, getMyFree } from "@/api/board";
+import { getBoardTypes } from "@/api/board";
+import { getMyFrees } from "@/api/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -10,15 +11,19 @@ const Free = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const frees = await getMyFree({ page, count });
+  const frees = await getMyFrees({ page, count });
   const boardTypes = await getBoardTypes();
 
   return (
     <>
-      <Table items={frees.contents} boardTypes={boardTypes} />
+      <Table
+        items={frees.data.results}
+        boardTypes={boardTypes}
+        errorTitle="작성하신 자유 게시글이 없습니다."
+      />
       <Pagination
         count={count}
-        total={frees.total}
+        total={frees.data.totals}
         current={page}
         marginTop={25}
       />

@@ -1,4 +1,5 @@
-import { getBoardTypes, getMyComments } from "@/api/board";
+import { getBoardTypes } from "@/api/board";
+import { getMyComments } from "@/api/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -15,10 +16,14 @@ const Comment = async ({
 
   return (
     <>
-      <Table items={comments.contents} boardTypes={boardTypes} />
+      <Table
+        items={comments.data.results}
+        boardTypes={boardTypes}
+        errorTitle="작성하신 댓글이 없습니다."
+      />
       <Pagination
         count={count}
-        total={comments.total}
+        total={comments.data.totals}
         current={page}
         marginTop={25}
       />

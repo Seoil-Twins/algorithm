@@ -12,4 +12,9 @@
     @include dynamicImg;
     max-width: 600px;
   }
+
+  .retry {
+    @include activeBtn;
+    margin-top: 15px;
+  }
 }

@@ -1,14 +1,14 @@
-import { getIronSession } from "iron-session";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-import { SessionData, sessionOptions } from "./app/api/sessionConfig";
 import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 
 const routes = ["/algorithm/*"];
 
 export default async function middleware(req: NextRequest) {
-  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+  const sessionId = cookies().get(
+    process.env.NEXT_PUBLIC_SESSION_KEY as string,
+  )?.value;
   const pathname = req.nextUrl.pathname;
   const url = req.nextUrl.clone();
 
@@ -16,12 +16,12 @@ export default async function middleware(req: NextRequest) {
     NO_AUTH_PATHS.some((noAuthPath) => {
       const regex = new RegExp(noAuthPath);
       return regex.test(pathname);
-    }) && session.sessionId;
+    }) && sessionId;
   const noSessionButAuthPath =
     AUTH_PATHS.some((authPath) => {
       const regex = new RegExp(authPath);
       return regex.test(pathname);
-    }) && !session.sessionId;
+    }) && !sessionId;
 
   if (pathname === "/forum") {
     url.pathname = "/forum/all";
@@ -39,8 +39,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // eslint-disable-next-line no-useless-escape
-  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
+  const regex = new RegExp(/\/algorithm\/.+$/);
 
   if (
     regex.test(pathname) &&
@@ -48,7 +47,7 @@ export default async function middleware(req: NextRequest) {
     !pathname.includes("js")
   ) {
     const splitedPathname = pathname.split("/");
-    const algorithmId = splitedPathname[splitedPathname.length - 1];
+    const algorithmId = splitedPathname[2];
 
     if (isNaN(Number(algorithmId))) {
       url.pathname = "/";

@@ -5,10 +5,13 @@ import Link from "next/link";
 
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
+
 import { useAuth } from "@/providers/authProvider";
 
+import { deleteUser } from "@/api/user";
+
 const Withdrawal = () => {
-  const { logout } = useAuth()!;
+  const { user, logout } = useAuth();
 
   const [isCheck, setIsCheck] = useState<boolean>(false);
 
@@ -17,19 +20,19 @@ const Withdrawal = () => {
   }, []);
 
   const handleWithdrawal = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-
+      if (!user) return;
       if (!isCheck) {
         alert("회원 탈퇴에 동의해주세요.");
         return;
       }
 
       // 회원 탈퇴 API
-      console.log("탈퇴");
+      await deleteUser(user?.userId);
       logout();
     },
-    [isCheck, logout],
+    [user, isCheck, logout],
   );
 
   return (

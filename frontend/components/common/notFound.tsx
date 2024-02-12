@@ -7,11 +7,18 @@ import { notosansMedium } from "@/styles/_font";
 type NotFoundProps = {
   title: string;
   description: string;
+  size?: number;
+  marginTop?: number;
 };
 
-const NotFound = ({ title, description }: NotFoundProps) => {
+const NotFound = ({
+  title,
+  description,
+  size = 100,
+  marginTop = 20,
+}: NotFoundProps) => {
   return (
-    <div className={styles.notFound}>
+    <div className={styles.notFound} style={{ marginTop: `${marginTop}px` }}>
       <div className={styles.imgBox}>
         <Image
           src="/svgs/no_data.svg"
@@ -19,6 +26,7 @@ const NotFound = ({ title, description }: NotFoundProps) => {
           width={500}
           height={500}
           className={styles.dynamicImg}
+          style={{ width: `${size}%` }}
         />
       </div>
       <div className={styles.textBox}>
