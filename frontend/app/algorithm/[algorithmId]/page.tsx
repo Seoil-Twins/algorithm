@@ -11,7 +11,8 @@ type PageParams = {
 
 const Detail = async ({ params }: { params: PageParams }) => {
   const algorithmId = params.algorithmId;
-  const algorithm = await getAlgorithm(algorithmId);
+  const algorithmResponse = await getAlgorithm(algorithmId);
+  const algorithm = await algorithmResponse.data;
 
   return (
     <div className={styles.algorithmDetail}>

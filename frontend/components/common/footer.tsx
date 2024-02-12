@@ -10,8 +10,7 @@ import styles from "./footer.module.scss";
 import { notosansMedium } from "@/styles/_font";
 
 const Footer = () => {
-  // eslint-disable-next-line no-useless-escape
-  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
+  const regex = new RegExp(/\/algorithm\/[0-9]+$/);
   const pathname = usePathname();
 
   return (

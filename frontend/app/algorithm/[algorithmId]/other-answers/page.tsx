@@ -7,15 +7,24 @@ import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
 
 const OtherAnswers = async ({
+  params,
   searchParams,
 }: {
+  params: { algorithmId: number };
   searchParams: { [key: string]: string | undefined };
 }) => {
+  const algorithmId = params.algorithmId;
   const language = searchParams.language || "python";
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
 
-  const answers: ResponseAnswer = await getAnswer(language, { count, page });
+  const answersResponse = await getAnswer(algorithmId, {
+    count,
+    page,
+    language,
+  });
+  // 추후 total 생성 시 .data만 추가
+  const answers: ResponseAnswer = { ...answersResponse.data, total: 3 };
 
   if (answers.total <= 0)
     return (
@@ -31,8 +40,9 @@ const OtherAnswers = async ({
         <DetailNav isEditable={false} />
       </div>
       <div className={styles.answers}>
-        {answers.answers.map((answer) => (
-          <Answer key={answer.codeId} answer={answer} />
+        {answers.codes.map((answer) => (
+          // comments 붙여지면 answer만 넘기면 됨
+          <Answer key={answer.codeId} answer={{ ...answer, comments: [] }} />
         ))}
       </div>
       <Pagination

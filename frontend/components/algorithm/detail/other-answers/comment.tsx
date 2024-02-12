@@ -15,6 +15,7 @@ import { notosansMedium } from "@/styles/_font";
 
 import EditorViewer from "@/components/common/editorViewer";
 import CommentUpdateEditor from "@/components/detail/commentUpdateEditor";
+import { IMAGE_URL } from "@/api";
 
 type CommentProps = {
   comment: Pick<CommentType, "commentId" | "user" | "content" | "createdTime">;
@@ -22,7 +23,7 @@ type CommentProps = {
 
 const Comment = ({ comment }: CommentProps) => {
   const router = useRouter();
-  const { user } = useAuth()!;
+  const { user } = useAuth();
 
   const [content, setContent] = useState<string>(comment.content);
   const [isVisibleEditor, setIsVisibleEditor] = useState<boolean>(false);
@@ -53,10 +54,10 @@ const Comment = ({ comment }: CommentProps) => {
       <Image
         src={
           comment.user.profile
-            ? comment.user.profile
+            ? `${IMAGE_URL}/${comment.user.profile}`
             : "/svgs/user_profile_default.svg"
         }
-        alt="프로필 사진"
+        alt="유저 아이콘"
         width={32}
         height={32}
         className={styles.profileImg}

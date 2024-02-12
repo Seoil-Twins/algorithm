@@ -309,28 +309,20 @@ const Contents = ({ algorithm }: DetailProps) => {
         <button className={styles.btn} onClick={handleTestcaseModal}>
           테스트 케이스
         </button>
-        <button className={styles.btn}>
-          <Link
-            href={`/algorithm/${algorithm.algorithmId}/all?page=1&count=10`}
-          >
-            질문 및 피드백
-          </Link>
-        </button>
+        <Link href={`/algorithm/${algorithm.algorithmId}/all?page=1&count=10`}>
+          <button className={styles.btn}>질문 및 피드백</button>
+        </Link>
         <div className={styles.blank}></div>
-        <button className={styles.btn}>
-          <Link
-            href={`/algorithm/${
-              algorithm.algorithmId
-            }/other-answers?language=${findMyTitle(type)}`}
-          >
-            다른 사람 풀이 보기
-          </Link>
-        </button>
-        <button className={styles.btn}>
-          <Link href={`/algorithm/${algorithm.algorithmId}/explain`}>
-            해설보기
-          </Link>
-        </button>
+        <Link
+          href={`/algorithm/${
+            algorithm.algorithmId
+          }/other-answers?language=${findMyTitle(type)}`}
+        >
+          <button className={styles.btn}>다른 사람 풀이 보기</button>
+        </Link>
+        <Link href={`/algorithm/${algorithm.algorithmId}/explain`}>
+          <button className={styles.btn}>해설보기</button>
+        </Link>
         <button className={styles.btn} onClick={handleReset}>
           초기화
         </button>

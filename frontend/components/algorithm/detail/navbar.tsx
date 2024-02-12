@@ -21,6 +21,7 @@ import {
 } from "@/providers/codeTypeProvider";
 
 import { checkMyType } from "@/api/algorithm/algorithm";
+import { useAuth } from "@/providers/authProvider";
 
 type AlgorithmNavbarProps = {
   algorithm: Algorithm;
@@ -42,6 +43,7 @@ const codeTypeDropdownItems = [
 ];
 
 const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
+  const { user } = useAuth();
   const { type, setType } = useCodeType();
   const defaultTitle = codeTypeDropdownItems.filter(({ value }) => {
     return type === value;
@@ -68,8 +70,9 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
   );
 
   const handleBoomark = useCallback(() => {
+    if (!user) return;
     console.log("bookmark");
-  }, []);
+  }, [user]);
 
   return (
     <header className={styles.header}>
@@ -91,7 +94,7 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
             height={12}
             className={styles.m15}
           />
-          <span>{algorithm.kinds[0]}</span>
+          <span>{algorithm.kinds}</span>
           <Image
             src="/svgs/arrow_right_gray.svg"
             alt="오른쪽 회색 화살표"
@@ -111,7 +114,7 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
           description={algorithm.content}
           thumbnail={algorithm.thumbnail}
         />
-        {algorithm.isSave ? (
+        {algorithm.isFavorite ? (
           <button className={styles.btn}>
             <ThemeImage
               lightSrc="/svgs/bookmark_active_black.svg"

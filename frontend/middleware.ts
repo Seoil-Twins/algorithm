@@ -50,8 +50,7 @@ export default async function middleware(req: NextRequest) {
     const algorithmId = splitedPathname[2];
 
     if (isNaN(Number(algorithmId))) {
-      url.pathname = "/";
-      return NextResponse.redirect(url);
+      return NextResponse.error();
     }
   }
 

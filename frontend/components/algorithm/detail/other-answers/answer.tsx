@@ -14,13 +14,14 @@ import { notosansBold } from "@/styles/_font";
 import Comment from "./comment";
 import EditorViewer from "@/components/common/editorViewer";
 import CommentEditor from "@/components/detail/commentEditor";
+import { IMAGE_URL } from "@/api";
 
 type AnswerProps = {
   answer: ResponseAnswerItem;
 };
 
 const Answer = ({ answer }: AnswerProps) => {
-  const { user } = useAuth()!;
+  const { user } = useAuth();
 
   const [recommend, setRecommend] = useState<number>(answer.recommend);
 
@@ -47,10 +48,10 @@ const Answer = ({ answer }: AnswerProps) => {
           <Image
             src={
               answer.user.profile
-                ? answer.user.profile
+                ? `${IMAGE_URL}/${answer.user.profile}`
                 : "/svgs/user_profile_default.svg"
             }
-            alt="프로필 사진"
+            alt="유저 아이콘"
             width={38}
             height={38}
             className={styles.profileImg}
