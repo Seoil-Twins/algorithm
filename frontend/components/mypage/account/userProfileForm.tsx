@@ -2,18 +2,26 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { AxiosError } from "axios";
+import { useSWRConfig } from "swr";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./userProfileForm.module.scss";
 
 import { User } from "@/interfaces/user";
 
-import { updateProfileImg, updateProfileUser } from "@/api/user";
-
-import { useAuth } from "@/providers/authProvider";
+import {
+  updateProfileImg,
+  updateProfileUser,
+  sendVerifyCode as sendVerifyCodeAPI,
+  compareVerifyCode,
+  UserKeys,
+} from "@/api/user";
+import { IMAGE_URL } from "@/api";
 
 import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
+import Spinner from "@/components/common/spinner";
 
 import {
   ValidationError,
@@ -42,7 +50,7 @@ type UserProfileProps = {
 };
 
 const UserProfileForm = ({ user }: UserProfileProps) => {
-  const { mutate } = useAuth()!;
+  const { mutate } = useSWRConfig();
 
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
@@ -68,6 +76,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
     user.profile,
   );
   const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
   const handleProfileInfo = useCallback(
     (changedValue: string, name: UserProfileKeys) => {
@@ -137,47 +146,78 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         return;
       }
 
-      const response = await updateProfileUser(
-        profileInfo.nickname.value!,
-        profileInfo.email.value!,
-      );
+      try {
+        const data: { email?: string; nickname?: string } = {};
 
-      if (response.statusCode === 204) {
-        setIsVerified(false);
-        setProfileInfo((prev: UserProfile) => {
-          const {
-            ["email"]: emailField,
-            ["verifyCode"]: verifyCodeField,
-            ...rest
-          } = prev;
+        if (user.nickname !== profileInfo.nickname.value) {
+          data.nickname = profileInfo.nickname.value;
+        }
+        if (user.email !== profileInfo.email.value && isVerified) {
+          data.email = profileInfo.email.value;
+        }
 
-          return {
-            ...rest,
-            email: {
-              ...emailField,
-              disabled: true,
-            },
-            verifyCode: {
-              ...verifyCodeField,
-              value: "",
-              disabled: true,
-            },
-          } as UserProfile;
-        });
+        const response = await updateProfileUser(user.userId, data);
 
-        await mutate();
-      } else {
-        alert("에러 발생");
+        if (response.status === 200) {
+          setIsVerified(false);
+          setProfileInfo((prev: UserProfile) => {
+            const {
+              ["nickname"]: nicknameField,
+              ["email"]: emailField,
+              ["verifyCode"]: verifyCodeField,
+              ...rest
+            } = prev;
+
+            return {
+              ...rest,
+              nickname: {
+                ...nicknameField,
+                value: response.data.nickname,
+              },
+              email: {
+                ...emailField,
+                value: response.data.email,
+                disabled: true,
+              },
+              verifyCode: {
+                ...verifyCodeField,
+                value: "",
+                disabled: true,
+              },
+            } as UserProfile;
+          });
+
+          await mutate(UserKeys.getUser);
+        }
+
+        setIsProfileDisabled(true);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response?.data.errorCode === 40910) {
+            const { ["nickname"]: nicknameField, ...prev } = profileInfo;
+            setProfileInfo({
+              ...prev,
+              nickname: {
+                ...nicknameField,
+                errMsg: "중복된 닉네임입니다.",
+                isError: true,
+              },
+            });
+          }
+        } else {
+          alert(
+            "알 수 없는 오류가 발생하였습니다.\n 나중에 다시 시도해주세요.",
+          );
+        }
       }
-
-      setIsProfileDisabled(true);
     },
     [
       validationProfile,
-      profileInfo.nickname,
-      profileInfo.email,
+      profileInfo,
       user.nickname,
       user.email,
+      user.userId,
+      isVerified,
       mutate,
     ],
   );
@@ -188,19 +228,23 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       if (!files || !user) return;
 
       const profile = files[0];
-      const response = await updateProfileImg(profile);
 
-      if (response.statusCode === 204) {
-        setProfileImg(URL.createObjectURL(profile));
-        await mutate();
-      } else {
-        alert("에러 발생");
+      try {
+        const response = await updateProfileImg(user.userId, {
+          image: profile,
+        });
+
+        if (response.status === 200) {
+          setProfileImg(response.data.profile);
+        }
+      } catch (error) {
+        alert("나중에 다시 시도해주세요.");
       }
     },
-    [user, mutate],
+    [user],
   );
 
-  const sendVerifyCode = useCallback(() => {
+  const sendVerifyCode = useCallback(async () => {
     const changeErrorInfo = (
       name: UserProfileKeys,
       isError: boolean,
@@ -233,37 +277,82 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
     else if (user?.email === profileInfo.email.value) return;
 
     // 이메일 전송 API 구현
-    const {
-      ["email"]: emailField,
-      ["verifyCode"]: verifyCodeField,
-      ...prev
-    } = profileInfo;
+    try {
+      setIsSending(true);
+      await sendVerifyCodeAPI({
+        email: profileInfo.email.value,
+      });
+      setIsSending(false);
 
-    setProfileInfo({
-      ...prev,
-      email: {
-        ...emailField,
-        isError: false,
-        errMsg: "",
-        disabled: true,
-      },
-      verifyCode: {
-        ...verifyCodeField,
-        disabled: false,
-      },
-    });
+      const {
+        ["email"]: emailField,
+        ["verifyCode"]: verifyCodeField,
+        ...prev
+      } = profileInfo;
+
+      setProfileInfo({
+        ...prev,
+        email: {
+          ...emailField,
+          isError: false,
+          errMsg: "",
+          disabled: true,
+        },
+        verifyCode: {
+          ...verifyCodeField,
+          disabled: false,
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof AxiosError &&
+        error.response?.data.errorCode === 40920
+      ) {
+        const { ["email"]: emailField, ...prev } = profileInfo;
+
+        setProfileInfo({
+          ...prev,
+          email: {
+            ...emailField,
+            isError: true,
+            errMsg: "중복된 이메일입니다.",
+          },
+        });
+      } else {
+        alert("나중에 다시 시도해주세요.");
+      }
+    } finally {
+      setIsSending(false);
+    }
   }, [isVerified, profileInfo, user?.email]);
 
-  const checkVerifyCode = useCallback(() => {
+  const checkVerifyCode = useCallback(async () => {
     if (profileInfo.verifyCode.disabled || isVerified) return;
 
     let isError = false;
+    let errMsg = "인증 번호가 맞지 않습니다.";
     const { ["verifyCode"]: verifyCodeField, ...prev } = profileInfo;
 
-    if (profileInfo.verifyCode.value === "1234") {
-      setIsVerified(true);
-    } else {
-      isError = true;
+    try {
+      const response = await compareVerifyCode({
+        email: profileInfo.email.value,
+        verifyCode: profileInfo.verifyCode.value,
+      });
+
+      if (response.status === 200) {
+        setIsVerified(true);
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 400) {
+          isError = true;
+          errMsg = "인증 번호가 맞지 않습니다.";
+        } else if (error.response?.status === 500) {
+          isError = true;
+          errMsg =
+            "예상치 못한 오류가 발생하였습니다.\n나중에 다시 시도해주세요.";
+        }
+      }
     }
 
     setProfileInfo({
@@ -271,7 +360,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       verifyCode: {
         ...verifyCodeField,
         isError,
-        errMsg: "인증 번호가 맞지 않습니다.",
+        errMsg,
       },
     });
   }, [isVerified, profileInfo]);
@@ -354,11 +443,16 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
 
   return (
     <>
+      <Spinner isVisible={isSending} isPage />
       <form className={styles.form} onSubmit={handleSubmitProfile}>
         <div className={styles.profile}>
           <label htmlFor="profile">
             <Image
-              src={profileImg ? profileImg : "/svgs/user_profile_default.svg"}
+              src={
+                profileImg
+                  ? `${IMAGE_URL}/${profileImg}`
+                  : "/svgs/user_profile_default.svg"
+              }
               alt="유저 프로필 사진"
               width={96}
               height={96}

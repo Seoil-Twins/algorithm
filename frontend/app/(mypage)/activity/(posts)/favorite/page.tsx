@@ -1,4 +1,5 @@
-import { getBoardTypes, getMyFavorites } from "@/api/board";
+import { getBoardTypes } from "@/api/board";
+import { getMyFavorites } from "@/api/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -15,10 +16,14 @@ const Answer = async ({
 
   return (
     <>
-      <Table items={favorites.contents} boardTypes={boardTypes} />
+      <Table
+        items={favorites.data.results}
+        boardTypes={boardTypes}
+        errorTitle="좋아요한 게시글이 없습니다."
+      />
       <Pagination
         count={count}
-        total={favorites.total}
+        total={favorites.data.totals}
         current={page}
         marginTop={25}
       />

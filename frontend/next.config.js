@@ -15,6 +15,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "www.birds.cornell.edu",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
     ],
   },
   // 엄격 모드로 인해 useEffect가 2번 실행 (1번만 실행하게 할라면 밑에 주석을 푸셈)

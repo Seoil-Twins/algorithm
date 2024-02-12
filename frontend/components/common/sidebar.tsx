@@ -30,7 +30,7 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ menuItems }: SidebarProps) => {
-  const { session, isLoading, logout } = useAuth()!;
+  const { user, isLoading, isValidating, logout } = useAuth()!;
   const path = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -45,10 +45,10 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   const [alrams, setAlrams] = useState<AlramType[]>([]);
 
   const customMenuItems: MenuItems[] = useMemo(() => {
-    return session.sessionId
+    return user
       ? [...menuItems, { title: "마이페이지", link: "/account" }]
       : [...menuItems];
-  }, [menuItems, session.sessionId]);
+  }, [menuItems, user]);
 
   const toggleModal = useCallback(() => {
     setIsOpen((prev) => {
@@ -178,26 +178,30 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
               );
             })}
           </div>
-          {!isLoading && session.sessionId ? (
-            <div className={styles.authBtn} onClick={handleLogout}>
-              로그아웃
-            </div>
-          ) : (
-            <div className={styles.authBtn}>
-              <Link
-                href="/login"
-                onClick={() => setTimeout(() => toggleModal(), 100)}
-              >
-                로그인
-              </Link>
-              <div className={styles.mlr10}>|</div>
-              <Link
-                href="/signup"
-                onClick={() => setTimeout(() => toggleModal(), 100)}
-              >
-                회원가입
-              </Link>
-            </div>
+          {!isLoading && !isValidating && (
+            <>
+              {user ? (
+                <div className={styles.authBtn} onClick={handleLogout}>
+                  로그아웃
+                </div>
+              ) : (
+                <div className={styles.authBtn}>
+                  <Link
+                    href="/login"
+                    onClick={() => setTimeout(() => toggleModal(), 100)}
+                  >
+                    로그인
+                  </Link>
+                  <div className={styles.mlr10}>|</div>
+                  <Link
+                    href="/signup"
+                    onClick={() => setTimeout(() => toggleModal(), 100)}
+                  >
+                    회원가입
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

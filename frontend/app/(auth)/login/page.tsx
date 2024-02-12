@@ -17,6 +17,7 @@ import {
 } from "@/utils/validation";
 
 import { useAuth } from "@/providers/authProvider";
+import { AxiosError } from "axios";
 
 interface LoginProperty {
   email: string;
@@ -33,7 +34,7 @@ type LoginInfo = {
 
 const Login = () => {
   const router = useRouter();
-  const { login, mutate } = useAuth()!;
+  const { login } = useAuth()!;
 
   const [loginInfo, setLoginInfo] = useState<LoginInfo>({
     email: {
@@ -98,27 +99,27 @@ const Login = () => {
 
       const isValid = validation();
       if (!isValid) {
-        console.log(loginInfo.email);
         setIsfailedLogin(false);
         return;
       }
 
       // 로그인 API 호출 및 처리 로직
-      // 로그인 실패
-      // const response = {
-      //   statusCode: 400,
-      // };
+      try {
+        await login({
+          email: loginInfo.email.value,
+          userPw: loginInfo.password.value,
+        });
 
-      // if (response.statusCode === 400) {
-      //   setIsfailedLogin(true);
-      // }
-      await login("1234");
-      await mutate();
-      router.refresh();
-
-      window.location.replace("/");
+        window.location.replace("/");
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 401) {
+          setIsfailedLogin(true);
+        } else {
+          alert("알 수 없는 에러가 발생하였습니다.\n나중에 다시 시도해주세요.");
+        }
+      }
     },
-    [loginInfo.email, router, validation, login, mutate],
+    [validation, login, loginInfo.email.value, loginInfo.password.value],
   );
 
   return (
