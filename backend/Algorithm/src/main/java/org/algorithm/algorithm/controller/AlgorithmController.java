@@ -24,8 +24,8 @@ public class AlgorithmController {
     private final AlgorithmService algorithmService;
     @GetMapping("/algorithm")
     public ResponseEntity<?> getAllAlgorithm(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
-                                                       @RequestParam(required = false, defaultValue = "5", value = "count") int count,
-                                                       HttpServletRequest request) {
+                                                @RequestParam(required = false, defaultValue = "5", value = "count") int count,
+                                                HttpServletRequest request) {
 
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
@@ -108,7 +108,7 @@ public class AlgorithmController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode resultNode = objectMapper.createObjectNode();
-        resultNode.put("conetent", result.getContent());
+        resultNode.put("content", result.getContent());
         return resultNode;
     }
 

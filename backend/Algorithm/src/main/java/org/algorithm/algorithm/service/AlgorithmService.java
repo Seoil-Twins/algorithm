@@ -38,7 +38,7 @@ public class AlgorithmService {
     public ObjectNode getAll(int pageNo, int pageSize, UserDTO userDTO) {
         try {
             System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            Pageable pageable = PageRequest.of(pageNo-1, pageSize);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
 
 
@@ -125,7 +125,7 @@ public class AlgorithmService {
     public ObjectNode getAll(int pageNo, int pageSize) {
         try {
             System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            Pageable pageable = PageRequest.of(pageNo-1, pageSize);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
 
 
@@ -203,6 +203,8 @@ public class AlgorithmService {
     public ObjectNode getRecommend(UserDTO userDTO) {
         try {
             List<AlgorithmEntity> algorithmEntities = algorithmRepository.findRecommend();
+            if (algorithmEntities == null)
+                throw new NotFoundException("NOT FOUND RECOMMEND ALGORITHM ( Maybe. Empty 'user_try' table )");
 
 
             ObjectMapper objectMapper = new ObjectMapper();
