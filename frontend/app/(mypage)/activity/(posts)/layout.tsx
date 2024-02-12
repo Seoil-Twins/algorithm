@@ -1,13 +1,13 @@
 import React from "react";
 
-import { notosansBold } from "@/styles/_font";
 import SubNavigation, {
   NavItem,
 } from "@/components/mypage/activity/subNavigation";
 import Content from "@/components/mypage/content";
 
-import { getAlgorithmCounts } from "@/api/algorithm/algorithm";
+import { getUserSolved } from "@/api/user";
 
+import { notosansBold } from "@/styles/_font";
 import styles from "./posts.module.scss";
 
 const navItems: NavItem[] = [
@@ -38,7 +38,7 @@ const navItems: NavItem[] = [
 ];
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-  const algorithmCounts = await getAlgorithmCounts();
+  const response = await getUserSolved();
 
   return (
     <div className={styles.activity}>
@@ -48,7 +48,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <div
               className={`${styles.correct} ${styles.number} ${notosansBold.className}`}
             >
-              {algorithmCounts.correct}
+              {response.data.solved}
             </div>
             <div>맞힌 문제</div>
           </div>
@@ -57,7 +57,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <div
               className={`${styles.incorrect} ${styles.number} ${notosansBold.className}`}
             >
-              {algorithmCounts.inCorrect}
+              {response.data.tried}
             </div>
             <div>시도한 문제</div>
           </div>
@@ -66,7 +66,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             <div
               className={`${styles.bookmark} ${styles.number} ${notosansBold.className}`}
             >
-              {algorithmCounts.bookmark}
+              {response.data.favorite}
             </div>
             <div>찜한 문제</div>
           </div>

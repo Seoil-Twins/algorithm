@@ -1,65 +1,100 @@
 "use client";
 
+import { AxiosError } from "axios";
 import React, {
   ReactNode,
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
+import useSWR, { useSWRConfig } from "swr";
 
-import { getUser } from "@/api/user";
-import { SessionResponse } from "@/app/api/sessionConfig";
+import { axiosInstance } from "@/api";
+import { UserKeys, getUser } from "@/api/user";
+
 import { User } from "@/interfaces/user";
-import useSession from "@/utils/clientSideSession";
-import { useRouter } from "next/navigation";
+
+type LoginData = {
+  email: string;
+  userPw: string;
+};
 
 type AuthProviderContext = {
-  user?: User;
-} & SessionResponse;
+  user: User | null;
+  login: (user: LoginData) => void;
+  logout: () => void;
+  isLoading: boolean;
+  isValidating: boolean;
+};
 
-const AuthContext = createContext<AuthProviderContext | undefined>(undefined);
+const AuthContext = createContext<AuthProviderContext>({
+  user: null,
+  login: () => {},
+  logout: () => {},
+  isLoading: false,
+  isValidating: false,
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const { mutate } = useSWRConfig();
+
   const {
-    session,
+    data: responseUser,
+    error,
     isLoading,
     isValidating,
-    mutate,
-    login,
-    logout: sessionLogout,
-  } = useSession();
-  const router = useRouter();
-  const [user, setUser] = useState<User | undefined>(undefined);
+  } = useSWR(UserKeys.getUser, getUser, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
+  const [user, setUser] = useState<User | null>(() => {
+    console.log(responseUser);
+    if (responseUser?.status !== 200 || error) {
+      return null;
+    }
 
-  const logout = useCallback(async () => {
-    await sessionLogout();
-    await router.refresh();
-  }, [router, sessionLogout]) as any;
+    return responseUser.data;
+  });
 
-  const fetchUser = useCallback(async () => {
-    if (isLoading || isValidating) return;
+  const login = async (data: LoginData) => {
+    const loginResponse = await axiosInstance.post("/login", data);
 
-    const user = await getUser(session.sessionId);
-    setUser(user);
-  }, [isLoading, isValidating, session.sessionId]);
+    if (loginResponse.status === 200) {
+      await mutate(UserKeys.getUser);
+    }
+  };
+
+  const logout = async () => {
+    setUser(null);
+    // await axiosInstance.delete("/logout");
+  };
 
   useEffect(() => {
-    if (session.sessionId) {
-      fetchUser();
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      logout();
     }
-  }, [session.sessionId, isValidating, fetchUser]);
+  }, [error]);
+
+  useEffect(() => {
+    if (
+      !isLoading &&
+      !isValidating &&
+      responseUser &&
+      responseUser.status === 200
+    ) {
+      setUser(responseUser.data);
+    }
+  }, [responseUser, error, isLoading, isValidating]);
 
   return (
     <AuthContext.Provider
       value={{
-        session,
+        user,
         isLoading,
-        mutate,
+        isValidating,
         login,
         logout,
-        user,
       }}
     >
       {children}

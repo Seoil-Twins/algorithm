@@ -12,13 +12,15 @@ import { getTimeAgo } from "@/utils/day";
 import ThemeImage from "@/components/common/themeImage";
 
 import Board from "@/interfaces/board";
+import NotFound from "@/components/common/notFound";
 
 type TableProps = {
   boardTypes: BoardType[];
   items: Board[];
+  errorTitle: string;
 };
 
-const Table = ({ boardTypes, items }: TableProps) => {
+const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
   const getTitleById = useCallback(
     (type: number) => {
       for (const boardType of boardTypes) {
@@ -34,6 +36,9 @@ const Table = ({ boardTypes, items }: TableProps) => {
 
   return (
     <div className={styles.table}>
+      {items.length <= 0 && (
+        <NotFound title={errorTitle} description={""} size={70} marginTop={0} />
+      )}
       {items.map((item: Board) => (
         <Link
           href={`/forum/${item.boardType}/${item.boardId}`}

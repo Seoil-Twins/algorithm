@@ -54,7 +54,12 @@ const Algorithm = async ({
     keyword: (searchParams?.keyword as string) || undefined,
   };
 
-  const algorithms = await getAlgorithms(sortOptions);
+  const algorithmsReponse = await getAlgorithms(sortOptions);
+  const algorithms = {
+    algorithms: algorithmsReponse.data,
+    total: 1,
+  };
+  console.log(algorithms);
   const algorithmKinds = await getAlgorithmKinds();
 
   const tableDatas: TableData[] = algorithms.algorithms.map(
@@ -75,7 +80,7 @@ const Algorithm = async ({
           <span className={`level${algorithm.level} ${notosansBold.className}`}>
             Level. {algorithm.level}
           </span>,
-          <span>{algorithm.kinds[0]}</span>,
+          <span>{algorithm.kinds}</span>,
           <span>{algorithm.solvedRate}%</span>,
         ],
         link: `/algorithm/${algorithm.algorithmId}`,

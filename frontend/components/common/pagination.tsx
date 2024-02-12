@@ -139,56 +139,56 @@ const Pagination = ({
     };
   }, [handleWindowSize]);
 
+  if (total <= 0) return null;
+
   return (
     <nav>
-      {total != 0 && (
-        <ul className={styles.pagination} style={{ marginTop }}>
-          <li className={styles.previous}>
-            <button disabled={current === 1} onClick={handlePrevois}>
-              <Image
-                src={`${
-                  current === 1
-                    ? "/svgs/arrow_left_white.svg"
-                    : "/svgs/arrow_left_gray.svg"
+      <ul className={styles.pagination} style={{ marginTop }}>
+        <li className={styles.previous}>
+          <button disabled={current === 1} onClick={handlePrevois}>
+            <Image
+              src={`${
+                current === 1
+                  ? "/svgs/arrow_left_white.svg"
+                  : "/svgs/arrow_left_gray.svg"
+              }`}
+              alt="왼쪽 이동 아이콘"
+              width={18}
+              height={18}
+            />
+          </button>
+        </li>
+        {isVisible ? (
+          viewPages.map((num: number) => (
+            <li key={num}>
+              <button
+                className={`${styles.btn} ${
+                  current === num ? styles.active : null
                 }`}
-                alt="왼쪽 이동 아이콘"
-                width={18}
-                height={18}
-              />
-            </button>
-          </li>
-          {isVisible ? (
-            viewPages.map((num: number) => (
-              <li key={num}>
-                <button
-                  className={`${styles.btn} ${
-                    current === num ? styles.active : null
-                  }`}
-                  onClick={() => handleChange(num)}
-                >
-                  {num}
-                </button>
-              </li>
-            ))
-          ) : (
-            <li className={styles.empty} />
-          )}
-          <li className={styles.next}>
-            <button disabled={current * count >= total} onClick={handleNext}>
-              <Image
-                src={`${
-                  current * count >= total
-                    ? "/svgs/arrow_right_white.svg"
-                    : "/svgs/arrow_right_gray.svg"
-                }`}
-                alt="오른쪽 이동 아이콘"
-                width={18}
-                height={18}
-              />
-            </button>
-          </li>
-        </ul>
-      )}
+                onClick={() => handleChange(num)}
+              >
+                {num}
+              </button>
+            </li>
+          ))
+        ) : (
+          <li className={styles.empty} />
+        )}
+        <li className={styles.next}>
+          <button disabled={current * count >= total} onClick={handleNext}>
+            <Image
+              src={`${
+                current * count >= total
+                  ? "/svgs/arrow_right_white.svg"
+                  : "/svgs/arrow_right_gray.svg"
+              }`}
+              alt="오른쪽 이동 아이콘"
+              width={18}
+              height={18}
+            />
+          </button>
+        </li>
+      </ul>
     </nav>
   );
 };

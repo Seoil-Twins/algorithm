@@ -16,7 +16,7 @@ export interface SessionResponse {
 
 export const sessionOptions: SessionOptions = {
   password: process.env.SESSION_PW!.toString(),
-  cookieName: "sessionId",
+  cookieName: "JSESSIONID",
   cookieOptions: {
     secure: process.env.ENVIROMENT === "product" ? true : false,
   },

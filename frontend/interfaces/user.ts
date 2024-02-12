@@ -12,6 +12,8 @@ export interface User {
   answer_nofi: boolean;
   event_nofi: boolean;
   profile?: string;
+  tried: number;
+  solved: number;
   createdTime: string;
 }
 

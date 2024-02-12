@@ -3,6 +3,7 @@ package org.algorithm.algorithm.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class UserController {
     @GetMapping("/user/me")
     public ResponseEntity<?> getRUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // default true
+
         UserDTO loginUser = null;
         if(session != null){
             // 상수로 뺼 예정

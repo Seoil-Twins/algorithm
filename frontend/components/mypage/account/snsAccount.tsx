@@ -37,25 +37,25 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
       id: snsId.github,
       title: "Github",
       imgSrc: "./svgs/github.svg",
-      disabled: sns.links[0].linkKind === snsId.github,
+      disabled: sns.links[0]?.linkKind === snsId.github,
     },
     {
       id: snsId.google,
       title: "Google",
       imgSrc: "./svgs/google.svg",
-      disabled: sns.links[0].linkKind === snsId.google,
+      disabled: sns.links[0]?.linkKind === snsId.google,
     },
     {
       id: snsId.naver,
       title: "Naver",
       imgSrc: "./svgs/naver.svg",
-      disabled: sns.links[0].linkKind === snsId.naver,
+      disabled: sns.links[0]?.linkKind === snsId.naver,
     },
     {
       id: snsId.kakao,
       title: "Kakako",
       imgSrc: "./svgs/kakao.svg",
-      disabled: sns.links[0].linkKind === snsId.kakao,
+      disabled: sns.links[0]?.linkKind === snsId.kakao,
     },
   ]);
 
@@ -68,7 +68,7 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
   );
 
   const handleGithub = useCallback(() => {
-    if (findSnsLinkInfo("1001")?.disabled) return;
+    if (findSnsLinkInfo(snsId.github)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
     if (!clientId) return;
@@ -83,10 +83,10 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
 
     // gihub Login 주소로 이동
     router.replace(githubUrl);
-  }, [findSnsLinkInfo, router]);
+  }, [findSnsLinkInfo, router, snsId.github]);
 
   const handleGoogle = useCallback(() => {
-    if (findSnsLinkInfo("1002")?.disabled) return;
+    if (findSnsLinkInfo(snsId.google)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_CODE_REDIRECT_URI;
@@ -103,10 +103,10 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
     const googleUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(googleUrl);
-  }, [findSnsLinkInfo, router]);
+  }, [findSnsLinkInfo, router, snsId.google]);
 
   const handleNaver = useCallback(() => {
-    if (findSnsLinkInfo("1003")?.disabled) return;
+    if (findSnsLinkInfo(snsId.naver)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_NAVER_CODE_REDIRECT_URI;
@@ -125,10 +125,10 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
     const naverUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(naverUrl);
-  }, [findSnsLinkInfo, router]);
+  }, [findSnsLinkInfo, router, snsId.naver]);
 
   const handleKakao = useCallback(() => {
-    if (findSnsLinkInfo("1004")?.disabled) return;
+    if (findSnsLinkInfo(snsId.kakao)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_CODE_REDIRECT_URI;
@@ -148,7 +148,7 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
     const kakaoUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(kakaoUrl);
-  }, [findSnsLinkInfo, router]);
+  }, [findSnsLinkInfo, router, snsId.kakao]);
 
   const handleSnsLinking = useCallback(
     (id: string) => {

@@ -16,7 +16,11 @@ import { Algorithm } from "@/interfaces/algorithm";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
-import { findMyTitle, useCodeType } from "@/providers/codeTypeProvider";
+import {
+  CodeType,
+  findMyTitle,
+  useCodeType,
+} from "@/providers/codeTypeProvider";
 
 import Modal from "@/components/common/modal";
 import EditorViewer from "@/components/common/editorViewer";
@@ -43,16 +47,28 @@ const DynamicCodeMirror = dynamic(() => import("@uiw/react-codemirror"), {
   ssr: false,
 });
 
+const defaultCode = (type?: CodeType) => {
+  if (type === "c") {
+    return `int main() {\n${"  "}\n${"  "}return 0;\n}`;
+  } else if (type === "j") {
+    return `public class Solution {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
+  }
+
+  return "";
+};
+
 const Contents = ({ algorithm }: DetailProps) => {
   const { type } = useCodeType();
   const { resolvedTheme } = useTheme();
 
   const [language, setLanguage] = useState<Extension>(python);
-  const [code, setCode] = useState<string>("\n\n\n\n\n\n");
+  const [code, setCode] = useState<string>(defaultCode(type));
   const [isVisibleContentResize, setIsVisibleContentResize] =
     useState<boolean>(true);
   const [isVisibleCodeResize, setIsVisibleCodeResize] = useState<boolean>(true);
   const [isVisibleTestcase, setIsVisibleTestcase] = useState<boolean>(false);
+  const [isVisibleResetModal, setIsVisibleResetModal] =
+    useState<boolean>(false);
 
   const handleChangeCode = useCallback((val: string) => {
     setCode(val);
@@ -70,11 +86,14 @@ const Contents = ({ algorithm }: DetailProps) => {
     }
   }, []);
 
+  const handleResetOk = useCallback(() => {
+    const initalCode = defaultCode(type);
+    setCode(initalCode);
+    setIsVisibleResetModal(false);
+  }, [type]);
+
   const handleReset = useCallback(() => {
-    // modal 컴포넌트 만들기
-    // modal 띄운 후 onOk, onCancel 만들기
-    // onOk 이벤트 발생하면 이 메소드 실행
-    setCode("\n\n\n\n\n\n");
+    setIsVisibleResetModal((prev) => !prev);
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -82,6 +101,9 @@ const Contents = ({ algorithm }: DetailProps) => {
   }, [code]);
 
   useEffect(() => {
+    const initalCode = defaultCode(type);
+    setCode(initalCode);
+
     if (type === "p") {
       setLanguage(python);
     } else if (type === "c") {
@@ -335,6 +357,15 @@ const Contents = ({ algorithm }: DetailProps) => {
             </React.Fragment>
           ))}
         </div>
+      </Modal>
+      <Modal
+        isVisible={isVisibleResetModal}
+        title="정말 초기화 하시겠습니까?"
+        onOk={handleResetOk}
+        onCancel={handleReset}
+        maxWidth={45}
+      >
+        <p>초기화 시 코드를 되돌릴 수 없습니다.</p>
       </Modal>
     </>
   );

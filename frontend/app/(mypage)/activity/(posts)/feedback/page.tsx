@@ -1,4 +1,5 @@
-import { getBoardTypes, getMyFeedbacks } from "@/api/board";
+import { getBoardTypes } from "@/api/board";
+import { getMyFeedbacks } from "@/api/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -15,10 +16,14 @@ const Feedback = async ({
 
   return (
     <>
-      <Table items={feedbacks.contents} boardTypes={boardTypes} />
+      <Table
+        items={feedbacks.data.results}
+        boardTypes={boardTypes}
+        errorTitle="작성하신 피드백이 없습니다."
+      />
       <Pagination
         count={count}
-        total={feedbacks.total}
+        total={feedbacks.data.totals}
         current={page}
         marginTop={25}
       />
