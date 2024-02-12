@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.EmailVerifyDTO;
 import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.entity.UserEntity;
+import org.algorithm.algorithm.entity.UserLinkEntity;
+import org.algorithm.algorithm.exception.GlobalException;
+import org.algorithm.algorithm.exception.UpdateException;
 import org.algorithm.algorithm.service.UserService;
 import org.algorithm.algorithm.util.Const;
 import org.springframework.http.HttpHeaders;
@@ -46,17 +49,18 @@ public class UserController {
             // 상수로 뺼 예정
             loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
         }
+
         if (loginUser != null) {
-            System.out.println(loginUser);
-            return ResponseEntity.ok(loginUser);
+            ObjectNode result = userService.userSelf(loginUser);
+            return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
     @GetMapping("/user/notification")
-    public ResponseEntity<Object> getUserNotification(HttpServletRequest request) {
+    public ResponseEntity<?> getUserNotification(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -67,20 +71,28 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
     @GetMapping("/user/link/{user_id}")
-    public ResponseEntity<Object> getUserLink(@PathVariable("user_id") String userId) throws JsonProcessingException {
+    public ResponseEntity<?> getUserLink(@PathVariable("user_id") String userId,HttpServletRequest request) throws JsonProcessingException {
+        HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
-        System.out.println("ASdasdasdasdsa");
-        ObjectNode result = userService.userLinks(userId);
-        return ResponseEntity.ok(result);
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null) {
+            ObjectNode result = userService.userLinks(userId);
+            return ResponseEntity.ok(result);
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
+        }
     }
 
     @GetMapping("/user/mypage/solved")
-    public ResponseEntity<Object> getUserMypageSolved(HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> getUserMypageSolved(HttpServletRequest request) throws JsonProcessingException {
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -91,12 +103,12 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
     @GetMapping("/user/mypage/question")
-    public ResponseEntity<Object> getUserMypageQuestion(HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> getUserMypageQuestion(HttpServletRequest request) throws JsonProcessingException {
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -107,12 +119,12 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
     @GetMapping("/user/mypage/feedback")
-    public ResponseEntity<Object> getUserMypageFeddback(HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity<?> getUserMypageFeddback(HttpServletRequest request) throws JsonProcessingException {
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -123,7 +135,7 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -140,7 +152,7 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -156,7 +168,7 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -172,7 +184,7 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -188,26 +200,40 @@ public class UserController {
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
     @PostMapping("/user/verify/compare")
     @ResponseBody
-    public String CompareVerifyCode(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
-        System.out.println(emailVerifyDTO);
-        String result = userService.compareCode(emailVerifyDTO);
+    public ResponseEntity<?> CompareVerifyCode(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
+        /*
+            private String email;
+            private String verifyCode;
+        */
+        if(emailVerifyDTO.getEmail() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require Email ! ");
+        if(emailVerifyDTO.getVerifyCode() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require Verify Code ! ");
 
-        return result;
+        return userService.compareCode(emailVerifyDTO);
     }
 
 
     @PostMapping("/user")
     public ResponseEntity<String> processForm(@RequestBody UserDTO userDTO) {
+        if(userDTO.getEmail() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require Email ! ");
+        if(userDTO.getUserPw() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require Password ! ");
+        if(userDTO.getNickname() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require NickName ! ");
+
         userDTO.setUserPw(passwordEncoder.encode(userDTO.getUserPw()));
+
         // 사용자 정보를 모델에 추가합니다.
         userService.save(userDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        return ResponseEntity.status(HttpStatus.CREATED).body(" Success User Post ! ");
     }
 
     @PostMapping("/login")
@@ -221,22 +247,43 @@ public class UserController {
         if (login == null) {
             rttr.addFlashAttribute("loginFail", failMessage);
 //            return "redirect:/login";
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("fail");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Login Failed");
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
-        session.setMaxInactiveInterval(30 * 60);
-        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(false).path("/").domain("localhost").maxAge(30 * 60).build();
+        session.setMaxInactiveInterval(1800); // 세션 만료 시간 30분
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(1800).build();
 
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body("successs");
     }
     @ResponseBody
     @PostMapping("/user/verify/send")
-    public ResponseEntity<String> MailSend(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
-        String number = userService.sendEmail(emailVerifyDTO);
-        System.out.println(number);
+    public ResponseEntity<?> MailSend(@RequestBody EmailVerifyDTO emailVerifyDTO) throws MessagingException {
 
-        return ResponseEntity.status(HttpStatus.OK).body("successs");
+        if(emailVerifyDTO.getEmail() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Require Email ! ");
+        String number = userService.sendEmail(emailVerifyDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Send Success");
+    }
+
+    @ResponseBody
+    @PostMapping("/user/link/{user_id}")
+    public ResponseEntity<?> postLink(@PathVariable("user_id") int userId, @RequestBody UserLinkEntity userLinkEntity, HttpServletRequest request) throws MessagingException {
+        // link_kind, domain
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null && userId == loginUser.getUserId()) {
+            ObjectNode result = userService.userLinkPost(userId, userLinkEntity);
+            return ResponseEntity.ok(result);
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
     }
 
     @PatchMapping("/user/{user_id}")
@@ -250,18 +297,18 @@ public class UserController {
         if (loginUser != null) {
 
             if(loginUser.getUserId() != userId)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Update Not Acceptable");
 
-            UserEntity result = null;
+            ObjectNode result = null;
             try {
                 result = userService.userUpdate(userDTO,userId);
             } catch (MessagingException e) {
-                throw new RuntimeException(e);
+                throw new UpdateException("Error User Update");
             }
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -276,18 +323,18 @@ public class UserController {
         if (loginUser != null) {
 
             if(loginUser.getUserId() != userId)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accept Failed. Only Own Data Accepted.");
 
-            UserEntity result = null;
+            ObjectNode result = null;
             try {
                 result = userService.userUpdate(userDTO,userId);
             } catch (MessagingException e) {
-                throw new RuntimeException(e);
+                throw new GlobalException("User Update Controller Error ! ");
             }
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
@@ -302,18 +349,18 @@ public class UserController {
         if (loginUser != null) {
 
             if(loginUser.getUserId() != userId)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Accept Failed. Only Own Data Accepted.");
 
             String result = null;
             try {
                 result = userService.userDelete(userId);
             } catch (MessagingException e) {
-                throw new RuntimeException(e);
+                throw new GlobalException("User Delete Controller Error ! ");
             }
             return ResponseEntity.ok(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 

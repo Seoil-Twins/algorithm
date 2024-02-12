@@ -13,6 +13,11 @@ public interface AlgorithmRepository extends JpaRepository<AlgorithmEntity, Long
 
     AlgorithmEntity findOneByAlgorithmId(long algorithmId);
     Page<AlgorithmEntity> findAll(Pageable pageable);
+    @Query(value = "SELECT * " +
+            "FROM algorithm " +
+            "WHERE algorithm_id IN (SELECT algorithm_id FROM user_try WHERE user_id = :userId)",
+            nativeQuery = true)
+    Page<AlgorithmEntity> findTriedByUserId(@Param("userId") long userId, Pageable pageable);
 
     @Query(value = "SELECT * FROM (\n" +
             "    SELECT a.*\n" +
@@ -34,6 +39,29 @@ public interface AlgorithmRepository extends JpaRepository<AlgorithmEntity, Long
             "WHERE kind_id = :kindId",
             nativeQuery = true)
     String findKindByKindId(@Param("kindId") Long kindId);
+    @Query(value = "SELECT COUNT(*)" +
+            " FROM user_try " +
+            "WHERE algorithm_id = :algorithmId AND user_id = :userId AND solved = 1",
+            nativeQuery = true)
+    int findSolvedByAlgorithmIdANDUserId(@Param("algorithmId") Long algorithmId, @Param("userId") Long userId);
+
+    @Query(value = "SELECT COUNT(*)" +
+            " FROM user_try " +
+            "WHERE algorithm_id = :algorithmId",
+            nativeQuery = true)
+    float findTriedByAlgorithmId(@Param("algorithmId") Long algorithmId);
+
+    @Query(value = "SELECT COUNT(*)" +
+            " FROM user_try " +
+            "WHERE algorithm_id = :algorithmId AND solved = 1",
+            nativeQuery = true)
+    float findCorrectByAlgorithmId(@Param("algorithmId") Long algorithmId);
+
+    @Query(value = "SELECT path" +
+            " FROM algorithm_image " +
+            "WHERE algorithm_id = :algorithmId",
+            nativeQuery = true)
+    String[] findImagePathByAlgorithmId(@Param("algorithmId") Long algorithmId);
 
 
     @Query(value = "SELECT a.* " +
