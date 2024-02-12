@@ -4,8 +4,13 @@ import Image from "next/image";
 import ErrorType from "next/error";
 
 import styles from "./error.module.scss";
+import { useEffect } from "react";
 
-const Error = ({ reset }: { error: ErrorType; reset: () => void }) => {
+const Error = ({ error, reset }: { error: ErrorType; reset: () => void }) => {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
     <div className={styles.error}>
       <Image

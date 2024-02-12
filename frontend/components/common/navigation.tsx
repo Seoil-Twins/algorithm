@@ -17,7 +17,7 @@ export type MenuItems = {
   link: string;
 };
 
-const regex = new RegExp(/^\/algorithm(?:\/[^/]+)?\/?$/);
+const regex = new RegExp(/\/algorithm\/[0-9]+$/);
 
 const Navigation = () => {
   const menuItems: MenuItems[] = [

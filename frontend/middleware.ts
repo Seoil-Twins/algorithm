@@ -39,8 +39,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // eslint-disable-next-line no-useless-escape
-  const regex = new RegExp(/^\/algorithm\/detail(?:\/[^\/]+)?\/?$/);
+  const regex = new RegExp(/\/algorithm\/.+$/);
 
   if (
     regex.test(pathname) &&
@@ -48,7 +47,7 @@ export default async function middleware(req: NextRequest) {
     !pathname.includes("js")
   ) {
     const splitedPathname = pathname.split("/");
-    const algorithmId = splitedPathname[splitedPathname.length - 1];
+    const algorithmId = splitedPathname[2];
 
     if (isNaN(Number(algorithmId))) {
       url.pathname = "/";
