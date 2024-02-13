@@ -42,9 +42,9 @@ public class UserProfileController {
 
         return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
     }
-    @PostMapping("/user/profile")
+    @PatchMapping("/user/profile/{user_id}")
     public ResponseEntity<HttpStatus> handleFileUpload(@RequestParam("image") MultipartFile file,
-                                                       @RequestParam("userId") long userId) {
+                                                       @PathVariable("user_id") long userId) {
         userProfileService.store(file,userId,"user/"+userId);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }

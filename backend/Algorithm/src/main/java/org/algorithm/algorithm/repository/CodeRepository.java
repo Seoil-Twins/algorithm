@@ -16,7 +16,10 @@ public interface CodeRepository extends JpaRepository<CodeEntity, Long> {
     CodeEntity findCodeEntityByCodeId(Long codeId);
 //    @Query(value = "select * from code where algorithm_id = :algorithmId;",
 //            nativeQuery = true)
-    Page<CodeEntity> findCodeEntitiesByAlgorithmId(Pageable pageable, Long algorithmId);
+
+    
+//    Page<CodeEntity> findCodeEntitiesByAlgorithmId(Pageable pageable, Long algorithmId);
+    Page<CodeEntity> findCodeEntitiesByAlgorithmIdAndTypeAndSolved(Pageable pageable, Long algorithmId, Long type, Boolean solved);
 
     @Query(value = "SELECT COUNT(*) FROM recommend_code where code_id = :codeId",
             nativeQuery = true)

@@ -19,6 +19,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -111,12 +112,19 @@ public class UserProfileService {
                 throw new StorageException(
                         "Cannot store file outside current directory.");
             }
+
+            // 기존 파일 삭제
+            UserProfileEntity existingEntity = userProfileRepository.findByUserId(userId);
+            if (existingEntity != null) {
+                Path existingFilePath = rootLocation.resolve(existingEntity.getPath());
+                Files.deleteIfExists(existingFilePath);
+                userProfileRepository.delete(existingEntity);
+            }
+
+
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
-                System.out.println(file.getSize());
-                System.out.println(file.getContentType());
-                System.out.println(rootLocation);
                 UserProfileEntity userProfileEntity = new UserProfileEntity();
                 userProfileEntity.setUserId(userId);
                 userProfileEntity.setType(file.getContentType());

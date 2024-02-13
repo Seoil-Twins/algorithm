@@ -10,6 +10,7 @@ import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.exception.NotFoundException;
 import org.algorithm.algorithm.exception.SQLException;
 import org.algorithm.algorithm.repository.*;
+import org.algorithm.algorithm.util.AlgorithmSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,10 +36,10 @@ public class AlgorithmService {
     public final FavoriteRepository favoriteRepository;
 
 
-    public ObjectNode getAll(int pageNo, int pageSize, UserDTO userDTO) {
+    public ObjectNode getAll(AlgorithmRequestDTO algorithmRequestDTO, UserDTO userDTO) {
         try {
-            System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+            System.out.println(algorithmRequestDTO);
+            Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
 
 
@@ -108,7 +109,6 @@ public class AlgorithmService {
                 dtoNode.put("solved",solved);
                 dtoNode.put("correctRate",Math.round(correctRate*100));
 
-                System.out.println(responseAlgorithmDTO);
                 response.add(dtoNode);
             }
             ObjectNode responseJSON = objectMapper.createObjectNode();
@@ -122,11 +122,21 @@ public class AlgorithmService {
         }
     }
 
-    public ObjectNode getAll(int pageNo, int pageSize) {
+    public ObjectNode getAll(AlgorithmRequestDTO algorithmRequestDTO) {
         try {
-            System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
+            System.out.println(algorithmRequestDTO);
+            Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
+            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(
+                    AlgorithmSpecification.withDynamicQuery(
+                            algorithmRequestDTO.getSolved(),
+                            algorithmRequestDTO.getSort(),
+                            algorithmRequestDTO.getLevel(),
+                            algorithmRequestDTO.getKind(),
+                            algorithmRequestDTO.getRate(),
+                            algorithmRequestDTO.getTag(),
+                            algorithmRequestDTO.getKeyword()),
+                    pageable
+            );
 
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -186,7 +196,6 @@ public class AlgorithmService {
                 dtoNode.put("testcase",testcaseArrayNode);
                 dtoNode.put("correctRate",Math.round(correctRate*100));
 
-                System.out.println(responseAlgorithmDTO);
                 response.add(dtoNode);
             }
             ObjectNode responseJSON = objectMapper.createObjectNode();
@@ -517,8 +526,7 @@ public class AlgorithmService {
             throw new NotFoundException("User Not Found");
 
         try {
-            page -= 1;
-            Pageable pageable = PageRequest.of(page, count);
+            Pageable pageable = PageRequest.of(page-1, count);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findTriedByUserId(userId, pageable);
             List<AlgorithmEntity> findsEntities = algorithmEntities.getContent();
 
@@ -605,8 +613,7 @@ public class AlgorithmService {
             throw new NotFoundException("User Not Found");
 
         try {
-            page -= 1;
-            Pageable pageable = PageRequest.of(page, count);
+            Pageable pageable = PageRequest.of(page-1, count);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findTriedByUserId(userId, pageable);
             List<AlgorithmEntity> findsEntities = algorithmEntities.getContent();
 

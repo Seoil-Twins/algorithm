@@ -35,7 +35,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<Object> handleSQLException(SQLException ex, WebRequest request) {
+    public ResponseEntity<Object> handleSQLException(SQLException ex) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode errorNode = objectMapper.createObjectNode();
         errorNode.put("errorCode", HttpStatus.NO_CONTENT.value());

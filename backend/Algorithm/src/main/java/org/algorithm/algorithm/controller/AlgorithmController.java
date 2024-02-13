@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.algorithm.algorithm.dto.AlgorithmRequestDTO;
 import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.entity.AlgorithmKindEntity;
 import org.algorithm.algorithm.entity.ExplanationEntity;
@@ -24,10 +25,18 @@ public class AlgorithmController {
     private final AlgorithmService algorithmService;
     @GetMapping("/algorithm")
     public ResponseEntity<?> getAllAlgorithm(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
-                                                @RequestParam(required = false, defaultValue = "5", value = "count") int count,
+                                             @RequestParam(required = false, defaultValue = "5", value = "count") int count,
+                                             @RequestParam(required = false, defaultValue = "a", value = "solved") String solved, // a : 전체, s : 푼 문제, ns : 안푼 문제
+                                             @RequestParam(required = false, defaultValue = "r", value = "sort") String sort, // r : 최신순, or : 오래된순, t : 시도순
+                                             @RequestParam(required = false, defaultValue = "0", value = "level") String level, // -1은 전체, 0~5
+                                             @RequestParam(required = false, defaultValue = "a", value = "kind") String kind, // a : 전체, c = cpp, p : python, j : java
+                                             @RequestParam(required = false, value = "rate") String rate, // h : 정답률 높은 순, l = 정답률 낮은 순
+                                             @RequestParam(required = false, value = "tag") String tag, // 1~14
+                                             @RequestParam(required = false, value = "keyword") String keyword,
                                                 HttpServletRequest request) {
 
         HttpSession session = request.getSession(false); // default true
+        AlgorithmRequestDTO algorithmRequestDTO = new AlgorithmRequestDTO(page,count,solved,sort,level,kind,rate,tag,keyword);
         UserDTO loginUser = null;
         if(session != null){
             // 상수로 뺼 예정
@@ -35,10 +44,10 @@ public class AlgorithmController {
         }
 
         if (loginUser != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(page, count, loginUser));
+            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, loginUser));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(page, count));
+            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO));
 
         }
     }

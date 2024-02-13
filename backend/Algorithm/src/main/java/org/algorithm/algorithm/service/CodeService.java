@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.CodeDTO;
 import org.algorithm.algorithm.dto.ResponseUserDTO;
 import org.algorithm.algorithm.dto.UserDTO;
-import org.algorithm.algorithm.entity.AlgorithmEntity;
-import org.algorithm.algorithm.entity.CodeEntity;
-import org.algorithm.algorithm.entity.ResponseUserEntity;
-import org.algorithm.algorithm.entity.UserTryEntity;
+import org.algorithm.algorithm.entity.*;
 import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.exception.NotFoundException;
 import org.algorithm.algorithm.exception.SQLException;
@@ -33,6 +30,7 @@ import java.util.Random;
 public class CodeService {
 
     public final CodeRepository codeRepository;
+    public final UserProfileRepository userProfileRepository;
     public final AlgorithmRepository algorithmRepository;
     public final ResponseUserRepository responseUserRepository;
     public final TestcaseRepository testcaseRepository;
@@ -75,13 +73,13 @@ public class CodeService {
         }
     }
 
-    public ObjectNode getCodeByAlgorithmId(int pageNo, int pageSize, Long algorithmId) {
+    public ObjectNode getCodeByAlgorithmId(int pageNo, int pageSize,Long language, Long algorithmId) {
 
         if(algorithmRepository.findOneByAlgorithmId(algorithmId) == null)
             throw new NotFoundException("Algorithm Not Found By AlgorithmId : " + algorithmId);
         try {
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
-            Page<CodeEntity> codeEntities = codeRepository.findCodeEntitiesByAlgorithmId(pageable,algorithmId);
+            Pageable pageable = PageRequest.of(pageNo-1, pageSize);
+            Page<CodeEntity> codeEntities = codeRepository.findCodeEntitiesByAlgorithmIdAndTypeAndSolved(pageable,algorithmId,language, true);
 
             List<CodeEntity> resultValue = codeEntities.getContent();
             List<ObjectNode> responseList = new ArrayList<>();
@@ -158,15 +156,24 @@ public class CodeService {
         // userId로 user data 가져와서 node 생성
         ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(codeDTO.getUserId());
         ResponseUserDTO responseUserDTO = ResponseUserDTO.toResponseUserDTO(userEntity);
+        System.out.println(responseUserDTO.getUserId());
+
+        UserProfileEntity userProfileEntity = userProfileRepository.findUserProfileEntityByUserId(responseUserDTO.getUserId());
+        String profile;
+
+        if (userProfileEntity == null) {
+            profile = null;
+        } else {
+            profile = userProfileEntity.getPath();
+        }
 
         ObjectNode userNode = objectMapper.createObjectNode();
         userNode.put("userId", responseUserDTO.getUserId());
-        userNode.put("profile", responseUserDTO.getProfile());
+        userNode.put("profile", profile);
         userNode.put("nickname", responseUserDTO.getNickname());
 
         // codeId로 recommend 추출
         String recommend = codeRepository.findRecommendByCodeId(codeDTO.getCodeId());
-
         codeNode.put("codeId", codeDTO.getCodeId());
         codeNode.set("user", userNode);
         codeNode.put("algorithmId", codeDTO.getAlgorithmId());
@@ -189,6 +196,7 @@ public class CodeService {
 
         ObjectNode resultNode = objectMapper.createObjectNode();
         resultNode.set("codes", codesArrayNode);
+        resultNode.put("total", responseList.size());
 
         return resultNode;
     }
