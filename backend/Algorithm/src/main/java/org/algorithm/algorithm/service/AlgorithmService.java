@@ -425,6 +425,11 @@ public class AlgorithmService {
             Boolean isFavorite = favoriteRepository.findCountByUserIdANDAlgorithmId(favoriteEntity) > 0;
             Boolean solved = algorithmRepository.findSolvedByAlgorithmIdANDUserId(algorithmDTO.getAlgorithmId(),userDTO.getUserId()) > 0;
 
+            String[] images = algorithmRepository.findImagePathByAlgorithmId(algorithmDTO.getAlgorithmId());
+            String thumnnail = null;
+            if(images.length > 0)
+                thumnnail = images[0];
+
             float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correctRate = 0.0f;
@@ -443,6 +448,7 @@ public class AlgorithmService {
             dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
             dtoNode.put("content",algorithmDTO.getContent());
             dtoNode.put("isFavorite",isFavorite);
+            dtoNode.put("thumnnail",thumnnail);
             dtoNode.put("testcase",testcaseArrayNode);
             dtoNode.put("solved",solved);
             dtoNode.put("correctRate",Math.round(correctRate*100));
@@ -492,6 +498,10 @@ public class AlgorithmService {
                 testcaseNode.put("output", testcaseDTO.getOutput());
                 testcaseArrayNode.add(testcaseNode);
             }
+            String[] images = algorithmRepository.findImagePathByAlgorithmId(algorithmDTO.getAlgorithmId());
+            String thumnnail = null;
+            if(images.length > 0)
+                thumnnail = images[0];
 
             float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
@@ -510,6 +520,7 @@ public class AlgorithmService {
             dtoNode.put("limitMem",algorithmDTO.getLimitMem());
             dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
             dtoNode.put("content",algorithmDTO.getContent());
+            dtoNode.put("thumnnail",thumnnail);
             dtoNode.put("testcase",testcaseArrayNode);
             dtoNode.put("correctRate",Math.round(correctRate*100));
 
