@@ -4,4 +4,5 @@ export const AUTH_PATHS = [
   "/activity",
   "/notification",
   "/algorithm/[0-9]+/new",
+  "/algorithm/[0-9]+/update",
 ];

@@ -48,7 +48,7 @@ const CommentEditor = ({
                 ? `${IMAGE_URL}/${user.profile}`
                 : "/svgs/user_profile_default.svg"
             }
-            alt="유저 아이콘"
+            alt="프로필 사진"
             width={38}
             height={38}
             className={styles.profileImg}

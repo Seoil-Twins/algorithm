@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ThemeImage from "../common/themeImage";
 
 import styles from "./navigation.module.scss";
@@ -10,6 +10,7 @@ import styles from "./navigation.module.scss";
 import Dropdown, { DropdownItem } from "../common/dropdown";
 
 import { AlgorithmKind } from "@/api/algorithm/algorithm";
+import { useAuth } from "@/providers/authProvider";
 
 type NavigationProps = {
   algorithmKinds: AlgorithmKind[];
@@ -152,6 +153,7 @@ const tagDropdownItems: DropdownItems = {
 };
 
 const Navigation = ({ algorithmKinds }: NavigationProps) => {
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const prevParams = Object.fromEntries(Array.from(searchParams.entries()));
@@ -172,7 +174,6 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
     });
 
     const newDropdownItems = [
-      solvedDropdownItems,
       sortDropdownItems,
       levelDropdownItems,
       kindDropdownItems,
@@ -249,6 +250,17 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
       return hasQuerykeyItems;
     });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setDropdownItems((prev) => [...prev, solvedDropdownItems]);
+    } else {
+      setDropdownItems((prev) => {
+        const newItem = prev.filter((item) => item.queryKey !== "solved");
+        return newItem;
+      });
+    }
+  }, [user]);
 
   return (
     <nav className={styles.navigation}>

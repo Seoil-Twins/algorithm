@@ -451,7 +451,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
                   ? `${IMAGE_URL}/${profileImg}`
                   : "/svgs/user_profile_default.svg"
               }
-              alt="유저 프로필 사진"
+              alt="프로필 사진"
               width={96}
               height={96}
               className={styles.profileImg}

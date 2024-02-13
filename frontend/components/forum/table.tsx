@@ -1,12 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 
+import { IMAGE_URL } from "@/api";
 import { ResponseBoard, getBoardTypes } from "@/api/board";
 
+import { notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
 import { getTimeAgo } from "@/utils/day";
-import { notosansMedium } from "@/styles/_font";
-import Link from "next/link";
 
 type TableProps = {
   item: ResponseBoard;
@@ -23,7 +24,7 @@ const Table = async ({ item }: TableProps) => {
             <Image
               src={
                 content.user.profile
-                  ? content.user.profile
+                  ? `${IMAGE_URL}/${content.user.profile}`
                   : "/svgs/user_profile_default.svg"
               }
               alt="프로필 사진"

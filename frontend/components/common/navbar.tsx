@@ -178,7 +178,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                         ? `${IMAGE_URL}/${user.profile}`
                         : "/svgs/user_profile_default.svg"
                     }
-                    alt="유저 아이콘"
+                    alt="프로필 사진"
                     width={38}
                     height={38}
                   />
@@ -213,7 +213,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                     ? `${IMAGE_URL}/${user.profile}`
                     : "/svgs/user_profile_default.svg"
                 }
-                alt="유저 아이콘"
+                alt="프로필 사진"
                 width={80}
                 height={80}
               />

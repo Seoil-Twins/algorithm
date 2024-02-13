@@ -1,12 +1,13 @@
 import Image from "next/image";
 
+import { IMAGE_URL } from "@/api";
 import { getRankings } from "@/api/ranking";
+
+import styles from "./ranking.module.scss";
 
 import Table, { TableData } from "@/components/algorithm/table";
 import BoardNavigation, { NavItem } from "@/components/common/boardNavigation";
 import NotFound from "@/components/common/notFound";
-
-import styles from "./ranking.module.scss";
 import Pagination from "@/components/common/pagination";
 
 const navItems: NavItem[] = [
@@ -51,7 +52,7 @@ const Ranking = async ({
           <Image
             src={
               item.user.profile
-                ? item.user.profile
+                ? `${IMAGE_URL}/${item.user.profile}`
                 : "/svgs/user_profile_default.svg"
             }
             alt="프로필 사진"

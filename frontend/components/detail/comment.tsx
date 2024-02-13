@@ -11,6 +11,7 @@ import { useAuth } from "@/providers/authProvider";
 
 import CommentType from "@/interfaces/comment";
 
+import { IMAGE_URL } from "@/api";
 import { deleteComment, modifyCommentSolved } from "@/api/comment";
 
 import EditorViewer from "../common/editorViewer";
@@ -106,7 +107,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
             <Image
               src={
                 comment.user.profile
-                  ? comment.user.profile
+                  ? `${IMAGE_URL}/${comment.user.profile}`
                   : "/svgs/user_profile_default.svg"
               }
               alt="프로필 사진"
