@@ -1,4 +1,9 @@
+import { AxiosError, AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
+
+import { axiosInstance } from "@/api";
+
+import { User } from "@/interfaces/user";
 
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;
@@ -15,7 +20,9 @@ export const GET = async (req: NextRequest) => {
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   if (!code || !clientId || !clientSecret)
-    return NextResponse.redirect(cloneUrl);
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=500&message=internal_server_error`,
+    );
 
   const baseUrl = "https://github.com/login/oauth/access_token";
   const config = {
@@ -32,11 +39,17 @@ export const GET = async (req: NextRequest) => {
       Accept: "application/json",
     },
   });
-  if (response.status >= 400) return NextResponse.redirect(cloneUrl);
+  if (response.status >= 400)
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=401&message=not_authorized`,
+    );
 
   const data = await response.json();
   const accessToken = data.access_token;
-  if (!accessToken) return NextResponse.redirect(cloneUrl);
+  if (!accessToken)
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=404&message=not_found_token`,
+    );
 
   const userUrl = "https://api.github.com/user";
   const userData = await (
@@ -46,7 +59,10 @@ export const GET = async (req: NextRequest) => {
       },
     })
   ).json();
-  if (!userData) return NextResponse.redirect(cloneUrl);
+  if (!userData)
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=404&message=not_found_user`,
+    );
 
   /**
    {
@@ -97,14 +113,22 @@ export const GET = async (req: NextRequest) => {
    }
    */
   const linkingData = {
-    snsId: "1001",
+    linkKind: "1001",
     id: userData.id,
     domain: userData.html_url,
-    email: userData.email,
   };
 
   // linking API 호출
-  console.log(linkingData);
+  try {
+    const user: AxiosResponse<User> = await axiosInstance.get("/user/me");
+    await axiosInstance.post(`/user/link/${user.data.userId}`, linkingData);
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return NextResponse.redirect(
+        `${cloneUrl}?errorCode=${error.response?.data.errorCode}&message=${error.response?.data.message}`,
+      );
+    }
+  }
 
   return NextResponse.redirect(cloneUrl);
 };

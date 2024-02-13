@@ -49,7 +49,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     revalidateOnFocus: false,
   });
   const [user, setUser] = useState<User | null>(() => {
-    console.log(responseUser);
     if (responseUser?.status !== 200 || error) {
       return null;
     }

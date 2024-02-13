@@ -376,8 +376,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         ["verifyCode"]: verifyCodeField,
       } = prev;
 
-      console.log(user.nickname);
-
       return {
         ...prev,
         nickname: {
