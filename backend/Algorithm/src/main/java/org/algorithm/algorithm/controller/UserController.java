@@ -237,7 +237,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
+    public ResponseEntity<?> loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
         HttpSession session = request.getSession(true); // default true
 
         UserDTO login = userService.userLogin(userDTO);
@@ -246,15 +246,16 @@ public class UserController {
 
         if (login == null) {
             rttr.addFlashAttribute("loginFail", failMessage);
-//            return "redirect:/login";
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Login Failed");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("아이디 혹은 비밀번호가 잘못 되었습니다.");
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
         session.setMaxInactiveInterval(1800); // 세션 만료 시간 30분
         ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(1800).build();
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body("successs");
+        ObjectNode responseUser = userService.userSelf(login);
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseUser);
     }
     @ResponseBody
     @PostMapping("/user/verify/send")
