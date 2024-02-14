@@ -14,6 +14,7 @@ import { axiosInstance } from "@/api";
 import { UserKeys, getUser } from "@/api/user";
 
 import { User } from "@/interfaces/user";
+import { useRouter } from "next/navigation";
 
 type LoginData = {
   email: string;
@@ -38,6 +39,7 @@ const AuthContext = createContext<AuthProviderContext>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { mutate } = useSWRConfig();
+  const router = useRouter();
 
   const {
     data: responseUser,
@@ -61,12 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (loginResponse.status === 200) {
       await mutate(UserKeys.getUser);
+      router.refresh();
     }
   };
 
   const logout = async () => {
     setUser(null);
     // await axiosInstance.delete("/logout");
+    router.refresh();
   };
 
   useEffect(() => {

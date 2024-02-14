@@ -6,5 +6,6 @@ export default interface Comment {
   user: RequiredUser;
   content: string;
   recommend: number;
+  isRecommend?: boolean;
   createdTime: string;
 }
