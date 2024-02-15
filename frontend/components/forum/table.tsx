@@ -98,7 +98,7 @@ const Table = async ({ item }: TableProps) => {
                     width={32}
                     height={32}
                   />
-                  {content.favorites}
+                  {content.recommend}
                 </div>
                 <div className={styles.line}></div>
                 <div className={styles.infoBox}>

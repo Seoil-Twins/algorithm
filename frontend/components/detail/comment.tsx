@@ -3,6 +3,7 @@
 import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import styles from "./comment.module.scss";
 
@@ -88,42 +89,47 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
       <div className={styles.contentBox}>
         <div className={styles.top}>
           <div className={styles.user}>
-            <Image
-              src={
-                comment.user.profile
-                  ? `${IMAGE_URL}/${comment.user.profile}`
-                  : "/svgs/user_profile_default.svg"
-              }
-              alt="프로필 사진"
-              width={38}
-              height={38}
-              className={styles.profileImg}
-            />
-            <div className={styles.info}>
-              <div>{comment.user.nickname}</div>
-              <div className={styles.fs14}>
-                <span className={styles.createdTime}>
-                  {comment.createdTime}
-                </span>
-                {comment.user.userId === user?.userId && (
-                  <>
-                    <button
-                      className={styles.blue}
-                      onClick={handleIsVisibleCommentEditor}
-                    >
-                      수정
-                    </button>{" "}
-                    ·{" "}
-                    <button
-                      className={styles.red}
-                      onClick={handleISVisibleModal}
-                    >
-                      삭제
-                    </button>
-                  </>
-                )}
+            <Link
+              href={`/user/${comment.user.userId}/question`}
+              className={styles.flex}
+            >
+              <Image
+                src={
+                  comment.user.profile
+                    ? `${IMAGE_URL}/${comment.user.profile}`
+                    : "/svgs/user_profile_default.svg"
+                }
+                alt="프로필 사진"
+                width={38}
+                height={38}
+                className={styles.profileImg}
+              />
+              <div className={styles.info}>
+                <div>{comment.user.nickname}</div>
+                <div className={styles.fs14}>
+                  <span className={styles.createdTime}>
+                    {comment.createdTime}
+                  </span>
+                  {comment.user.userId === user?.userId && (
+                    <>
+                      <button
+                        className={styles.blue}
+                        onClick={handleIsVisibleCommentEditor}
+                      >
+                        수정
+                      </button>{" "}
+                      ·{" "}
+                      <button
+                        className={styles.red}
+                        onClick={handleISVisibleModal}
+                      >
+                        삭제
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
           <div className={styles.recommend}>
             <div className={styles.solved}>{renderCheckMark()}</div>
@@ -154,7 +160,6 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
         onOk={handleCommentDelete}
         onCancel={handleISVisibleModal}
         maxWidth={45}
-        cancelMsg="취소"
       >
         <p>한 번 삭제하시면 되돌릴 수가 없습니다.</p>
       </Modal>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import CommentType from "@/interfaces/comment";
 
+import { IMAGE_URL } from "@/api";
 import { deleteComment } from "@/api/comment";
 
 import { useAuth } from "@/providers/authProvider";
@@ -15,7 +16,8 @@ import { notosansMedium } from "@/styles/_font";
 
 import EditorViewer from "@/components/common/editorViewer";
 import CommentUpdateEditor from "@/components/detail/commentUpdateEditor";
-import { IMAGE_URL } from "@/api";
+import Link from "next/link";
+import Modal from "@/components/common/modal";
 
 type CommentProps = {
   comment: Pick<CommentType, "commentId" | "user" | "content" | "createdTime">;
@@ -26,10 +28,15 @@ const Comment = ({ comment }: CommentProps) => {
   const { user } = useAuth();
 
   const [content, setContent] = useState<string>(comment.content);
+  const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
   const [isVisibleEditor, setIsVisibleEditor] = useState<boolean>(false);
 
   const handleIsVisibleCommentEditor = useCallback(() => {
     setIsVisibleEditor((prev) => !prev);
+  }, []);
+
+  const handleISVisibleModal = useCallback(() => {
+    setIsVisibleModal((prev) => !prev);
   }, []);
 
   const handleSubmit = useCallback(
@@ -41,32 +48,34 @@ const Comment = ({ comment }: CommentProps) => {
     [comment.commentId],
   );
 
-  const handleCommentDelete = useCallback(
-    async (commentId: number) => {
-      await deleteComment(commentId);
-      router.refresh();
-    },
-    [router],
-  );
+  const handleCommentDelete = useCallback(async () => {
+    await deleteComment(comment.commentId);
+    router.refresh();
+    setIsVisibleModal(false);
+  }, [comment.commentId, router]);
 
   return (
     <div className={styles.comment}>
-      <Image
-        src={
-          comment.user.profile
-            ? `${IMAGE_URL}/${comment.user.profile}`
-            : "/svgs/user_profile_default.svg"
-        }
-        alt="유저 아이콘"
-        width={32}
-        height={32}
-        className={styles.profileImg}
-      />
+      <Link href={`/user/${comment.user.userId}/question`}>
+        <Image
+          src={
+            comment.user.profile
+              ? `${IMAGE_URL}/${comment.user.profile}`
+              : "/svgs/user_profile_default.svg"
+          }
+          alt="유저 아이콘"
+          width={32}
+          height={32}
+          className={styles.profileImg}
+        />
+      </Link>
       <div className={styles.content}>
         <div className={styles.user}>
-          <span className={notosansMedium.className}>
-            {comment.user.nickname}
-          </span>
+          <Link href={`/user/${comment.user.userId}/question`}>
+            <span className={notosansMedium.className}>
+              {comment.user.nickname}
+            </span>
+          </Link>
           <span className={styles.createdTime}>{comment.createdTime}</span>
           {comment.user.userId === user?.userId && (
             <div>
@@ -77,10 +86,7 @@ const Comment = ({ comment }: CommentProps) => {
                 수정
               </button>{" "}
               ·{" "}
-              <button
-                className={styles.red}
-                onClick={() => handleCommentDelete(comment.commentId)}
-              >
+              <button className={styles.red} onClick={handleISVisibleModal}>
                 삭제
               </button>
             </div>
@@ -96,6 +102,15 @@ const Comment = ({ comment }: CommentProps) => {
           <EditorViewer content={content} />
         )}
       </div>
+      <Modal
+        isVisible={isVisibleModal}
+        title="정말 삭제하시겠습니까?"
+        onOk={handleCommentDelete}
+        onCancel={handleISVisibleModal}
+        maxWidth={45}
+      >
+        <p>한 번 삭제하시면 되돌릴 수가 없습니다.</p>
+      </Modal>
     </div>
   );
 };

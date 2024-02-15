@@ -68,7 +68,7 @@ const Ranking = async ({
           {convertFloatAtTwo(item.tried, item.solved)}%
         </span>,
       ],
-      link: "",
+      link: `/user/${item.user.userId}/question`,
     };
   });
 

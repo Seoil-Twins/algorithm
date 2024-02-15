@@ -53,6 +53,10 @@
       align-items: center;
       margin-bottom: 5px;
 
+      .flex {
+        display: flex;
+      }
+
       .profileImg {
         border-radius: 100px;
         margin-right: 10px;

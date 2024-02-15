@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import Board from "@/interfaces/board";
 import { User } from "@/interfaces/user";
@@ -47,23 +48,28 @@ const BoardDetail = async ({
       <DetailNav isEditable={user?.userId === board.user.userId} />
       <div className={styles.contentBox}>
         <div className={styles.user}>
-          <Image
-            src={
-              board.user.profile
-                ? board.user.profile
-                : "user_profile_default.svg"
-            }
-            alt="프로필 사진"
-            width={38}
-            height={38}
-            className={styles.profileImg}
-          />
-          <div className={styles.userInfo}>
-            <div className={notosansMedium.className}>
-              {board.user.nickname}
+          <Link
+            href={`/user/${board.user.userId}/question`}
+            className={styles.flex}
+          >
+            <Image
+              src={
+                board.user.profile
+                  ? board.user.profile
+                  : "user_profile_default.svg"
+              }
+              alt="프로필 사진"
+              width={38}
+              height={38}
+              className={styles.profileImg}
+            />
+            <div className={styles.userInfo}>
+              <div className={notosansMedium.className}>
+                {board.user.nickname}
+              </div>
+              <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
-            <div className={styles.createdTime}>{board.createdTime}</div>
-          </div>
+          </Link>
         </div>
         {typeof board.solved === "number" && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>
