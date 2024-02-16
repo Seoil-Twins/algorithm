@@ -10,6 +10,15 @@ import cpp from "highlight.js/lib/languages/cpp";
 import json from "highlight.js/lib/languages/json";
 import md from "highlight.js/lib/languages/markdown";
 import bash from "highlight.js/lib/languages/bash";
+import java from "highlight.js/lib/languages/java";
+import c from "highlight.js/lib/languages/c";
+import csharp from "highlight.js/lib/languages/csharp";
+import dart from "highlight.js/lib/languages/dart";
+import go from "highlight.js/lib/languages/go";
+import kotlin from "highlight.js/lib/languages/kotlin";
+import less from "highlight.js/lib/languages/less";
+import r from "highlight.js/lib/languages/r";
+import arduino from "highlight.js/lib/languages/arduino";
 
 lowlight.registerLanguage("css", css);
 lowlight.registerLanguage("js", js);
@@ -26,6 +35,15 @@ lowlight.registerLanguage("markdown", md);
 lowlight.registerLanguage("bash", bash);
 lowlight.registerLanguage("python", python);
 lowlight.registerLanguage("cpp", cpp);
+lowlight.registerLanguage("c", c);
+lowlight.registerLanguage("java", java);
+lowlight.registerLanguage("csharp", csharp);
+lowlight.registerLanguage("dart", dart);
+lowlight.registerLanguage("go", go);
+lowlight.registerLanguage("kotlin", kotlin);
+lowlight.registerLanguage("less", less);
+lowlight.registerLanguage("r", r);
+lowlight.registerLanguage("arduino", arduino);
 
 const CustomCodeBlockLowlight = CodeBlockLowlight.extend({
   addKeyboardShortcuts() {

@@ -137,7 +137,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
               <RecommendPost
                 apiUrl={`/comment/favorite/${comment.commentId}`}
                 isRecommend={comment.isRecommend}
-                recommendCount={comment.recommend}
+                recommendCount={comment.recommendCount}
                 userId={user?.userId}
                 requestId={comment.commentId}
                 padding={10}

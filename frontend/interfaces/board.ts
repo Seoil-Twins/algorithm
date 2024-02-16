@@ -10,7 +10,7 @@ export default interface Board {
   tags?: string[];
   thumbnail?: string;
   solved?: number | null;
-  recommend: number;
+  recommendCount: number;
   commentCount: number;
   isRecommend?: boolean;
   isView: boolean;

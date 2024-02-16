@@ -7,7 +7,7 @@ import { axiosInstance } from ".";
 export type ResponseAnswerItem = {
   user: RequiredUser;
   comments: Pick<Comment, "commentId" | "user" | "content" | "createdTime">[];
-} & Pick<Code, "codeId" | "code" | "type" | "recommend" | "createdTime">;
+} & Pick<Code, "codeId" | "code" | "type" | "recommendCount" | "createdTime">;
 
 export interface ResponseAnswer {
   codes: ResponseAnswerItem[];

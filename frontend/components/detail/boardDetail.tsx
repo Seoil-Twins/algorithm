@@ -94,7 +94,7 @@ const BoardDetail = async ({
           <RecommendPost
             apiUrl={`/board/favorite/${board.boardId}`}
             isRecommend={board.isRecommend}
-            recommendCount={board.recommend}
+            recommendCount={board.recommendCount}
             userId={user?.userId}
             requestId={board.boardId}
           />

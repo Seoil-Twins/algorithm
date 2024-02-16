@@ -57,7 +57,7 @@ const Answer = ({ answer }: AnswerProps) => {
             userId={user?.userId}
             requestId={answer.codeId}
             isRecommend={undefined}
-            recommendCount={Number(answer.recommend)}
+            recommendCount={Number(answer.recommendCount)}
             padding={10}
           />
         </div>
