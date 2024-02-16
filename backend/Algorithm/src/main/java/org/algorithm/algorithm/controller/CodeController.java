@@ -12,13 +12,18 @@ import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.service.CodeService;
 import org.algorithm.algorithm.util.Const;
 import org.algorithm.algorithm.util.ErrorResponse;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @ResponseBody
@@ -105,6 +110,7 @@ public class CodeController {
         }
     }
 
+
     @PostMapping("/code/comment/{code_id}")
     public ResponseEntity<?> postCommentCode(@PathVariable(value = "code_id")Long codeId, @RequestBody CommentCodeDTO commentCodeDTO,
                                       HttpServletRequest request) {
@@ -120,6 +126,55 @@ public class CodeController {
         }
         if (loginUser != null) {
             HttpStatus result = codeService.postCommentCode(commentCodeDTO,codeId, loginUser);
+            return ResponseEntity.status(result).body(result.value());
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
+    @PostMapping("/code/recommend/{code_id}")
+    public ResponseEntity<?> postRecommendCode(@PathVariable(value = "code_id")Long codeId, @RequestParam(value = "value")long value,
+                                             HttpServletRequest request) throws BadRequestException {
+
+        System.out.println(value);
+        if(!(value == -1L || value == 1L)){
+            return ResponseEntity.badRequest().body(
+                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "value Only -1 or 1")
+            );
+        }
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null) {
+            HttpStatus result = codeService.postRecommendCode(codeId, loginUser, value);
+            return ResponseEntity.status(result).body(result.value());
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
+    @PostMapping("/code/comment/recommend/{comment_code_id}")
+    public ResponseEntity<?> postRecommendCommentCode(@PathVariable(value = "comment_code_id")Long codeId, @RequestParam(value = "value")long value,
+                                               HttpServletRequest request) throws BadRequestException {
+
+        if(!(value == -1L || value == 1L)){
+            return ResponseEntity.badRequest().body(
+                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "value Only -1 or 1")
+            );
+        }
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null) {
+            HttpStatus result = codeService.postRecommendCommentCode(codeId, loginUser, value);
             return ResponseEntity.status(result).body(result.value());
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
@@ -164,6 +219,62 @@ public class CodeController {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
         }
+    }
+
+    @DeleteMapping("/code/recommend/{code_id}")
+    public ResponseEntity<?> deleteRecommendCode(@PathVariable(value = "code_id")Long codeId,
+                                               HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null) {
+            HttpStatus result = codeService.deleteRecommendCode(codeId, loginUser);
+            return ResponseEntity.status(result).body(result.value());
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
+    @DeleteMapping("/code/comment/recommend/{comment_code_id}")
+    public ResponseEntity<?> deleteRecommendCommentCode(@PathVariable(value = "comment_code_id")Long codeId,
+                                                 HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+        if (loginUser != null) {
+            HttpStatus result = codeService.deleteRecommendCommentCode(codeId, loginUser);
+            return ResponseEntity.status(result).body(result.value());
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated");
+        }
+    }
+
+
+    private ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @GetMapping("/sse")
+    public SseEmitter handleSse() {
+        SseEmitter emitter = new SseEmitter();
+
+        executorService.execute(() -> {
+            try {
+                // 예시 데이터 전송
+                emitter.send("Hello, SSE!");
+                emitter.complete();
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+            }
+        });
+
+        return emitter;
     }
 
 }

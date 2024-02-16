@@ -75,6 +75,28 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorNode, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(AuthorizedException.class)
+    public ResponseEntity<Object> handleAuthorizedException(AuthorizedException ex) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("errorCode", HttpStatus.UNAUTHORIZED.value());
+        errorNode.put("message",ex.getMessage());
+
+        // 적절한 HTTP 상태 코드 선택, 예: HttpStatus.INTERNAL_SERVER_ERROR
+        return new ResponseEntity<>(errorNode, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DuplicatedExcepiton.class)
+    public ResponseEntity<Object> handleDuplicatedException(DuplicatedExcepiton ex) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("errorCode", HttpStatus.CONFLICT.value());
+        errorNode.put("message",ex.getMessage());
+
+        // 적절한 HTTP 상태 코드 선택, 예: HttpStatus.INTERNAL_SERVER_ERROR
+        return new ResponseEntity<>(errorNode, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> handleNotFoundException(NotFoundException ex) {
         ObjectMapper objectMapper = new ObjectMapper();

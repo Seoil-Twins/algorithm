@@ -9,9 +9,7 @@ import org.algorithm.algorithm.dto.CommentCodeDTO;
 import org.algorithm.algorithm.dto.ResponseUserDTO;
 import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.entity.*;
-import org.algorithm.algorithm.exception.GlobalException;
-import org.algorithm.algorithm.exception.NotFoundException;
-import org.algorithm.algorithm.exception.SQLException;
+import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.*;
 import org.algorithm.algorithm.util.CodeRunner;
 import org.apache.coyote.BadRequestException;
@@ -25,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -39,6 +38,8 @@ public class CodeService {
     public final TestcaseRepository testcaseRepository;
     public final GlotService glotService;
     public final UserTryRepository userTryRepository;
+    public final RecommendCodeRepository recommendCodeRepository;
+    public final RecommendCommentCodeRepository recommendCommentCodeRepository;
 
     public ObjectNode getAllCode(int pageNo, int pageSize) {
         try {
@@ -71,6 +72,9 @@ public class CodeService {
             ObjectNode codeNode = createCodeNode(codeDTO);
 
             return codeNode;
+        }   catch ( NotFoundException e) {
+            throw e;
+
         } catch (Exception e) {
             throw new SQLException("Failed to get code.");
         }
@@ -94,7 +98,10 @@ public class CodeService {
             }
 
             return createResultNode(responseList);
-        } catch (Exception e) {
+        }  catch ( NotFoundException e) {
+            throw e;
+
+        }  catch (Exception e) {
             throw new SQLException("Failed to get code.");
         }
     }
@@ -145,6 +152,9 @@ public class CodeService {
 
             userTryRepository.save(userTryEntity);
             return CodeDTO.toCodeDTO(savedEntity);
+        }   catch (GlobalException e) {
+            throw e;
+
         } catch (Exception e) {
             System.out.println(e);
             throw new SQLException("Failed to post code.");
@@ -167,9 +177,81 @@ public class CodeService {
 
             return HttpStatus.CREATED;
 
+        }   catch ( NotFoundException e) {
+            throw e;
+
         } catch (Exception e) {
             System.out.println(e);
             throw new SQLException("Failed to post comment_code.");
+        }
+    }
+
+    public HttpStatus postRecommendCode(Long codeId, UserDTO userDTO, long value) {
+        try {
+            CodeEntity targetCodeEntity = codeRepository.findCodeEntityByCodeId(codeId);
+
+            if(targetCodeEntity == null)
+                throw new NotFoundException("Not Found Code. code_id : " + codeId);
+
+
+            RecommendCodeEntity checkRecommendEntity = recommendCodeRepository.findByCodeIdAndUserId(codeId, userDTO.getUserId());
+
+            if(checkRecommendEntity != null)
+                throw new DuplicatedExcepiton("Already Exist Recommend");
+
+            RecommendCodeEntity recommendCodeEntity = new RecommendCodeEntity();
+
+            recommendCodeEntity.setUserId(userDTO.getUserId());
+            recommendCodeEntity.setCodeId(codeId);
+            recommendCodeEntity.setValue(value);
+
+            recommendCodeRepository.save(recommendCodeEntity);
+
+            return HttpStatus.CREATED;
+
+        }  catch (DuplicatedExcepiton | NotFoundException e) {
+            throw e;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to post recommend_code.");
+        }
+    }
+
+    public HttpStatus postRecommendCommentCode(Long commentCodeId, UserDTO userDTO, long value) {
+        try {
+            CommentCodeEntity targetCodeEntity = commentCodeRepository.findCommentCodeEntityByCommentCodeId(commentCodeId);
+
+            if(targetCodeEntity == null)
+                throw new NotFoundException("Not Found CommentCode. comment_code_id : " + commentCodeId);
+
+
+            RecommendCommentCodeEntity checkRecommendEntity = recommendCommentCodeRepository.findByCommentCodeIdAndUserId(commentCodeId, userDTO.getUserId());
+
+            if(checkRecommendEntity != null)
+                throw new DuplicatedExcepiton("Already Exist Recommend");
+
+            RecommendCommentCodeEntity recommendCommentCodeEntity = new RecommendCommentCodeEntity();
+
+            recommendCommentCodeEntity.setUserId(userDTO.getUserId());
+            recommendCommentCodeEntity.setCommentCodeId(commentCodeId);
+            recommendCommentCodeEntity.setValue(value);
+
+            recommendCommentCodeRepository.save(recommendCommentCodeEntity);
+
+            return HttpStatus.CREATED;
+
+        }  catch (DuplicatedExcepiton e) {
+            System.out.println(e);
+            throw e;
+
+        } catch (NotFoundException e) {
+            System.out.println(e);
+            throw e;
+
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to post recommend_comment_code.");
         }
     }
 
@@ -224,6 +306,62 @@ public class CodeService {
         }
     }
 
+    public HttpStatus deleteRecommendCode(Long codeId, UserDTO userDTO) {
+        try {
+            CodeEntity targetCodeEntity = codeRepository.findCodeEntityByCodeId(codeId);
+
+            if(targetCodeEntity == null)
+                throw new NotFoundException("Not Found Code. code_id : " + codeId);
+
+            RecommendCodeEntity recommendCodeEntity = recommendCodeRepository.findByCodeIdAndUserId(codeId, userDTO.getUserId());
+
+            if(recommendCodeEntity == null)
+                throw new NotFoundException("Not Found Recommend. code_id : " + codeId);
+
+            if(recommendCodeEntity.getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Not Equals User_id");
+
+            recommendCodeRepository.delete(recommendCodeEntity);
+
+            return HttpStatus.OK;
+
+        } catch (NotFoundException | AuthorizedException e) {
+            System.out.println(e);
+            throw e;
+        }  catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to post comment_code.");
+        }
+    }
+
+    public HttpStatus deleteRecommendCommentCode(Long commentCodeId, UserDTO userDTO) {
+        try {
+            CommentCodeEntity targetCodeEntity = commentCodeRepository.findByCommentCodeId(commentCodeId);
+
+            if(targetCodeEntity == null)
+                throw new NotFoundException("Not Found CommentCode. comment_code_id : " + commentCodeId);
+
+            RecommendCommentCodeEntity recommendCommentCodeEntity = recommendCommentCodeRepository.findByCommentCodeIdAndUserId(commentCodeId, userDTO.getUserId());
+
+            if(recommendCommentCodeEntity == null)
+                throw new NotFoundException("Not Found Recommend. code_id : " + commentCodeId);
+
+            if(recommendCommentCodeEntity.getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Not Equals User_id");
+
+            recommendCommentCodeRepository.delete(recommendCommentCodeEntity);
+
+            return HttpStatus.OK;
+
+        } catch (NotFoundException | AuthorizedException e) {
+            System.out.println(e);
+            throw e;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to post comment_code.");
+        }
+    }
+
     private ObjectNode createCodeNode(CodeDTO codeDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode codeNode = objectMapper.createObjectNode();
@@ -257,10 +395,13 @@ public class CodeService {
                 commentUserProfile = userProfileEntity.getPath();
             }
 
+            String recommend = commentCodeRepository.findRecommendByCommentCodeId(commentCodeEntity.getCommentCodeId());
+            if ( recommend == null ) recommend = "0";
             commentNode.put("commentCodeId", commentCodeEntity.getCommentCodeId());
             commentNode.put("codeId", commentCodeEntity.getCodeId());
             commentNode.put("user",commentUserProfile);
             commentNode.put("content",commentCodeEntity.getContent());
+            commentNode.put("recommend",recommend);
             commentNode.put("createdTime", String.valueOf(commentCodeEntity.getCreatedTime()));
 
             commentsNode.add(commentNode);
@@ -277,6 +418,7 @@ public class CodeService {
 
         // codeId로 recommend 추출
         String recommend = codeRepository.findRecommendByCodeId(codeDTO.getCodeId());
+        if ( recommend == null ) recommend = "0";
         codeNode.put("codeId", codeDTO.getCodeId());
         codeNode.set("user", userNode);
         codeNode.put("algorithmId", codeDTO.getAlgorithmId());

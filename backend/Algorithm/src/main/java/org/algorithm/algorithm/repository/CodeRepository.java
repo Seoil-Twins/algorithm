@@ -21,7 +21,7 @@ public interface CodeRepository extends JpaRepository<CodeEntity, Long> {
 //    Page<CodeEntity> findCodeEntitiesByAlgorithmId(Pageable pageable, Long algorithmId);
     Page<CodeEntity> findCodeEntitiesByAlgorithmIdAndTypeAndSolved(Pageable pageable, Long algorithmId, Long type, Boolean solved);
 
-    @Query(value = "SELECT COUNT(*) FROM recommend_code where code_id = :codeId",
+    @Query(value = "SELECT SUM(value) FROM recommend_code where code_id = :codeId",
             nativeQuery = true)
     String findRecommendByCodeId(@Param("codeId") Long codeId);
 

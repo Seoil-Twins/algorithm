@@ -4,11 +4,14 @@ import org.algorithm.algorithm.dto.CodeDTO;
 import org.algorithm.algorithm.entity.TestcaseEntity;
 import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.repository.TestcaseRepository;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CodeRunner {
 
@@ -197,6 +200,7 @@ public class CodeRunner {
 
     public Boolean runJava(CodeDTO codeDTO){
         TestcaseEntity[] testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmId(codeDTO.getAlgorithmId());
+        ExecutorService executorService = Executors.newCachedThreadPool();
         // Java에서 python 코드 실행
         try {
             for(TestcaseEntity testcaseEntity : testcaseEntities) {
@@ -225,14 +229,13 @@ public class CodeRunner {
                 for (String input : inputs) {
                     inputWriter.write(input.trim() + "\n");
                 }
-                inputWriter.close();
+                inputWriter.close(); // [ 3  5 ]   ->   [ 8 ]
 
                 // 실행 결과 출력
                 BufferedReader reader = new BufferedReader(new InputStreamReader(processRun.getInputStream()));
                 String line;
                 List<String> results = new ArrayList<>();
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
                     results.add(line);
                 }
 
@@ -240,12 +243,25 @@ public class CodeRunner {
                 sourceFile.delete();
                 new File("Main.class").delete();
 
+
                 // 결과값 비교
                 if (results.equals(Arrays.asList(expectedOutput))) {
                     System.out.println(Arrays.toString(inputs));
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치합니다.");
+
+                    SseEmitter emitter = new SseEmitter();
+
+                    executorService.execute(() -> {
+                        try {
+                            // 예시 데이터 전송
+                            emitter.send("Hello, SSE!");
+                            emitter.complete();
+                        } catch (IOException e) {
+                            emitter.completeWithError(e);
+                        }
+                    });
                 } else {
                     System.out.println(Arrays.toString(inputs));
                     System.out.println(results);
