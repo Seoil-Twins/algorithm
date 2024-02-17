@@ -14,10 +14,9 @@ import { usePathname } from "next/navigation";
 import styles from "./sidebar.module.scss";
 
 import { MenuItems } from "./navigation";
+import { signOut, useSession } from "next-auth/react";
 
 import AlramType from "@/interfaces/alram";
-
-import { useAuth } from "@/providers/authProvider";
 
 import { fetchAlrams } from "@/api/alram";
 
@@ -30,7 +29,7 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ menuItems }: SidebarProps) => {
-  const { user, isLoading, isValidating, logout } = useAuth()!;
+  const { data: session, status } = useSession();
   const path = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -45,10 +44,10 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   const [alrams, setAlrams] = useState<AlramType[]>([]);
 
   const customMenuItems: MenuItems[] = useMemo(() => {
-    return user
+    return session?.user
       ? [...menuItems, { title: "마이페이지", link: "/account" }]
       : [...menuItems];
-  }, [menuItems, user]);
+  }, [menuItems, session?.user]);
 
   const toggleModal = useCallback(() => {
     setIsOpen((prev) => {
@@ -90,8 +89,9 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    await logout();
-  }, [logout]);
+    // cookie 삭제 api 호출
+    await signOut();
+  }, []);
 
   useEffect(() => {
     // 마이페이지가 추가된 경우, menuRefs를 업데이트
@@ -178,9 +178,9 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
               );
             })}
           </div>
-          {!isLoading && !isValidating && (
+          {status !== "loading" && (
             <>
-              {user ? (
+              {session?.user ? (
                 <div className={styles.authBtn} onClick={handleLogout}>
                   로그아웃
                 </div>

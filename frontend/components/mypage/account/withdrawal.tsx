@@ -2,16 +2,15 @@
 
 import React, { useCallback, useState } from "react";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { useAuth } from "@/providers/authProvider";
-
 import { deleteUser } from "@/api/user";
 
 const Withdrawal = () => {
-  const { user, logout } = useAuth();
+  const { data: session } = useSession();
 
   const [isCheck, setIsCheck] = useState<boolean>(false);
 
@@ -22,17 +21,17 @@ const Withdrawal = () => {
   const handleWithdrawal = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (!user) return;
+      if (!session?.user) return;
       if (!isCheck) {
         alert("회원 탈퇴에 동의해주세요.");
         return;
       }
 
       // 회원 탈퇴 API
-      await deleteUser(user?.userId);
-      logout();
+      await deleteUser(session.user.userId);
+      signOut();
     },
-    [user, isCheck, logout],
+    [session?.user, isCheck],
   );
 
   return (

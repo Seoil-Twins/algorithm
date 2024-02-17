@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR from "swr";
-
-import { useAuth } from "@/providers/authProvider";
+import { useSession } from "next-auth/react";
 
 import {
   ResponseNotification,
@@ -69,12 +68,11 @@ const defaultNotifications: NotificationSettings[] = [
 ];
 
 const Notification = () => {
-  const { user } = useAuth();
-  const {
-    data: notificationsWithAPI,
-    isLoading: notificationLoading,
-    mutate,
-  } = useSWR(UserKeys.getNotification, getNotifications);
+  const { data: session } = useSession();
+  const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
+    UserKeys.getNotification,
+    getNotifications,
+  );
 
   const [notifications, setNotifications] =
     useState<NotificationSettings[]>(defaultNotifications);
@@ -82,7 +80,7 @@ const Notification = () => {
   const updateNotification = useDebouncedCallback(
     useCallback(
       async (notifications: NotificationSettings[]) => {
-        if (!user) return;
+        if (!session?.user) return;
 
         const notificationSettings: ResponseNotification = notifications.reduce(
           (result, { paramKey, value }) => {
@@ -93,12 +91,12 @@ const Notification = () => {
         );
 
         try {
-          await updateNotifications(user.userId, notificationSettings);
+          await updateNotifications(session?.user.userId, notificationSettings);
         } catch (error) {
           alert("나중에 다시 시도해주세요.");
         }
       },
-      [user],
+      [session?.user],
     ),
     600,
   );

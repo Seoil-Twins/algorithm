@@ -11,13 +11,12 @@ import React, {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 import styles from "./navbar.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import AlramType from "@/interfaces/alram";
-
-import { useAuth } from "@/providers/authProvider";
 
 import { fetchAlrams } from "@/api/alram";
 import { IMAGE_URL } from "@/api";
@@ -32,7 +31,8 @@ type NavbarProps = {
 };
 
 const Navbar = ({ menuItems }: NavbarProps) => {
-  const { user, logout, isLoading, isValidating } = useAuth();
+  const { data: session, status } = useSession();
+  console.log(session);
   const path: string = usePathname();
 
   const alramImgRef = useRef<HTMLButtonElement>(null);
@@ -95,8 +95,9 @@ const Navbar = ({ menuItems }: NavbarProps) => {
 
   const handleLogout = useCallback(async () => {
     setIsVisibleProfileModal(false);
-    logout();
-  }, [logout]);
+    // cookie 삭제 api 호출
+    signOut();
+  }, []);
 
   const callFetchAlrams = useCallback(async () => {
     const newAlrams = await fetchAlrams();
@@ -149,9 +150,9 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             );
           })}
         </div>
-        {!isLoading && !isValidating && (
+        {status !== "loading" && (
           <>
-            {user ? (
+            {status === "authenticated" && session ? (
               <div className={styles.headerItem}>
                 <ThemeSwitch className={styles.theme} />
                 <button
@@ -174,8 +175,8 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                 >
                   <Image
                     src={
-                      user.profile
-                        ? `${IMAGE_URL}/${user.profile}`
+                      session.user.profile
+                        ? `${IMAGE_URL}/${session.user.profile}`
                         : "/svgs/user_profile_default.svg"
                     }
                     alt="프로필 사진"
@@ -200,7 +201,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
           </>
         )}
       </div>
-      {isVisibleProfileModal && user && (
+      {isVisibleProfileModal && session && (
         <div className={styles.profileModalBox} ref={profileModalRef}>
           <div className={styles.topBox}>
             <div className={`${styles.title} ${notosansBold.className}`}>
@@ -209,8 +210,8 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             <div className={styles.imgBox}>
               <Image
                 src={
-                  user.profile
-                    ? `${IMAGE_URL}/${user.profile}`
+                  session.user.profile
+                    ? `${IMAGE_URL}/${session.user.profile}`
                     : "/svgs/user_profile_default.svg"
                 }
                 alt="프로필 사진"
@@ -220,7 +221,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             </div>
             <div className={styles.infoBox}>
               <div className={`${styles.nickname} ${notosansMedium.className}`}>
-                {user.nickname}
+                {session.user.nickname}
               </div>
               <div className={styles.algorithmBox}>
                 <div className={styles.algorithmItem}>

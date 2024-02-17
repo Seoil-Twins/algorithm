@@ -12,6 +12,7 @@ import Footer from "@/components/common/footer";
 import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 import ThemeProvider from "@/providers/themeProvider";
+import { NextAuthProvider } from "@/providers/nextAuthProvider";
 
 declare global {
   interface Window {
@@ -32,15 +33,17 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notosansRegular.className}`}>
-        <AuthProvider>
-          <CodeTypeProvider>
-            <ThemeProvider>
-              <Navigation />
-              <div className="mainCenterBox">{children}</div>
-              <Footer />
-            </ThemeProvider>
-          </CodeTypeProvider>
-        </AuthProvider>
+        <NextAuthProvider>
+          <AuthProvider>
+            <CodeTypeProvider>
+              <ThemeProvider>
+                <Navigation />
+                <div className="mainCenterBox">{children}</div>
+                <Footer />
+              </ThemeProvider>
+            </CodeTypeProvider>
+          </AuthProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

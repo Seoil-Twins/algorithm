@@ -18,6 +18,7 @@ import {
 
 import { useAuth } from "@/providers/authProvider";
 import { AxiosError } from "axios";
+import { signIn } from "next-auth/react";
 
 interface LoginProperty {
   email: string;
@@ -105,12 +106,12 @@ const Login = () => {
 
       // 로그인 API 호출 및 처리 로직
       try {
-        await login({
+        await signIn("credentials", {
           email: loginInfo.email.value,
           userPw: loginInfo.password.value,
+          redirect: true,
+          callbackUrl: "/",
         });
-
-        window.location.replace("/");
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 401) {
           setIsfailedLogin(true);
@@ -119,7 +120,7 @@ const Login = () => {
         }
       }
     },
-    [validation, login, loginInfo.email.value, loginInfo.password.value],
+    [validation, loginInfo.email.value, loginInfo.password.value],
   );
 
   return (

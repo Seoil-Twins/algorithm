@@ -103,7 +103,7 @@ export const updateProfileImg = async (
   userId: number | string,
   data: { image: File },
 ) => {
-  const response = await axiosInstance.postForm(
+  const response = await axiosInstance.patchForm(
     `/user/profile/${userId}`,
     data,
   );

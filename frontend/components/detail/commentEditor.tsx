@@ -2,12 +2,12 @@
 
 import React, { useCallback, useState } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 import Editor from "../common/editor";
 
 import styles from "./commentEditor.module.scss";
 
-import { useAuth } from "@/providers/authProvider";
 import { IMAGE_URL } from "@/api";
 
 type CommentEditorProps = {
@@ -19,7 +19,7 @@ const CommentEditor = ({
   apiUrl,
   isVisibleToolbar = true,
 }: CommentEditorProps) => {
-  const { user } = useAuth();
+  const { data: session } = useSession();
 
   const [value, setValue] = useState<string>("");
 
@@ -36,7 +36,7 @@ const CommentEditor = ({
     [apiUrl, value],
   );
 
-  if (!user) return null;
+  if (!session?.user) return null;
 
   return (
     <form className={styles.commentEditor} onSubmit={handleSubmit}>
@@ -44,8 +44,8 @@ const CommentEditor = ({
         <div className={styles.profileImgBox}>
           <Image
             src={
-              user.profile
-                ? `${IMAGE_URL}/${user.profile}`
+              session.user.profile
+                ? `${IMAGE_URL}/${session.user.profile}`
                 : "/svgs/user_profile_default.svg"
             }
             alt="프로필 사진"

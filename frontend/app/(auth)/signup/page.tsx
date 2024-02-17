@@ -29,6 +29,7 @@ import {
 import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
+import { signIn } from "next-auth/react";
 
 interface SignupProperty {
   nickname: string;
@@ -296,8 +297,12 @@ const Signup = () => {
         });
 
         if (singupResponse.status === 201) {
-          await login({ email, userPw: password });
-          window.location.replace("/");
+          await signIn("credentials", {
+            email: signupInfo.email.value,
+            userPw: signupInfo.password.value,
+            redirect: true,
+            callbackUrl: "/",
+          });
         }
       } catch (error) {
         if (error instanceof AxiosError) {
