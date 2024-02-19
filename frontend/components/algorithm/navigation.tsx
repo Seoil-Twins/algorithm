@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import ThemeImage from "../common/themeImage";
-import { useSession } from "next-auth/react";
 
 import styles from "./navigation.module.scss";
 
 import Dropdown, { DropdownItem } from "../common/dropdown";
+
+import { useAuth } from "@/providers/authProvider";
 
 import { AlgorithmKind } from "@/api/algorithm/algorithm";
 
@@ -153,7 +154,7 @@ const tagDropdownItems: DropdownItems = {
 };
 
 const Navigation = ({ algorithmKinds }: NavigationProps) => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const prevParams = Object.fromEntries(Array.from(searchParams.entries()));
@@ -252,7 +253,7 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
   }, []);
 
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       setDropdownItems((prev) => [...prev, solvedDropdownItems]);
     } else {
       setDropdownItems((prev) => {
@@ -260,7 +261,7 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
         return newItem;
       });
     }
-  }, [session?.user]);
+  }, [user]);
 
   return (
     <nav className={styles.navigation}>

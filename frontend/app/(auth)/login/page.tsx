@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AxiosError } from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./login.module.scss";
@@ -17,8 +18,8 @@ import {
 } from "@/utils/validation";
 
 import { useAuth } from "@/providers/authProvider";
-import { AxiosError } from "axios";
-import { signIn } from "next-auth/react";
+
+import { getUser, login as loginAPI } from "@/api/user";
 
 interface LoginProperty {
   email: string;
@@ -35,8 +36,8 @@ type LoginInfo = {
 
 const Login = () => {
   const router = useRouter();
-  const { login } = useAuth()!;
-
+  const searchParam = useSearchParams();
+  const { login, logout } = useAuth();
   const [loginInfo, setLoginInfo] = useState<LoginInfo>({
     email: {
       value: "",
@@ -50,6 +51,7 @@ const Login = () => {
     },
   });
 
+  const redirectUrl = useRef<string | undefined>();
   const [isFailedLogin, setIsfailedLogin] = useState<boolean>(false);
 
   const handleLoginInfo = useCallback(
@@ -106,12 +108,22 @@ const Login = () => {
 
       // 로그인 API 호출 및 처리 로직
       try {
-        await signIn("credentials", {
+        await loginAPI({
           email: loginInfo.email.value,
           userPw: loginInfo.password.value,
-          redirect: true,
-          callbackUrl: "/",
         });
+        const userResponse = await getUser();
+
+        if (userResponse.status === 200) {
+          login(userResponse.data);
+
+          router.refresh();
+          if (redirectUrl) {
+            router.replace(redirectUrl.current || "/");
+          } else {
+            router.replace("/");
+          }
+        }
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 401) {
           setIsfailedLogin(true);
@@ -120,8 +132,26 @@ const Login = () => {
         }
       }
     },
-    [validation, loginInfo.email.value, loginInfo.password.value],
+    [
+      validation,
+      loginInfo.email.value,
+      loginInfo.password.value,
+      login,
+      router,
+    ],
   );
+
+  useEffect(() => {
+    const error = searchParam.get("error");
+    const redirect = searchParam.get("redirectUrl");
+
+    if (error === "unauthorized") {
+      logout();
+    }
+    if (redirect) {
+      redirectUrl.current = redirect;
+    }
+  }, [searchParam, logout]);
 
   return (
     <form className={styles.formBox} onSubmit={handleClickLogin}>

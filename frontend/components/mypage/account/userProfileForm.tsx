@@ -29,7 +29,6 @@ import {
   validationEmail,
   validationNickname,
 } from "@/utils/validation";
-import { useSession } from "next-auth/react";
 
 interface UserProfileProperty {
   nickname: string;
@@ -52,7 +51,6 @@ type UserProfileProps = {
 
 const UserProfileForm = ({ user }: UserProfileProps) => {
   const { mutate } = useSWRConfig();
-  const { update } = useSession();
 
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
@@ -189,12 +187,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
             } as UserProfile;
           });
 
-          update({
-            user: {
-              nickname: response.data.nickname,
-              email: response.data.email,
-            },
-          });
           await mutate(UserKeys.getUser);
         }
 
@@ -225,7 +217,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       user.email,
       user.userId,
       isVerified,
-      update,
       mutate,
       validationProfile,
     ],
@@ -244,16 +235,14 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         });
 
         if (response.status === 200) {
-          await update({
-            profile: response.data.profile,
-          });
+          mutate(UserKeys.getUser);
           setProfileImg(response.data.profile);
         }
       } catch (error) {
         alert("나중에 다시 시도해주세요.");
       }
     },
-    [user],
+    [user, mutate],
   );
 
   const sendVerifyCode = useCallback(async () => {

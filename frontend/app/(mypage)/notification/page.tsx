@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR from "swr";
-import { useSession } from "next-auth/react";
 
 import {
   ResponseNotification,
@@ -13,6 +12,8 @@ import {
 } from "@/api/user";
 
 import styles from "./notification.module.scss";
+
+import { useAuth } from "@/providers/authProvider";
 
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
@@ -68,7 +69,7 @@ const defaultNotifications: NotificationSettings[] = [
 ];
 
 const Notification = () => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
     UserKeys.getNotification,
     getNotifications,
@@ -80,7 +81,7 @@ const Notification = () => {
   const updateNotification = useDebouncedCallback(
     useCallback(
       async (notifications: NotificationSettings[]) => {
-        if (!session?.user) return;
+        if (!user) return;
 
         const notificationSettings: ResponseNotification = notifications.reduce(
           (result, { paramKey, value }) => {
@@ -91,12 +92,12 @@ const Notification = () => {
         );
 
         try {
-          await updateNotifications(session?.user.userId, notificationSettings);
+          await updateNotifications(user.userId, notificationSettings);
         } catch (error) {
           alert("나중에 다시 시도해주세요.");
         }
       },
-      [session?.user],
+      [user],
     ),
     600,
   );

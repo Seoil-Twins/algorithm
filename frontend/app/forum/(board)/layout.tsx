@@ -2,10 +2,15 @@ import React from "react";
 
 import BoardNavigation, { NavItem } from "@/components/common/boardNavigation";
 
-import { getSessionId } from "@/utils/serverSideSession";
+import { getUser } from "@/api/user";
 
 const Forum = async ({ children }: { children: React.ReactNode }) => {
-  const sessionId = await getSessionId();
+  let user;
+  try {
+    user = (await getUser()).data;
+  } catch (error) {
+    user = undefined;
+  }
 
   const navItems: NavItem[] = [
     {
@@ -24,10 +29,7 @@ const Forum = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <BoardNavigation
-        isVisiblePost={sessionId !== undefined}
-        items={navItems}
-      />
+      <BoardNavigation isVisiblePost={user !== undefined} items={navItems} />
       {children}
     </>
   );

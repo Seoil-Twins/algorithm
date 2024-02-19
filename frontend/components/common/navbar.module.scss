@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
 
-    .theme {
+    .theme:has(~ .profileBox) {
       margin-right: 30px;
     }
 

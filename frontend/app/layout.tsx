@@ -9,10 +9,9 @@ import { notosansRegular } from "@/styles/_font";
 import Navigation from "@/components/common/navigation";
 import Footer from "@/components/common/footer";
 
-import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 import ThemeProvider from "@/providers/themeProvider";
-import { NextAuthProvider } from "@/providers/nextAuthProvider";
+import { AuthProvider } from "@/providers/authProvider";
 
 declare global {
   interface Window {
@@ -33,17 +32,15 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notosansRegular.className}`}>
-        <NextAuthProvider>
-          <AuthProvider>
-            <CodeTypeProvider>
-              <ThemeProvider>
-                <Navigation />
-                <div className="mainCenterBox">{children}</div>
-                <Footer />
-              </ThemeProvider>
-            </CodeTypeProvider>
-          </AuthProvider>
-        </NextAuthProvider>
+        <AuthProvider>
+          <CodeTypeProvider>
+            <ThemeProvider>
+              <Navigation />
+              <div className="mainCenterBox">{children}</div>
+              <Footer />
+            </ThemeProvider>
+          </CodeTypeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

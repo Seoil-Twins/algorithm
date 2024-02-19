@@ -10,7 +10,7 @@ import Navbar from "./navbar";
 
 import { AUTH_PATHS } from "@/constants";
 
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/providers/authProvider";
 
 export type MenuItems = {
   title: string;
@@ -41,7 +41,7 @@ const Navigation = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { user, isValidating, isLoading } = useAuth();
 
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -74,13 +74,13 @@ const Navigation = () => {
    * setUser가 비동기이기 때문
    */
   useEffect(() => {
-    if (status === "loading") return;
+    if (isLoading || isValidating) return;
 
-    if (!session?.user && AUTH_PATHS.includes(pathname)) {
+    if (!user && AUTH_PATHS.includes(pathname)) {
       router.replace("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.user, pathname, router]);
+  }, [user, pathname, router]);
 
   return (
     <>

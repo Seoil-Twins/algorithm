@@ -31,8 +31,7 @@ const BoardDetail = async ({
 }) => {
   let user: User | undefined = undefined;
   try {
-    const userResponse = await getUser();
-    user = userResponse.data;
+    user = (await getUser()).data;
   } catch (error) {
     user = undefined;
   }

@@ -3,13 +3,14 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 import { IMAGE_URL } from "@/api";
 import { ResponseAnswerItem } from "@/api/code";
 
 import styles from "./answer.module.scss";
 import { notosansBold } from "@/styles/_font";
+
+import { useAuth } from "@/providers/authProvider";
 
 import Comment from "./comment";
 import EditorViewer from "@/components/common/editorViewer";
@@ -21,7 +22,7 @@ type AnswerProps = {
 };
 
 const Answer = ({ answer }: AnswerProps) => {
-  const { data: session } = useSession();
+  const { user } = useAuth();
 
   return (
     <div className={styles.answer}>
@@ -53,7 +54,7 @@ const Answer = ({ answer }: AnswerProps) => {
           {/** 코드 댓글 recommend가 API 나오면 바꿔야 합니다. */}
           <RecommendPost
             apiUrl={`/code/favorite/${answer.codeId}`}
-            userId={session?.user.userId}
+            userId={user?.userId}
             requestId={answer.codeId}
             isRecommend={undefined}
             recommendCount={Number(answer.recommendCount)}
@@ -69,7 +70,7 @@ const Answer = ({ answer }: AnswerProps) => {
           <Comment key={idx} comment={comment} />
         ))}
       </div>
-      {session?.user && (
+      {user && (
         <CommentEditor
           apiUrl={`/code/comment/${answer.codeId}`}
           isVisibleToolbar={false}

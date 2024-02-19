@@ -4,9 +4,10 @@ import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 import styles from "./comment.module.scss";
+
+import { useAuth } from "@/providers/authProvider";
 
 import CommentType from "@/interfaces/comment";
 
@@ -27,7 +28,7 @@ type CommentProps = {
 
 const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { user } = useAuth();
 
   const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
   const [isVisibleEditor, setIsVisibleEditor] = useState<boolean>(false);
@@ -62,7 +63,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
   );
 
   const renderCheckMark = () => {
-    if (boardTypeId !== 2 && userId === session?.user.userId) {
+    if (boardTypeId !== 2 && userId === user?.userId) {
       return comment.commentId === solved ? (
         <Image src="/svgs/valid_check.svg" alt="채택" width={32} height={32} />
       ) : (
@@ -75,10 +76,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
           />
         </button>
       );
-    } else if (
-      userId !== session?.user.userId &&
-      comment.commentId === solved
-    ) {
+    } else if (userId !== user?.userId && comment.commentId === solved) {
       return (
         <Image src="/svgs/valid_check.svg" alt="채택" width={32} height={32} />
       );
@@ -112,7 +110,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
                   <span className={styles.createdTime}>
                     {comment.createdTime}
                   </span>
-                  {comment.user.userId === session?.user.userId && (
+                  {comment.user.userId === user?.userId && (
                     <>
                       <button
                         className={styles.blue}
@@ -140,7 +138,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
                 apiUrl={`/comment/favorite/${comment.commentId}`}
                 isRecommend={comment.isRecommend}
                 recommendCount={comment.recommendCount}
-                userId={session?.user.userId}
+                userId={user?.userId}
                 requestId={comment.commentId}
                 padding={10}
               />

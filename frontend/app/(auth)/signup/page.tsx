@@ -4,10 +4,12 @@ import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AxiosError } from "axios";
+import { useDebouncedCallback } from "use-debounce";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./signup.module.scss";
-import { useDebouncedCallback } from "use-debounce";
+
+import { useAuth } from "@/providers/authProvider";
 
 import {
   Info,
@@ -18,18 +20,16 @@ import {
   validationPassword,
 } from "@/utils/validation";
 
-import { useAuth } from "@/providers/authProvider";
-
 import {
   signup,
   sendVerifyCode as sendVerifyCodeAPI,
   compareVerifyCode,
+  getUser,
 } from "@/api/user";
 
 import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
-import { signIn } from "next-auth/react";
 
 interface SignupProperty {
   nickname: string;
@@ -50,7 +50,7 @@ type SignupInfo = {
 
 const Signup = () => {
   const router = useRouter();
-  const { login } = useAuth()!;
+  const { login } = useAuth();
 
   const [signupInfo, setSignupInfo] = useState<SignupInfo>({
     nickname: {
@@ -297,12 +297,11 @@ const Signup = () => {
         });
 
         if (singupResponse.status === 201) {
-          await signIn("credentials", {
-            email: signupInfo.email.value,
-            userPw: signupInfo.password.value,
-            redirect: true,
-            callbackUrl: "/",
-          });
+          const userResponse = await getUser();
+          login(userResponse.data);
+
+          router.refresh();
+          router.replace("/");
         }
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -325,7 +324,7 @@ const Signup = () => {
           );
         }
       }
-    }, [isCheck, signupInfo, router, login, validation]),
+    }, [isCheck, signupInfo, router, validation, login]),
     500,
   );
 

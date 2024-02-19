@@ -3,14 +3,24 @@ import { cookies } from "next/headers";
 
 import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
 
-const routes = ["/algorithm/*"];
+const routes = ["/((?!api|static|.*\\..*|_next).*)"];
 
-export default async function middleware(req: NextRequest) {
-  const sessionId = cookies().get(
-    process.env.NEXT_PUBLIC_SESSION_KEY as string,
-  )?.value;
+export default async function middrleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const url = req.nextUrl.clone();
+
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/static") ||
+    pathname.startsWith("/svgs") ||
+    pathname.startsWith("/favicon.ico")
+  ) {
+    return NextResponse.next();
+  }
+
+  const sessionKey = process.env.NEXT_PUBLIC_SESSION_KEY as string;
+  const sessionId = cookies().get(sessionKey)?.value;
 
   const hasSessionButUnAuthPath =
     NO_AUTH_PATHS.some((noAuthPath) => {
@@ -29,8 +39,14 @@ export default async function middleware(req: NextRequest) {
   }
 
   // 잘못된 권한으로 접근할 시 홈으로 리다이렉션
-  if (hasSessionButUnAuthPath || noSessionButAuthPath) {
+  if (hasSessionButUnAuthPath) {
     url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  if (noSessionButAuthPath) {
+    url.search = `error=unauthorized&redirectUrl=${pathname}`;
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
@@ -41,11 +57,7 @@ export default async function middleware(req: NextRequest) {
 
   const regex = new RegExp(/\/algorithm\/.+$/);
 
-  if (
-    regex.test(pathname) &&
-    !pathname.includes("css") &&
-    !pathname.includes("js")
-  ) {
+  if (regex.test(pathname)) {
     const splitedPathname = pathname.split("/");
     const algorithmId = splitedPathname[2];
 
@@ -58,5 +70,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", ...NO_AUTH_PATHS, ...AUTH_PATHS, ...routes],
+  matcher: [...NO_AUTH_PATHS, ...AUTH_PATHS, ...routes],
 };
