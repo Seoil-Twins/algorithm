@@ -255,7 +255,7 @@ public class UserController {
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
         session.setMaxInactiveInterval(1800); // 세션 만료 시간 30분
-        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(1800).build();
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(2592000).build();
 
         ObjectNode responseUser = userService.userSelf(login);
 
