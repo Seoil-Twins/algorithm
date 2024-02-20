@@ -43,7 +43,7 @@ public class FileService {
         this.rootLocation = Paths.get(properties.getLocation());
     }
 
-    public void store(MultipartFile file, long userId, String additionalPath) {
+    public String store(MultipartFile file, long userId, String additionalPath) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
@@ -96,13 +96,14 @@ public class FileService {
                 userProfileRepository.save(userProfileEntity);
 
             }
+            return destinationDirectory.toString();
         }
         catch (IOException e) {
             throw new StorageException("Failed to store file.", e);
         }
     }
 
-    public void storeBoardImage(MultipartFile file, long boardId, String additionalPath) {
+    public String storeBoardImage(MultipartFile file, long boardId, String additionalPath) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
@@ -136,6 +137,8 @@ public class FileService {
             }
 
             try (InputStream inputStream = file.getInputStream()) {
+                System.out.println(destinationFile.getParent());
+                System.out.println(destinationDirectory);
                 Files.copy(inputStream, destinationFile,
                         StandardCopyOption.REPLACE_EXISTING);
                 BoardImageEntity boardImageEntity = new BoardImageEntity();
@@ -144,8 +147,9 @@ public class FileService {
                 boardImageEntity.setSize(file.getSize());
                 boardImageEntity.setPath( rootLocation.relativize(destinationFile) + "");
                 boardImageRepository.save(boardImageEntity);
-
             }
+
+            return destinationDirectory.toString();
         }
         catch (IOException e) {
             throw new StorageException("Failed to store file.", e);

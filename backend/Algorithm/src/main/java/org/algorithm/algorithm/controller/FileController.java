@@ -43,17 +43,16 @@ public class FileController {
         return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
     }
     @PatchMapping("/user/profile/{user_id}")
-    public ResponseEntity<HttpStatus> handleFileUpload(@RequestParam("image") MultipartFile file,
+    public ResponseEntity<?> handleFileUpload(@RequestParam("image") MultipartFile file,
                                                        @PathVariable("user_id") long userId) {
-        fileService.store(file,userId,"user/"+userId);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        return ResponseEntity.ok(fileService.store(file,userId,"user/"+userId));
     }
 
     @PostMapping("/board/image/{board_id}")
-    public ResponseEntity<HttpStatus> handleBoardImage(@RequestParam("image") MultipartFile file,
+    public ResponseEntity<?> handleBoardImage(@RequestParam("image") MultipartFile file,
                                                        @PathVariable("board_id") long boardId) {
-        fileService.storeBoardImage(file,boardId,"board/"+boardId);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+
+        return ResponseEntity.ok(fileService.storeBoardImage(file,boardId,"board/"+boardId));
     }
 
     @DeleteMapping("/board/image/delete/{board_image_id}")
