@@ -17,11 +17,11 @@ public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id", columnDefinition = "INT UNSIGNED")
-    private long commentId;
+    private Long commentId;
     @Column(name = "board_id", columnDefinition = "INT UNSIGNED")
-    private long boardId;
+    private Long boardId;
     @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
-    private long userId;
+    private Long userId;
     @Column(name = "content")
     private String content;
     @Column(name = "created_time")
@@ -37,4 +37,5 @@ public class CommentEntity {
 
         return commentEntity;
     }
+
 }

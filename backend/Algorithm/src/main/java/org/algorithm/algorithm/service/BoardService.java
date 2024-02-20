@@ -5,24 +5,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.*;
 import org.algorithm.algorithm.entity.*;
-import org.algorithm.algorithm.exception.GlobalException;
-import org.algorithm.algorithm.exception.SQLException;
+import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.*;
 import org.algorithm.algorithm.util.AlgorithmSpecification;
+import org.apache.coyote.BadRequestException;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.xml.stream.events.Comment;
+import java.beans.PropertyDescriptor;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -200,6 +205,194 @@ public class BoardService {
             throw new SQLException(" Board Algorithm All SQL Error ! ");
         }
     }
+
+    public void postBoard(BoardDTO boardDTO, UserDTO userDTO) {
+        try {
+
+            boardDTO.setUserId(userDTO.getUserId());
+            boardDTO.setCreatedTime(LocalDateTime.now());
+
+            if(boardDTO.getAlgorithmId() != null)
+            {
+                if(algorithmRepository.findOneByAlgorithmId(boardDTO.getAlgorithmId()) == null)
+                    throw new NotFoundException("Algorithm Not Found. algorithm_id : " + boardDTO.getAlgorithmId());
+            }
+
+            BoardEntity boardEntity = BoardEntity.toBoardEntity(boardDTO);
+            boardRepository.save(boardEntity);
+
+        }
+        catch(NotFoundException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new SQLException(" Board Algorithm All SQL Error ! ");
+        }
+    }
+
+    public void postComment(CommentDTO commentDTO,Long boardId, UserDTO userDTO) {
+        try {
+
+            commentDTO.setUserId(userDTO.getUserId());
+            commentDTO.setCreatedTime(LocalDateTime.now());
+            commentDTO.setBoardId(boardId);
+
+            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+                throw new NotFoundException("Board Not Found. board_id : " + boardId);
+
+
+            CommentEntity commentEntity = CommentEntity.toCommentEntity(commentDTO);
+            commentRepository.save(commentEntity);
+
+        }
+        catch(NotFoundException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new SQLException(" Board Algorithm All SQL Error ! ");
+        }
+    }
+
+    public void postAdopt(Long boardId,Long commentId, UserDTO userDTO) {
+        try {
+
+            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+                throw new NotFoundException("Board Not Found. board_id : " + boardId);
+
+            if(commentRepository.findByCommentId(commentId) == null)
+                throw new NotFoundException("Comment Not Found. comment_id : " + commentId);
+
+            if(boardRepository.findBoardEntityByBoardId(boardId).getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Only Writer Adopt");
+
+            AdoptEntity adoptEntity = new AdoptEntity();
+            adoptEntity.setBoardId(boardId);
+            adoptEntity.setCommentId(commentId);
+
+            adoptRepository.save(adoptEntity);
+
+        }
+        catch(NotFoundException | AuthorizedException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new SQLException(" Board Algorithm All SQL Error ! ");
+        }
+    }
+
+    public void patchBoard(BoardDTO boardDTO, Long boardId, UserDTO userDTO){
+        try {
+            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+                throw new NotFoundException("Board Not Found. board_id : " + boardId);
+
+            if(boardDTO.getAlgorithmId() != null) {
+                if(algorithmRepository.findOneByAlgorithmId(boardDTO.getAlgorithmId()) == null)
+                    throw new NotFoundException("Algorithm Not Found. algorithm_id : " + boardDTO.getAlgorithmId());
+            }
+
+            BoardEntity existingBoard = boardRepository.findBoardEntityByBoardId(boardId);
+
+            if(existingBoard.getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Only Writer Update Board");
+
+            BoardEntity patchRequesBoard = BoardEntity.toBoardEntity(boardDTO);
+            patchRequesBoard.setBoardId(boardId);
+            patchRequesBoard.setUserId(existingBoard.getUserId());
+
+            BeanUtils.copyProperties(patchRequesBoard, existingBoard, getNullPropertyNames(patchRequesBoard));
+
+            boardRepository.save(existingBoard);
+        }
+        catch (NotFoundException | AuthorizedException e ){
+            throw e;
+        }
+        catch(Error e){
+            throw new SQLException(" Board Patch SQL Error ! ");
+        }
+    }
+
+    public void patchComment(CommentDTO commentDTO, Long commentId, UserDTO userDTO){
+        try {
+            if(commentRepository.findByCommentId(commentId) == null)
+                throw new NotFoundException("Comment Not Found. comment_id : " + commentId);
+
+            CommentEntity existingComment = commentRepository.findByCommentId(commentId);
+
+            if(existingComment.getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Only Writer Update Comment");
+
+            CommentEntity patchRequestComment = CommentEntity.toCommentEntity(commentDTO);
+            patchRequestComment.setCommentId(commentId);
+            patchRequestComment.setBoardId(existingComment.getBoardId());
+            patchRequestComment.setUserId(userDTO.getUserId());
+
+            BeanUtils.copyProperties(patchRequestComment, existingComment, getNullPropertyNames(patchRequestComment));
+
+
+            commentRepository.save(existingComment);
+        }
+        catch (NotFoundException | AuthorizedException e){
+            throw e;
+        }
+        catch(Error e){
+            throw new SQLException(" Comment Patch SQL Error ! ");
+        }
+    }
+
+    public HttpStatus deleteBoard(Long boardId, UserDTO userDTO) {
+        try {
+            // 댓글 엔티티 검색
+            BoardEntity boardEntity = boardRepository.findById(boardId).orElse(null);
+
+            // 해당 댓글이 없으면 NotFoundException 발생
+            if (boardEntity == null)
+                throw new NotFoundException("Not Found Comment. comment_id : " + boardId);
+
+            // 유저 확인 (옵션: 댓글 작성자와 현재 유저가 같은지 확인)
+            if (!boardEntity.getUserId().equals(userDTO.getUserId()))
+                throw new BadRequestException("User not authorized to edit this board.");
+
+            // 댓글 삭제
+            boardRepository.delete(boardEntity);
+
+            return HttpStatus.OK;
+
+        }
+        catch (NotFoundException | AuthorizedException e){
+            throw e;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to delete board.");
+        }
+    }
+
+    public HttpStatus deleteComment(Long commentId, UserDTO userDTO) {
+        try {
+            // 댓글 엔티티 검색
+            CommentEntity commentEntity = commentRepository.findByCommentId(commentId);
+
+            // 해당 댓글이 없으면 NotFoundException 발생
+            if (commentEntity == null)
+                throw new NotFoundException("Not Found Comment. comment_id : " + commentId);
+
+            // 유저 확인 (옵션: 댓글 작성자와 현재 유저가 같은지 확인)
+            if (!commentEntity.getUserId().equals(userDTO.getUserId()))
+                throw new AuthorizedException("User not authorized to edit this comment.");
+
+            // 댓글 삭제
+            commentRepository.delete(commentEntity);
+
+            return HttpStatus.OK;
+
+        }
+        catch (NotFoundException | AuthorizedException e){
+            throw e;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to delete board.");
+        }
+    }
+
     private ObjectNode createBoardNode(BoardDTO boardDTO, UserDTO userDTO) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode boardNode = objectMapper.createObjectNode();
@@ -397,6 +590,19 @@ public class BoardService {
         resultNode.put("total", responseList.size());
 
         return resultNode;
+    }
+
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 
 }

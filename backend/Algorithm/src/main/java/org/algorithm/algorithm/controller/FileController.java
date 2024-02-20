@@ -1,7 +1,7 @@
 package org.algorithm.algorithm.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.algorithm.algorithm.service.UserProfileService;
+import org.algorithm.algorithm.service.FileService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.repository.query.Param;
@@ -19,9 +19,9 @@ import java.nio.file.Paths;
 @RestController
 @ResponseBody
 @RequiredArgsConstructor
-public class UserProfileController {
+public class FileController {
 
-    private final UserProfileService userProfileService;
+    private final FileService fileService;
 
     @GetMapping("/display")
     public ResponseEntity<Resource> display(@Param("filename") String filename) {
@@ -45,8 +45,23 @@ public class UserProfileController {
     @PatchMapping("/user/profile/{user_id}")
     public ResponseEntity<HttpStatus> handleFileUpload(@RequestParam("image") MultipartFile file,
                                                        @PathVariable("user_id") long userId) {
-        userProfileService.store(file,userId,"user/"+userId);
+        fileService.store(file,userId,"user/"+userId);
         return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
+    @PostMapping("/board/image/{board_id}")
+    public ResponseEntity<HttpStatus> handleBoardImage(@RequestParam("image") MultipartFile file,
+                                                       @PathVariable("board_id") long boardId) {
+        fileService.storeBoardImage(file,boardId,"board/"+boardId);
+        return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/board/image/delete/{board_image_id}")
+    public ResponseEntity<HttpStatus> handleDeleteBoardImage(@PathVariable("board_image_id") long boardImageId) {
+        fileService.deleteBoardImage(boardImageId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
 }
+
+
