@@ -7,7 +7,7 @@ import { useUser } from "@/hooks/useUser";
 import { User } from "@/interfaces/user";
 
 type AuthProviderContext = {
-  user: User | undefined;
+  user: User | undefined | null;
   isLoading: boolean;
   isValidating: boolean;
   login: (user: User) => Promise<void>;

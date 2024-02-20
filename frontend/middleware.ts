@@ -45,7 +45,7 @@ export default async function middrleware(req: NextRequest) {
   }
 
   if (noSessionButAuthPath) {
-    url.search = `error=unauthorized&redirectUrl=${pathname}`;
+    url.search = `error=unauthorized&redirect_url=${pathname}`;
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }

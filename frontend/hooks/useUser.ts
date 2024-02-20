@@ -15,16 +15,16 @@ export const useUser = () => {
         const userResponse = await getUser();
         return userResponse.data;
       } catch (error) {
-        return undefined;
+        return null;
       }
     },
     {
       revalidateOnFocus: false,
-      errorRetryInterval: 0,
+      shouldRetryOnError: false,
       refreshInterval: 30 * 60 * 1000,
     },
   );
-  const [user, setUser] = useState<User | undefined>(data || undefined);
+  const [user, setUser] = useState<User | undefined | null>(data || undefined);
 
   const addUser = async (user: User) => {
     setUser(user);
@@ -32,7 +32,7 @@ export const useUser = () => {
 
   const removeUser = () => {
     // remove cookie
-    setUser(undefined);
+    setUser(null);
   };
 
   useEffect(() => {

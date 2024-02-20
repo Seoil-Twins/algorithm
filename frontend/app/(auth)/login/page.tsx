@@ -38,6 +38,7 @@ const Login = () => {
   const router = useRouter();
   const searchParam = useSearchParams();
   const { login, logout } = useAuth();
+
   const [loginInfo, setLoginInfo] = useState<LoginInfo>({
     email: {
       value: "",
@@ -50,9 +51,12 @@ const Login = () => {
       errMsg: "올바른 비밀번호 형식이 아닙니다.",
     },
   });
-
-  const redirectUrl = useRef<string | undefined>();
   const [isFailedLogin, setIsfailedLogin] = useState<boolean>(false);
+
+  const error = useRef<string | undefined>(searchParam.get("error"));
+  const redirectUrl = useRef<string | undefined>(
+    searchParam.get("redirect_url"),
+  );
 
   const handleLoginInfo = useCallback(
     (changedValue: string, name: LoginKeys) => {
@@ -142,16 +146,11 @@ const Login = () => {
   );
 
   useEffect(() => {
-    const error = searchParam.get("error");
-    const redirect = searchParam.get("redirectUrl");
-
-    if (error === "unauthorized") {
+    if (error.current === "unauthorized") {
       logout();
     }
-    if (redirect) {
-      redirectUrl.current = redirect;
-    }
-  }, [searchParam, logout]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <form className={styles.formBox} onSubmit={handleClickLogin}>
