@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.EmailVerifyDTO;
@@ -19,7 +20,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -237,7 +241,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
+    public ResponseEntity<?> loginPOST(@RequestBody UserDTO userDTO, HttpServletRequest request, RedirectAttributes rttr){
         HttpSession session = request.getSession(true); // default true
 
         UserDTO login = userService.userLogin(userDTO);
@@ -246,15 +250,29 @@ public class UserController {
 
         if (login == null) {
             rttr.addFlashAttribute("loginFail", failMessage);
-//            return "redirect:/login";
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Login Failed");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("아이디 혹은 비밀번호가 잘못 되었습니다.");
         }
 
         session.setAttribute(Const.LOGIN_USER_KEY, login);
         session.setMaxInactiveInterval(1800); // 세션 만료 시간 30분
         ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(1800).build();
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body("successs");
+        ObjectNode responseUser = userService.userSelf(login);
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseUser);
+    }
+
+
+    @PostMapping("/logoutee")
+    public ResponseEntity<?> logoutDelete(HttpServletRequest request, HttpServletResponse response) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+            return ResponseEntity.ok("logout");
+        }
+        return ResponseEntity.ok("logout failed");
+
     }
     @ResponseBody
     @PostMapping("/user/verify/send")
@@ -363,5 +381,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
+
 
 }

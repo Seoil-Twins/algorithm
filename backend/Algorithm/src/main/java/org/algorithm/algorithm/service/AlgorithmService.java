@@ -1,5 +1,6 @@
 package org.algorithm.algorithm.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,16 +11,18 @@ import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.exception.NotFoundException;
 import org.algorithm.algorithm.exception.SQLException;
 import org.algorithm.algorithm.repository.*;
+import org.algorithm.algorithm.util.AlgorithmSpecification;
+import org.algorithm.algorithm.util.ErrorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +38,19 @@ public class AlgorithmService {
     public final FavoriteRepository favoriteRepository;
 
 
-    public ObjectNode getAll(int pageNo, int pageSize, UserDTO userDTO) {
+    public ObjectNode getAll(AlgorithmRequestDTO algorithmRequestDTO, UserDTO userDTO) {
         try {
-            System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
-            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
+            System.out.println(algorithmRequestDTO);
+            Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
+            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(
+                    AlgorithmSpecification.withDynamicQuery(
+                            algorithmRequestDTO.getSort(),
+                            algorithmRequestDTO.getLevel(),
+                            algorithmRequestDTO.getTag(),
+                            algorithmRequestDTO.getKeyword()),
+                    pageable
+            );
+            long total = algorithmEntities.getTotalElements();
 
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -51,7 +62,6 @@ public class AlgorithmService {
 
             for (AlgorithmEntity algorithmEntity : resultValue) {
                 AlgorithmDTO algorithmDTO = AlgorithmDTO.toAlgorithmDTO(algorithmEntity);
-                ResponseAlgorithmDTO responseAlgorithmDTO = new ResponseAlgorithmDTO();
 
                 // userId로 user data 가져와서 node 생성
                 ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(algorithmDTO.getUserId());
@@ -86,6 +96,19 @@ public class AlgorithmService {
                 Boolean isFavorite = favoriteRepository.findCountByUserIdANDAlgorithmId(favoriteEntity) > 0;
                 Boolean solved = algorithmRepository.findSolvedByAlgorithmIdANDUserId(algorithmDTO.getAlgorithmId(),userDTO.getUserId()) > 0;
 
+                if(Objects.equals(algorithmRequestDTO.getSolved(), "s")){
+                    if(!solved){
+                        total -= 1;
+                        continue;
+                    }
+                }
+                if(Objects.equals(algorithmRequestDTO.getSolved(), "ns")){
+                    if(solved){
+                        total -= 1;
+                        continue;
+                    }
+                }
+
                 float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
                 float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
                 float correctRate = 0.0f;
@@ -108,12 +131,32 @@ public class AlgorithmService {
                 dtoNode.put("solved",solved);
                 dtoNode.put("correctRate",Math.round(correctRate*100));
 
-                System.out.println(responseAlgorithmDTO);
                 response.add(dtoNode);
             }
+            List<JsonNode> list = new ArrayList<>();
+            ArrayNode sortedResponse = objectMapper.createArrayNode();
+
+            if(Objects.equals(algorithmRequestDTO.getRate(), "h")) {
+                response.forEach(list::add);
+
+                // correctRate를 기준으로 내림차순 정렬
+                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()).reversed());
+
+                // 정렬된 데이터를 새로운 ArrayNode에 추가
+                list.forEach(sortedResponse::add);
+            } else {
+                response.forEach(list::add);
+
+                // correctRate를 기준으로 오름차순 정렬
+                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()));
+
+                // 정렬된 데이터를 새로운 ArrayNode에 추가
+                list.forEach(sortedResponse::add);
+            }
+
             ObjectNode responseJSON = objectMapper.createObjectNode();
-            responseJSON.set("algorithms", response);
-            responseJSON.put("total",algorithmEntities.getTotalElements());
+            responseJSON.set("algorithms", sortedResponse);
+            responseJSON.put("total",total);
 
             return responseJSON;
         }
@@ -122,11 +165,19 @@ public class AlgorithmService {
         }
     }
 
-    public ObjectNode getAll(int pageNo, int pageSize) {
+    public ObjectNode getAll(AlgorithmRequestDTO algorithmRequestDTO) {
         try {
-            System.out.println(pageNo + "::" + pageSize);
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
-            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(pageable);
+            System.out.println(algorithmRequestDTO);
+            Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
+            Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(
+                    AlgorithmSpecification.withDynamicQuery(
+                            algorithmRequestDTO.getSort(),
+                            algorithmRequestDTO.getLevel(),
+                            algorithmRequestDTO.getTag(),
+                            algorithmRequestDTO.getKeyword()),
+                    pageable
+            );
+            long total = algorithmEntities.getTotalElements();
 
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -138,7 +189,6 @@ public class AlgorithmService {
 
             for (AlgorithmEntity algorithmEntity : resultValue) {
                 AlgorithmDTO algorithmDTO = AlgorithmDTO.toAlgorithmDTO(algorithmEntity);
-                ResponseAlgorithmDTO responseAlgorithmDTO = new ResponseAlgorithmDTO();
 
                 // userId로 user data 가져와서 node 생성
                 ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(algorithmDTO.getUserId());
@@ -186,12 +236,33 @@ public class AlgorithmService {
                 dtoNode.put("testcase",testcaseArrayNode);
                 dtoNode.put("correctRate",Math.round(correctRate*100));
 
-                System.out.println(responseAlgorithmDTO);
                 response.add(dtoNode);
             }
+
+            List<JsonNode> list = new ArrayList<>();
+            ArrayNode sortedResponse = objectMapper.createArrayNode();
+
+            if(Objects.equals(algorithmRequestDTO.getRate(), "h")) {
+                response.forEach(list::add);
+
+                // correctRate를 기준으로 내림차순 정렬
+                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()).reversed());
+
+                // 정렬된 데이터를 새로운 ArrayNode에 추가
+                list.forEach(sortedResponse::add);
+            } else {
+                response.forEach(list::add);
+
+                // correctRate를 기준으로 오름차순 정렬
+                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()));
+
+                // 정렬된 데이터를 새로운 ArrayNode에 추가
+                list.forEach(sortedResponse::add);
+            }
+
             ObjectNode responseJSON = objectMapper.createObjectNode();
-            responseJSON.set("algorithms", response);
-            responseJSON.put("total",algorithmEntities.getTotalElements());
+            responseJSON.set("algorithms", sortedResponse);
+            responseJSON.put("total",total);
 
             return responseJSON;
         }
@@ -203,6 +274,8 @@ public class AlgorithmService {
     public ObjectNode getRecommend(UserDTO userDTO) {
         try {
             List<AlgorithmEntity> algorithmEntities = algorithmRepository.findRecommend();
+            if (algorithmEntities == null)
+                throw new NotFoundException("NOT FOUND RECOMMEND ALGORITHM ( Maybe. Empty 'user_try' table )");
 
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -414,6 +487,11 @@ public class AlgorithmService {
             Boolean isFavorite = favoriteRepository.findCountByUserIdANDAlgorithmId(favoriteEntity) > 0;
             Boolean solved = algorithmRepository.findSolvedByAlgorithmIdANDUserId(algorithmDTO.getAlgorithmId(),userDTO.getUserId()) > 0;
 
+            String[] images = algorithmRepository.findImagePathByAlgorithmId(algorithmDTO.getAlgorithmId());
+            String thumnnail = null;
+            if(images.length > 0)
+                thumnnail = images[0];
+
             float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correctRate = 0.0f;
@@ -432,6 +510,7 @@ public class AlgorithmService {
             dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
             dtoNode.put("content",algorithmDTO.getContent());
             dtoNode.put("isFavorite",isFavorite);
+            dtoNode.put("thumnnail",thumnnail);
             dtoNode.put("testcase",testcaseArrayNode);
             dtoNode.put("solved",solved);
             dtoNode.put("correctRate",Math.round(correctRate*100));
@@ -481,6 +560,10 @@ public class AlgorithmService {
                 testcaseNode.put("output", testcaseDTO.getOutput());
                 testcaseArrayNode.add(testcaseNode);
             }
+            String[] images = algorithmRepository.findImagePathByAlgorithmId(algorithmDTO.getAlgorithmId());
+            String thumnnail = null;
+            if(images.length > 0)
+                thumnnail = images[0];
 
             float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
             float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
@@ -499,6 +582,7 @@ public class AlgorithmService {
             dtoNode.put("limitMem",algorithmDTO.getLimitMem());
             dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
             dtoNode.put("content",algorithmDTO.getContent());
+            dtoNode.put("thumnnail",thumnnail);
             dtoNode.put("testcase",testcaseArrayNode);
             dtoNode.put("correctRate",Math.round(correctRate*100));
 
@@ -515,8 +599,7 @@ public class AlgorithmService {
             throw new NotFoundException("User Not Found");
 
         try {
-            page -= 1;
-            Pageable pageable = PageRequest.of(page, count);
+            Pageable pageable = PageRequest.of(page-1, count);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findTriedByUserId(userId, pageable);
             List<AlgorithmEntity> findsEntities = algorithmEntities.getContent();
 
@@ -603,8 +686,7 @@ public class AlgorithmService {
             throw new NotFoundException("User Not Found");
 
         try {
-            page -= 1;
-            Pageable pageable = PageRequest.of(page, count);
+            Pageable pageable = PageRequest.of(page-1, count);
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findTriedByUserId(userId, pageable);
             List<AlgorithmEntity> findsEntities = algorithmEntities.getContent();
 

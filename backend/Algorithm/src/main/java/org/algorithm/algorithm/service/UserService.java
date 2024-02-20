@@ -17,6 +17,7 @@ import org.algorithm.algorithm.entity.UserLinkEntity;
 import org.algorithm.algorithm.entity.UserProfileEntity;
 import org.algorithm.algorithm.exception.EmailException;
 import org.algorithm.algorithm.exception.NicknameException;
+import org.algorithm.algorithm.exception.NotFoundException;
 import org.algorithm.algorithm.exception.SQLException;
 import org.algorithm.algorithm.repository.EmailVerifyRepository;
 import org.algorithm.algorithm.repository.UserLinkRepository;
@@ -500,6 +501,8 @@ public class UserService {
     public ResponseEntity<String> compareCode(EmailVerifyDTO emailVerifyDTO) throws MessagingException {
         try {
             EmailVerifyEntity emailVerifyEntity = emailVerifyRepository.findByEmail(emailVerifyDTO.getEmail());
+            if(emailVerifyEntity == null)
+                throw new NotFoundException("Verify Email Not Found !! Input Email : " + emailVerifyDTO.getEmail());
 
             LocalDateTime currentTime = LocalDateTime.now();
             long minutesDifference = ChronoUnit.MINUTES.between(currentTime, emailVerifyEntity.getExpirationTime());
