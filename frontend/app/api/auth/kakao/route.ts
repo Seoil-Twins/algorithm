@@ -1,4 +1,9 @@
+import { AxiosError, AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
+
+import { axiosInstance } from "@/api";
+
+import { User } from "@/interfaces/user";
 
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;
@@ -14,7 +19,9 @@ export const GET = async (req: NextRequest) => {
   const redirectUri = process.env.NEXT_PUBLIC_KAKAO_CODE_REDIRECT_URI;
 
   if (!code || !clientId || !clientSecret || !redirectUri)
-    return NextResponse.redirect(cloneUrl);
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=500&message=internal_server_error`,
+    );
 
   const tokenBaseUrl = "https://kauth.kakao.com/oauth/token";
   const config = {
@@ -34,7 +41,10 @@ export const GET = async (req: NextRequest) => {
   });
   const data = await response.json();
   const accessToken = data.access_token;
-  if (!accessToken) return NextResponse.redirect(cloneUrl);
+  if (!accessToken)
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=404&message=not_found_token`,
+    );
 
   const userUrl = "https://kapi.kakao.com/v2/user/me";
   const userData = await (
@@ -45,17 +55,30 @@ export const GET = async (req: NextRequest) => {
       },
     })
   ).json();
-  if (!userData) return NextResponse.redirect(cloneUrl);
+  if (!userData)
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=404&message=not_found_user`,
+    );
 
   const linkingData = {
-    snsId: "1004",
+    linkKind: "1004",
     id: userData.id,
     // Kakao email 정책 변경으로 인해 비즈니스 앱 등록해야 가져올 수 있습니다.
     // domain: userData.response.email,
+    domain: "seungyong00@kakao.com",
   };
 
   // linking API 호출
-  console.log(linkingData);
+  try {
+    const user: AxiosResponse<User> = await axiosInstance.get("/user/me");
+    await axiosInstance.post(`/user/link/${user.data.userId}`, linkingData);
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return NextResponse.redirect(
+        `${cloneUrl}?errorCode=${error.response?.data.errorCode}&message=${error.response?.data.message}`,
+      );
+    }
+  }
 
   return NextResponse.redirect(cloneUrl);
 };

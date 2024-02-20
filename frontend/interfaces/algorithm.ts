@@ -1,12 +1,9 @@
 import { Testcase } from "./testcase";
+import { RequiredUser } from "./user";
 
 export interface Algorithm {
   algorithmId: number;
-  user: {
-    userId: number;
-    profile?: string;
-    nickname: string;
-  };
+  user: RequiredUser;
   title: string;
   level: string;
   algorithmKind: number;
@@ -18,7 +15,7 @@ export interface Algorithm {
   thumbnail?: string;
   kinds: string[];
   testcase: Testcase[];
-  isSave: boolean;
+  isFavorite?: boolean;
   solved?: boolean;
-  solvedRate: number;
+  correctRate: number;
 }

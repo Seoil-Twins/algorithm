@@ -9,9 +9,9 @@ import { notosansRegular } from "@/styles/_font";
 import Navigation from "@/components/common/navigation";
 import Footer from "@/components/common/footer";
 
-import { AuthProvider } from "@/providers/authProvider";
 import { CodeTypeProvider } from "@/providers/codeTypeProvider";
 import ThemeProvider from "@/providers/themeProvider";
+import { AuthProvider } from "@/providers/authProvider";
 
 declare global {
   interface Window {

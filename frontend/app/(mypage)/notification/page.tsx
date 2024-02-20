@@ -4,8 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR from "swr";
 
-import { useAuth } from "@/providers/authProvider";
-
 import {
   ResponseNotification,
   UserKeys,
@@ -14,6 +12,8 @@ import {
 } from "@/api/user";
 
 import styles from "./notification.module.scss";
+
+import { useAuth } from "@/providers/authProvider";
 
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
@@ -70,11 +70,10 @@ const defaultNotifications: NotificationSettings[] = [
 
 const Notification = () => {
   const { user } = useAuth();
-  const {
-    data: notificationsWithAPI,
-    isLoading: notificationLoading,
-    mutate,
-  } = useSWR(UserKeys.getNotification, getNotifications);
+  const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
+    UserKeys.getNotification,
+    getNotifications,
+  );
 
   const [notifications, setNotifications] =
     useState<NotificationSettings[]>(defaultNotifications);

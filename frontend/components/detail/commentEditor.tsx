@@ -7,6 +7,8 @@ import Editor from "../common/editor";
 
 import styles from "./commentEditor.module.scss";
 
+import { IMAGE_URL } from "@/api";
+
 import { useAuth } from "@/providers/authProvider";
 
 type CommentEditorProps = {
@@ -18,7 +20,7 @@ const CommentEditor = ({
   apiUrl,
   isVisibleToolbar = true,
 }: CommentEditorProps) => {
-  const { user } = useAuth()!;
+  const { user } = useAuth();
 
   const [value, setValue] = useState<string>("");
 
@@ -42,7 +44,11 @@ const CommentEditor = ({
       <div className={styles.editorBox}>
         <div className={styles.profileImgBox}>
           <Image
-            src={user.profile ? user.profile : "/svgs/user_profile_default.svg"}
+            src={
+              user.profile
+                ? `${IMAGE_URL}/${user.profile}`
+                : "/svgs/user_profile_default.svg"
+            }
             alt="프로필 사진"
             width={38}
             height={38}

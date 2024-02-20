@@ -54,15 +54,10 @@ const Algorithm = async ({
     keyword: (searchParams?.keyword as string) || undefined,
   };
 
-  const algorithmsReponse = await getAlgorithms(sortOptions);
-  const algorithms = {
-    algorithms: algorithmsReponse.data,
-    total: 1,
-  };
-  console.log(algorithms);
-  const algorithmKinds = await getAlgorithmKinds();
+  const algorithm = (await getAlgorithms(sortOptions)).data;
+  const algorithmKinds = (await getAlgorithmKinds()).data;
 
-  const tableDatas: TableData[] = algorithms.algorithms.map(
+  const tableDatas: TableData[] = algorithm.algorithms.map(
     (algorithm: AlgorithmType) => {
       return {
         datas: [
@@ -81,7 +76,7 @@ const Algorithm = async ({
             Level. {algorithm.level}
           </span>,
           <span>{algorithm.kinds}</span>,
-          <span>{algorithm.solvedRate}%</span>,
+          <span>{algorithm.correctRate}%</span>,
         ],
         link: `/algorithm/${algorithm.algorithmId}`,
       };
@@ -91,7 +86,7 @@ const Algorithm = async ({
   return (
     <>
       <Navigation algorithmKinds={algorithmKinds} />
-      {algorithms.total > 0 ? (
+      {algorithm.total > 0 ? (
         <>
           <Table
             headers={tableHeaders}
@@ -100,7 +95,7 @@ const Algorithm = async ({
           />
           <Pagination
             count={5}
-            total={algorithms.total}
+            total={algorithm.total}
             current={sortOptions.page}
             marginTop={25}
           />

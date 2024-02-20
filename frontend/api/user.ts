@@ -86,6 +86,11 @@ export const compareVerifyCode = async (data: {
   return response;
 };
 
+export const login = async (data: { email: string; userPw: string }) => {
+  const response = await axiosInstance.post("/login", data);
+  return response;
+};
+
 export const signup = async (data: SignupUser) => {
   const response = await axiosInstance.post("/user", data);
   return response;
@@ -103,7 +108,7 @@ export const updateProfileImg = async (
   userId: number | string,
   data: { image: File },
 ) => {
-  const response = await axiosInstance.postForm(
+  const response = await axiosInstance.patchForm(
     `/user/profile/${userId}`,
     data,
   );

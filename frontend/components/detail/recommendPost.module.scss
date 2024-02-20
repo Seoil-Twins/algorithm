@@ -10,7 +10,6 @@
     .count {
       position: relative;
       top: -1px;
-      padding: 0 15px;
     }
 
     .active {
@@ -18,8 +17,6 @@
     }
 
     .btn {
-      padding: 12px;
-
       &:first-child {
         border-right: 1px solid var(--color-border);
       }

@@ -15,9 +15,9 @@ import { usePathname } from "next/navigation";
 import styles from "./navbar.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import AlramType from "@/interfaces/alram";
-
 import { useAuth } from "@/providers/authProvider";
+
+import AlramType from "@/interfaces/alram";
 
 import { fetchAlrams } from "@/api/alram";
 import { IMAGE_URL } from "@/api";
@@ -32,7 +32,7 @@ type NavbarProps = {
 };
 
 const Navbar = ({ menuItems }: NavbarProps) => {
-  const { user, logout, isLoading, isValidating } = useAuth();
+  const { user, isLoading, isValidating, logout } = useAuth();
   const path: string = usePathname();
 
   const alramImgRef = useRef<HTMLButtonElement>(null);
@@ -178,7 +178,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                         ? `${IMAGE_URL}/${user.profile}`
                         : "/svgs/user_profile_default.svg"
                     }
-                    alt="유저 아이콘"
+                    alt="프로필 사진"
                     width={38}
                     height={38}
                   />
@@ -213,7 +213,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                     ? `${IMAGE_URL}/${user.profile}`
                     : "/svgs/user_profile_default.svg"
                 }
-                alt="유저 아이콘"
+                alt="프로필 사진"
                 width={80}
                 height={80}
               />

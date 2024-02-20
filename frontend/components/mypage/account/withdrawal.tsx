@@ -6,9 +6,9 @@ import Link from "next/link";
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { useAuth } from "@/providers/authProvider";
-
 import { deleteUser } from "@/api/user";
+
+import { useAuth } from "@/providers/authProvider";
 
 const Withdrawal = () => {
   const { user, logout } = useAuth();
@@ -29,7 +29,7 @@ const Withdrawal = () => {
       }
 
       // 회원 탈퇴 API
-      await deleteUser(user?.userId);
+      await deleteUser(user.userId);
       logout();
     },
     [user, isCheck, logout],

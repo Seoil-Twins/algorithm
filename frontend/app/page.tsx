@@ -13,10 +13,24 @@ import { Algorithm } from "@/interfaces/algorithm";
 
 import { getRecommendAlgorithms } from "@/api/algorithm/algorithm";
 import { getRecommendPosts } from "@/api/board";
+import Board from "@/interfaces/board";
 
 const Home = async () => {
-  const recommendAlgorithms: Algorithm[] = await getRecommendAlgorithms();
-  const recommendPosts = await getRecommendPosts();
+  let recommendAlgorithms: Algorithm[] = [];
+  let recommendPosts: Board[] = [];
+
+  try {
+    const recommendAlgorithmsResponse = await getRecommendAlgorithms();
+    recommendAlgorithms = recommendAlgorithmsResponse.data;
+  } catch (error) {
+    recommendAlgorithms = [];
+  }
+
+  try {
+    recommendPosts = await getRecommendPosts();
+  } catch (error) {
+    recommendPosts = [];
+  }
 
   return (
     <>
@@ -58,36 +72,47 @@ const Home = async () => {
           height="100%"
         ></iframe>
       </div>
-      <div className={styles.cardTop}>
-        <div className={styles.topBox}>
-          <div className={`${styles.ft24} ${notosansMedium.className}`}>
-            추천 알고리즘
+      {recommendAlgorithms.length > 0 && (
+        <>
+          <div className={styles.cardTop}>
+            <div className={styles.topBox}>
+              <div className={`${styles.ft24} ${notosansMedium.className}`}>
+                추천 알고리즘
+              </div>
+              <Link href="/algorithm" className={notosansMedium.className}>
+                <button className={styles.moreBtn}>더 보기</button>
+              </Link>
+            </div>
           </div>
-          <Link href="/algorithm" className={notosansMedium.className}>
-            <button className={styles.moreBtn}>더 보기</button>
-          </Link>
-        </div>
-      </div>
-      <div className={`${styles.cardBox} ${styles.algorithmCardBox}`}>
-        {recommendAlgorithms.map((algorithm: Algorithm) => (
-          <AlgorithmCard key={algorithm.algorithmId} algorithm={algorithm} />
-        ))}
-      </div>
-      <div className={styles.cardTop}>
-        <div className={styles.topBox}>
-          <div className={`${styles.ft24} ${notosansMedium.className}`}>
-            추천 게시물
+          <div className={`${styles.cardBox} ${styles.algorithmCardBox}`}>
+            {recommendAlgorithms.map((algorithm: Algorithm) => (
+              <AlgorithmCard
+                key={algorithm.algorithmId}
+                algorithm={algorithm}
+              />
+            ))}
           </div>
-          <Link href="/forum" className={notosansMedium.className}>
-            <button className={styles.moreBtn}>더 보기</button>
-          </Link>
-        </div>
-      </div>
-      <div className={`${styles.cardBox} ${styles.postCardBox}`}>
-        {recommendPosts.map((post) => (
-          <PostCard key={post.boardId} post={post} />
-        ))}
-      </div>
+        </>
+      )}
+      {recommendPosts.length > 0 && (
+        <>
+          <div className={styles.cardTop}>
+            <div className={styles.topBox}>
+              <div className={`${styles.ft24} ${notosansMedium.className}`}>
+                추천 게시물
+              </div>
+              <Link href="/forum" className={notosansMedium.className}>
+                <button className={styles.moreBtn}>더 보기</button>
+              </Link>
+            </div>
+          </div>
+          <div className={`${styles.cardBox} ${styles.postCardBox}`}>
+            {recommendPosts.map((post) => (
+              <PostCard key={post.boardId} post={post} />
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 };

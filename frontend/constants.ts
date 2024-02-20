@@ -1,7 +1,9 @@
 export const NO_AUTH_PATHS = ["/login", "/signup"];
 export const AUTH_PATHS = [
   "/account",
-  "/activity",
+  "/activity/*",
   "/notification",
   "/algorithm/[0-9]+/new",
+  "/forum/[0-9]+/update",
+  "/forum/new",
 ];

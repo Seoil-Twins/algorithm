@@ -7,8 +7,7 @@ import Content from "@/components/mypage/content";
 
 import { getUserSolved } from "@/api/user";
 
-import { notosansBold } from "@/styles/_font";
-import styles from "./posts.module.scss";
+import Solved from "@/components/mypage/activity/solved";
 
 const navItems: NavItem[] = [
   {
@@ -41,40 +40,13 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   const response = await getUserSolved();
 
   return (
-    <div className={styles.activity}>
+    <div>
       <Content title="문제">
-        <div className={styles.algorithmCount}>
-          <div className={styles.item}>
-            <div
-              className={`${styles.correct} ${styles.number} ${notosansBold.className}`}
-            >
-              {response.data.solved}
-            </div>
-            <div>맞힌 문제</div>
-          </div>
-          <div className={styles.line}></div>
-          <div className={styles.item}>
-            <div
-              className={`${styles.incorrect} ${styles.number} ${notosansBold.className}`}
-            >
-              {response.data.tried}
-            </div>
-            <div>시도한 문제</div>
-          </div>
-          <div className={styles.line}></div>
-          <div className={styles.item}>
-            <div
-              className={`${styles.bookmark} ${styles.number} ${notosansBold.className}`}
-            >
-              {response.data.favorite}
-            </div>
-            <div>찜한 문제</div>
-          </div>
-        </div>
+        <Solved info={response.data} />
       </Content>
       <Content title="내 활동 내역">
         <SubNavigation items={navItems} />
-        <div className={styles.content}>{children}</div>
+        <div>{children}</div>
       </Content>
     </div>
   );

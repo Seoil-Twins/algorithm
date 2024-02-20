@@ -9,6 +9,10 @@
     align-items: center;
     margin-bottom: 1.25rem;
 
+    .flex {
+      display: flex;
+    }
+
     .profileImg {
       margin-right: 10px;
       border-radius: 100px;

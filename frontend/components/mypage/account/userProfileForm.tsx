@@ -212,13 +212,13 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       }
     },
     [
-      validationProfile,
       profileInfo,
       user.nickname,
       user.email,
       user.userId,
       isVerified,
       mutate,
+      validationProfile,
     ],
   );
 
@@ -235,13 +235,14 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         });
 
         if (response.status === 200) {
+          mutate(UserKeys.getUser);
           setProfileImg(response.data.profile);
         }
       } catch (error) {
         alert("나중에 다시 시도해주세요.");
       }
     },
-    [user],
+    [user, mutate],
   );
 
   const sendVerifyCode = useCallback(async () => {
@@ -376,8 +377,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         ["verifyCode"]: verifyCodeField,
       } = prev;
 
-      console.log(user.nickname);
-
       return {
         ...prev,
         nickname: {
@@ -453,7 +452,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
                   ? `${IMAGE_URL}/${profileImg}`
                   : "/svgs/user_profile_default.svg"
               }
-              alt="유저 프로필 사진"
+              alt="프로필 사진"
               width={96}
               height={96}
               className={styles.profileImg}

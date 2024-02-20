@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./snsAccount.module.scss";
 
-import { Link } from "@/interfaces/link";
+interface Link {
+  linkId: string;
+  linkKind: string;
+  domain: string;
+  createdTime: string;
+}
 
 interface SNSLinking {
   id: string;
@@ -17,13 +22,13 @@ interface SNSLinking {
 }
 
 type SnsAccountProps = {
-  sns: {
-    userId: number;
-    links: Link[];
-  };
+  links: Link[];
 };
 
-const SnsAccount = ({ sns }: SnsAccountProps) => {
+const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
+  const params = useSearchParams();
+  const errorCode = params.get("errorCode");
+
   const router = useRouter();
   const snsId = {
     github: "1001",
@@ -37,25 +42,25 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
       id: snsId.github,
       title: "Github",
       imgSrc: "./svgs/github.svg",
-      disabled: sns.links[0]?.linkKind === snsId.github,
+      disabled: sns.links.some((link) => snsId.github === link.linkKind),
     },
     {
       id: snsId.google,
       title: "Google",
       imgSrc: "./svgs/google.svg",
-      disabled: sns.links[0]?.linkKind === snsId.google,
+      disabled: sns.links.some((link) => snsId.google === link.linkKind),
     },
     {
       id: snsId.naver,
       title: "Naver",
       imgSrc: "./svgs/naver.svg",
-      disabled: sns.links[0]?.linkKind === snsId.naver,
+      disabled: sns.links.some((link) => snsId.naver === link.linkKind),
     },
     {
       id: snsId.kakao,
       title: "Kakako",
       imgSrc: "./svgs/kakao.svg",
-      disabled: sns.links[0]?.linkKind === snsId.kakao,
+      disabled: sns.links.some((link) => snsId.kakao === link.linkKind),
     },
   ]);
 
@@ -171,6 +176,12 @@ const SnsAccount = ({ sns }: SnsAccountProps) => {
     },
     [handleGithub, handleGoogle, handleNaver, handleKakao],
   );
+
+  useEffect(() => {
+    if (errorCode) {
+      alert("나중에 다시 시도해주세요.");
+    }
+  }, [errorCode]);
 
   return (
     <div className={styles.linking}>

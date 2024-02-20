@@ -13,11 +13,11 @@ import { usePathname } from "next/navigation";
 
 import styles from "./sidebar.module.scss";
 
+import { useAuth } from "@/providers/authProvider";
+
 import { MenuItems } from "./navigation";
 
 import AlramType from "@/interfaces/alram";
-
-import { useAuth } from "@/providers/authProvider";
 
 import { fetchAlrams } from "@/api/alram";
 
@@ -30,7 +30,7 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ menuItems }: SidebarProps) => {
-  const { user, isLoading, isValidating, logout } = useAuth()!;
+  const { user, isLoading, isValidating, logout } = useAuth();
   const path = usePathname();
 
   const alramModalRef = useRef<HTMLDivElement>(null);
@@ -90,7 +90,8 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   }, []);
 
   const handleLogout = useCallback(async () => {
-    await logout();
+    // cookie 삭제 api 호출
+    logout();
   }, [logout]);
 
   useEffect(() => {

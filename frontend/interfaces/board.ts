@@ -10,9 +10,9 @@ export default interface Board {
   tags?: string[];
   thumbnail?: string;
   solved?: number | null;
-  favorites: number;
+  recommendCount: number;
   commentCount: number;
-  isFavorite: boolean;
+  isRecommend?: boolean;
   isView: boolean;
   createdTime: string;
 }

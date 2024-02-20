@@ -1,41 +1,73 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { useDebouncedCallback } from "use-debounce";
+import { useRouter } from "next/navigation";
 
 import styles from "./recommendPost.module.scss";
 
+import Modal from "../common/modal";
+
 type RecommendPostProps = {
-  userId?: string;
-  boardId: string | number;
+  apiUrl: string;
+  userId?: string | number;
+  requestId: string | number;
+  isRecommend?: boolean;
   recommendCount: number;
-  isFavorite: boolean;
+  padding?: number;
 };
 
 const RecommendPost = ({
+  apiUrl,
   userId,
-  boardId,
+  requestId,
+  isRecommend,
   recommendCount,
-  isFavorite,
+  padding = 12,
 }: RecommendPostProps) => {
+  const router = useRouter();
+
+  const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
+  const [count, setCount] = useState<number>(recommendCount);
+
+  const handleIsVisibleModal = useCallback(() => {
+    setIsVisibleModal((prev) => !prev);
+  }, []);
+
+  const handleOk = useCallback(() => {
+    setIsVisibleModal(false);
+    router.push("/login");
+  }, [router]);
+
   const handleRecommend = useDebouncedCallback(
     useCallback(
-      (isRecommend: boolean) => {
-        if (isFavorite === isRecommend) {
+      (changeIsRecommend: boolean) => {
+        const changeCount = changeIsRecommend ? count + 1 : count - 1;
+        const isDisableWithUndefined =
+          isRecommend === undefined &&
+          Math.abs(recommendCount - changeCount) >= 2;
+
+        const isDisableWithFalse =
+          isRecommend === false &&
+          (changeCount < recommendCount || changeCount >= recommendCount + 3);
+
+        const isDisableWithTrue =
+          isRecommend === true &&
+          (changeCount > recommendCount || changeCount <= recommendCount - 3);
+
+        if (isDisableWithUndefined || isDisableWithFalse || isDisableWithTrue) {
           return;
         } else if (!userId) {
+          setIsVisibleModal(true);
           return;
         }
 
-        console.log(
-          "Fetch API Favorite : ",
-          String(isRecommend),
-          userId,
-          boardId,
-        );
+        console.log(apiUrl, changeIsRecommend, userId, requestId);
+
+        setCount((prev) => (changeIsRecommend ? prev + 1 : prev - 1));
       },
-      [boardId, isFavorite, userId],
+      [count, recommendCount, userId, isRecommend, apiUrl, requestId],
     ),
     1000,
   );
@@ -43,7 +75,11 @@ const RecommendPost = ({
   return (
     <div className={styles.recommendWrapper}>
       <div className={styles.recommend}>
-        <button className={styles.btn} onClick={() => handleRecommend(false)}>
+        <button
+          className={styles.btn}
+          style={{ padding }}
+          onClick={() => handleRecommend(false)}
+        >
           <Image
             src="/svgs/recommend_down.svg"
             alt="추천 안 함"
@@ -51,10 +87,27 @@ const RecommendPost = ({
             height={10}
           />
         </button>
-        <div className={`${styles.count} ${isFavorite && styles.active}`}>
-          {recommendCount}
+        <div
+          className={`${styles.count} ${
+            isRecommend === true && recommendCount === count && styles.active
+          } ${
+            isRecommend === false &&
+            recommendCount + 2 === count &&
+            styles.active
+          } ${
+            isRecommend === undefined &&
+            recommendCount + 1 === count &&
+            styles.active
+          }`}
+          style={{ padding: `0px ${padding}px` }}
+        >
+          {count}
         </div>
-        <button className={styles.btn} onClick={() => handleRecommend(true)}>
+        <button
+          className={styles.btn}
+          style={{ padding }}
+          onClick={() => handleRecommend(true)}
+        >
           <Image
             src="/svgs/recommend_up.svg"
             alt="추천함"
@@ -63,6 +116,15 @@ const RecommendPost = ({
           />
         </button>
       </div>
+      <Modal
+        isVisible={isVisibleModal}
+        onOk={handleOk}
+        onCancel={handleIsVisibleModal}
+        title="로그인이 필요한 기능입니다"
+        maxWidth={45}
+      >
+        <p>로그인이 필요한 기능입니다. 로그인 하시겠습니까?</p>
+      </Modal>
     </div>
   );
 };

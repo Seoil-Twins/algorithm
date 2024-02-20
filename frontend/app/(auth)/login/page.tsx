@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AxiosError } from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./login.module.scss";
@@ -17,7 +18,8 @@ import {
 } from "@/utils/validation";
 
 import { useAuth } from "@/providers/authProvider";
-import { AxiosError } from "axios";
+
+import { getUser, login as loginAPI } from "@/api/user";
 
 interface LoginProperty {
   email: string;
@@ -34,7 +36,8 @@ type LoginInfo = {
 
 const Login = () => {
   const router = useRouter();
-  const { login } = useAuth()!;
+  const searchParam = useSearchParams();
+  const { login, logout } = useAuth();
 
   const [loginInfo, setLoginInfo] = useState<LoginInfo>({
     email: {
@@ -48,8 +51,12 @@ const Login = () => {
       errMsg: "올바른 비밀번호 형식이 아닙니다.",
     },
   });
-
   const [isFailedLogin, setIsfailedLogin] = useState<boolean>(false);
+
+  const error = useRef<string | undefined>(searchParam.get("error"));
+  const redirectUrl = useRef<string | undefined>(
+    searchParam.get("redirect_url"),
+  );
 
   const handleLoginInfo = useCallback(
     (changedValue: string, name: LoginKeys) => {
@@ -105,12 +112,22 @@ const Login = () => {
 
       // 로그인 API 호출 및 처리 로직
       try {
-        await login({
+        await loginAPI({
           email: loginInfo.email.value,
           userPw: loginInfo.password.value,
         });
+        const userResponse = await getUser();
 
-        window.location.replace("/");
+        if (userResponse.status === 200) {
+          login(userResponse.data);
+
+          router.refresh();
+          if (redirectUrl) {
+            router.replace(redirectUrl.current || "/");
+          } else {
+            router.replace("/");
+          }
+        }
       } catch (error) {
         if (error instanceof AxiosError && error.response?.status === 401) {
           setIsfailedLogin(true);
@@ -119,8 +136,21 @@ const Login = () => {
         }
       }
     },
-    [validation, login, loginInfo.email.value, loginInfo.password.value],
+    [
+      validation,
+      loginInfo.email.value,
+      loginInfo.password.value,
+      login,
+      router,
+    ],
   );
+
+  useEffect(() => {
+    if (error.current === "unauthorized") {
+      logout();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <form className={styles.formBox} onSubmit={handleClickLogin}>

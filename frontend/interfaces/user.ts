@@ -1,10 +1,7 @@
 export interface User {
   userId: number;
   email: string;
-  emailVerified: boolean;
   nickname: string;
-  birthday: string;
-  phone: string;
   anno_nofi: boolean;
   post_nofi: boolean;
   comment_nofi: boolean;

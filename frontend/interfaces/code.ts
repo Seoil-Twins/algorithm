@@ -5,6 +5,6 @@ export default interface Code {
   code: string;
   type: number;
   solved: boolean;
-  recommend: number;
+  recommendCount: number;
   createdTime: string;
 }

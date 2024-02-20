@@ -4,6 +4,8 @@ import Link from "next/link";
 
 import AlramType from "@/interfaces/alram";
 
+import { IMAGE_URL } from "@/api";
+
 import { notosansMedium } from "@/styles/_font";
 import styles from "./alram.module.scss";
 
@@ -25,21 +27,17 @@ const Alram = forwardRef<HTMLDivElement, AlramProps>(
                   <Link href={`/forum/${alram.board.boardId}`} key={idx}>
                     <div className={styles.item}>
                       <div>
-                        {alram.otherUser.profile ? (
-                          <Image
-                            src={alram.otherUser.profile}
-                            alt="다른 사용자 이미지"
-                            width={28}
-                            height={28}
-                          />
-                        ) : (
-                          <Image
-                            src="/svgs/user_profile_default.svg"
-                            alt="기본 사용자 이미지"
-                            width={28}
-                            height={28}
-                          />
-                        )}
+                        <Image
+                          src={
+                            alram.otherUser.profile
+                              ? `${IMAGE_URL}/${alram.otherUser.profile}`
+                              : "/svgs/user_profile_default.svg"
+                          }
+                          alt="프로필 사진"
+                          width={28}
+                          height={28}
+                          className={styles.profileImg}
+                        />
                       </div>
                       <div>{alram.otherUser.nickname}</div>
                       <div>{alram.createdTime}</div>

@@ -29,7 +29,8 @@ export const getComments = async (
         },
         content:
           "제가 생각하기에는 저는 하이 제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이",
-        recommend: 0,
+        recommendCount: 1,
+        isRecommend: true,
         createdTime: "2023-12-25 12:25:25",
       },
       {
@@ -40,7 +41,19 @@ export const getComments = async (
           nickname: "황야의고라니",
         },
         content: "제가 생각하기에는 저는 똥이 마려워용!!~",
-        recommend: 0,
+        recommendCount: -1,
+        isRecommend: false,
+        createdTime: "2023-12-25 12:25:25",
+      },
+      {
+        commentId: 1325,
+        boardId: 3,
+        user: {
+          userId: 9,
+          nickname: "테스트임234",
+        },
+        content: "제가 생각하기에는 저는 똥이 마려워용!!~",
+        recommendCount: 0,
         createdTime: "2023-12-25 12:25:25",
       },
     ],
