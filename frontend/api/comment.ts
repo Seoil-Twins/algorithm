@@ -1,4 +1,4 @@
-import Comment from "@/interfaces/comment";
+import Comment from "@/types/comment";
 
 export interface ResponseComment {
   comments: Comment[];

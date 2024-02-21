@@ -1,6 +1,6 @@
 import styles from "./detail.module.scss";
 
-import { getAlgorithm } from "@/api/algorithm/algorithm";
+import { getAlgorithm } from "@/api/algorithm";
 
 import Navbar from "@/components/algorithm/detail/navbar";
 import Contents from "@/components/algorithm/detail/contents";
@@ -11,8 +11,7 @@ type PageParams = {
 
 const Detail = async ({ params }: { params: PageParams }) => {
   const algorithmId = params.algorithmId;
-  const algorithmResponse = await getAlgorithm(algorithmId);
-  const algorithm = await algorithmResponse.data;
+  const algorithm = (await getAlgorithm(algorithmId)).data;
 
   return (
     <div className={styles.algorithmDetail}>

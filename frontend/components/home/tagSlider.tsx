@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import styles from "./tagSlider.module.scss";
 
 type PropsType = {
-  tags: string[];
+  tags: string[] | string;
 };
 
 const TagSlider = ({ tags }: PropsType) => {
@@ -161,11 +161,12 @@ const TagSlider = ({ tags }: PropsType) => {
   return (
     <div className={styles.tagBox}>
       <div className={styles.moveBox} ref={moveBoxRef}>
-        {tags.map((tag: string, idx: number) => (
+        <div className={styles.tag}># {tags}</div>
+        {/* {tags.map((tag: string, idx: number) => (
           <div className={styles.tag} key={idx}>
             # {tag}
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );

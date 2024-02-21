@@ -9,25 +9,24 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 import AlgorithmCard from "@/components/home/algorithmCard";
 import PostCard from "@/components/home/postCard";
 
-import { Algorithm } from "@/interfaces/algorithm";
+import { Algorithm } from "@/types/algorithm";
+import { Board } from "@/types/board";
 
-import { getRecommendAlgorithms } from "@/api/algorithm/algorithm";
+import { getRecommendAlgorithms } from "@/api/algorithm";
 import { getRecommendPosts } from "@/api/board";
-import Board from "@/interfaces/board";
 
 const Home = async () => {
   let recommendAlgorithms: Algorithm[] = [];
   let recommendPosts: Board[] = [];
 
   try {
-    const recommendAlgorithmsResponse = await getRecommendAlgorithms();
-    recommendAlgorithms = recommendAlgorithmsResponse.data;
+    recommendAlgorithms = (await getRecommendAlgorithms()).data.algorithms;
   } catch (error) {
     recommendAlgorithms = [];
   }
 
   try {
-    recommendPosts = await getRecommendPosts();
+    recommendPosts = (await getRecommendPosts()).data.contents;
   } catch (error) {
     recommendPosts = [];
   }

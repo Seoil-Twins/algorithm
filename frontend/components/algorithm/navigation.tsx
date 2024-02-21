@@ -11,7 +11,7 @@ import Dropdown, { DropdownItem } from "../common/dropdown";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { AlgorithmKind } from "@/api/algorithm/algorithm";
+import { AlgorithmKind } from "@/api/algorithm";
 
 type NavigationProps = {
   algorithmKinds: AlgorithmKind[];

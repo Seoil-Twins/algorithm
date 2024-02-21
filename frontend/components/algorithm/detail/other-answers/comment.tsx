@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import CommentType from "@/interfaces/comment";
+import CommentType from "@/types/comment";
 
 import { IMAGE_URL } from "@/api";
 import { deleteComment } from "@/api/comment";

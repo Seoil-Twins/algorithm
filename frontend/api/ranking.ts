@@ -1,4 +1,4 @@
-import Ranking from "@/interfaces/ranking";
+import Ranking from "@/types/ranking";
 
 export interface ResponseRanking {
   rankings: Ranking[];

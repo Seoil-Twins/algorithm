@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Board from "@/interfaces/board";
-import { User } from "@/interfaces/user";
+import Board from "@/types/board";
+import { User } from "@/types/user";
 
 import { getBoardDetail } from "@/api/board";
 import { ResponseComment, getComments } from "@/api/comment";

@@ -8,7 +8,7 @@ import { useSWRConfig } from "swr";
 import { notosansBold } from "@/styles/_font";
 import styles from "./userProfileForm.module.scss";
 
-import { User } from "@/interfaces/user";
+import { User } from "@/types/user";
 
 import {
   updateProfileImg,

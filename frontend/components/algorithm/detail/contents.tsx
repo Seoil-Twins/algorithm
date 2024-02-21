@@ -5,13 +5,15 @@ import { Extension, ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { cpp } from "@codemirror/lang-cpp";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
-import DOMPurify from "isomorphic-dompurify";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { Resizable } from "re-resizable";
 import dynamic from "next/dynamic";
 
-import { Algorithm } from "@/interfaces/algorithm";
+import { Algorithm } from "@/types/algorithm";
+import { CodeOptions } from "@/types/code";
+
+import { sendCode } from "@/api/code";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
@@ -19,6 +21,7 @@ import styles from "./contents.module.scss";
 import {
   CodeType,
   findMyTitle,
+  getCodeValue,
   useCodeType,
 } from "@/providers/codeTypeProvider";
 
@@ -51,7 +54,7 @@ const defaultCode = (type?: CodeType) => {
   if (type === "c") {
     return `int main() {\n${"  "}\n${"  "}return 0;\n}`;
   } else if (type === "j") {
-    return `public class Solution {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
+    return `public class Main {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
   }
 
   return "";
@@ -96,9 +99,20 @@ const Contents = ({ algorithm }: DetailProps) => {
     setIsVisibleResetModal((prev) => !prev);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    console.log(code);
-  }, [code]);
+  const handleSubmit = useCallback(async () => {
+    try {
+      const options: CodeOptions = {
+        algorithmId: algorithm.algorithmId,
+        code,
+        type: getCodeValue(type),
+      };
+
+      const response = await sendCode(options);
+      console.log(response);
+    } catch (error) {
+      alert("에러가 발생하였습니다. 나중에 다시 시도해주세요.");
+    }
+  }, [algorithm.algorithmId, code, type]);
 
   useEffect(() => {
     const initalCode = defaultCode(type);

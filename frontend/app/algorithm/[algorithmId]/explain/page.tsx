@@ -1,10 +1,10 @@
-import { getAlgorithm, getExplain } from "@/api/algorithm/algorithm";
+import { getAlgorithm, getExplain } from "@/api/algorithm";
 
 import styles from "./explain.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import EditorViewer from "@/components/common/editorViewer";
-import Explanation from "@/interfaces/explanation";
+import Explanation from "@/types/explanation";
 import { AxiosError } from "axios";
 import NotFound from "@/components/common/notFound";
 

@@ -8,10 +8,23 @@ import {
   useEffect,
 } from "react";
 
-import { KindOptions } from "@/api/algorithm/algorithm";
+import { KindOptions } from "@/types/algorithm";
 
 export type CodeType = Exclude<KindOptions, "a">;
 export const CODE_TYPE_OPTIONS_ARRAY: CodeType[] = ["c", "p", "j"];
+
+export const getCodeValue = (code: CodeType) => {
+  switch (code) {
+    case "c":
+      return 3001;
+    case "p":
+      return 3002;
+    case "j":
+      return 3003;
+    default:
+      return 3001;
+  }
+};
 
 type CodeTypeProviderContext = {
   type: CodeType;

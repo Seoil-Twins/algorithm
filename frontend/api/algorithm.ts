@@ -1,12 +1,17 @@
-import { Algorithm } from "@/interfaces/algorithm";
-import Explanation from "@/interfaces/explanation";
-import { axiosInstance } from "..";
 import { AxiosResponse } from "axios";
 
-export type SolvedOptions = "a" | "s" | "ns";
-export type SortOptions = "r" | "or" | "t";
-export type KindOptions = "a" | "c" | "p" | "j";
-export type RateOptions = "h" | "l";
+import { axiosInstance } from ".";
+import {
+  Algorithm,
+  AlgorithmKind,
+  AlgorithmOptions,
+  AlgorithmResponse,
+  KindOptions,
+  RateOptions,
+  SolvedOptions,
+  SortOptions,
+} from "@/types/algorithm";
+import Explanation from "@/types/explanation";
 
 export const SOLVED_OPTIONS_ARRAY: SolvedOptions[] = ["a", "s", "ns"];
 export const SORT_OPTIONS_ARRAY: SortOptions[] = ["r", "or", "t"];
@@ -20,23 +25,6 @@ export const checkMyType = (
   return compareArray.includes(value as never);
 };
 
-export interface AlgorithmOptions {
-  count: number;
-  page: number;
-  solved: SolvedOptions;
-  sort: SortOptions;
-  level: number;
-  kind: KindOptions;
-  rate?: RateOptions;
-  tag?: number;
-  keyword?: string;
-}
-
-export interface AlgorithmKind {
-  kindId: string;
-  kindName: string;
-}
-
 export const getAlgorithmKinds = async (): Promise<
   AxiosResponse<AlgorithmKind[]>
 > => {
@@ -44,14 +32,10 @@ export const getAlgorithmKinds = async (): Promise<
   return response;
 };
 
-export interface AlgorithmResponse {
-  algorithms: Algorithm[];
-  total: number;
-}
-
 export const getAlgorithms = async (
   options: AlgorithmOptions,
 ): Promise<AxiosResponse<AlgorithmResponse>> => {
+  console.log(options);
   const response = await axiosInstance.get<AlgorithmResponse>("/algorithm", {
     params: options,
   });
@@ -67,9 +51,9 @@ export const getAlgorithm = async (
 };
 
 export const getRecommendAlgorithms = async (): Promise<
-  AxiosResponse<Algorithm[]>
+  AxiosResponse<AlgorithmResponse>
 > => {
-  const response = await axiosInstance.get("/algorithm/recommended");
+  const response = await axiosInstance.get("/algorithm/recommend");
   return response;
 };
 

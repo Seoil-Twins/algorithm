@@ -1,6 +1,6 @@
 import { RequiredUser } from "./user";
 
-export default interface Board {
+export type Board = {
   boardId: number;
   boardType: number;
   user: RequiredUser;
@@ -15,4 +15,16 @@ export default interface Board {
   isRecommend?: boolean;
   isView: boolean;
   createdTime: string;
-}
+};
+
+export type BoardResponse = {
+  contents: Board[];
+  total: number;
+};
+
+export type PageOptions = {
+  count: number;
+  page: number;
+  kind: 1 | 2 | 5;
+  keyword?: string;
+};

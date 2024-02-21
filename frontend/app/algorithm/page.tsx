@@ -2,27 +2,29 @@
 import Image from "next/image";
 
 import {
-  AlgorithmOptions,
-  KIND_OPTIONS_ARRAY,
-  KindOptions,
-  RATE_OPTIONS_ARRAY,
-  RateOptions,
-  SOLVED_OPTIONS_ARRAY,
-  SORT_OPTIONS_ARRAY,
-  SolvedOptions,
-  SortOptions,
   checkMyType,
   getAlgorithmKinds,
   getAlgorithms,
-} from "@/api/algorithm/algorithm";
+  KIND_OPTIONS_ARRAY,
+  RATE_OPTIONS_ARRAY,
+  SOLVED_OPTIONS_ARRAY,
+  SORT_OPTIONS_ARRAY,
+} from "@/api/algorithm";
+import {
+  AlgorithmOptions,
+  Algorithm as AlgorithmType,
+  KindOptions,
+  RateOptions,
+  SolvedOptions,
+  SortOptions,
+} from "@/types/algorithm";
+
 import Navigation from "@/components/algorithm/navigation";
 import Table, { TableData } from "@/components/algorithm/table";
 import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
 
 import { notosansBold } from "@/styles/_font";
-
-import { Algorithm as AlgorithmType } from "@/interfaces/algorithm";
 
 const tableHeaders = ["상태", "제목", "난이도", "분류", "정답률"];
 
@@ -43,16 +45,19 @@ const Algorithm = async ({
     sort: checkMyType(SORT_OPTIONS_ARRAY, searchParams?.sort as SortOptions)
       ? (searchParams?.sort as SortOptions)
       : "r",
-    level: Number(searchParams?.level) || 0,
     kind: checkMyType(KIND_OPTIONS_ARRAY, searchParams?.kind as KindOptions)
       ? (searchParams?.kind as KindOptions)
       : "a",
     rate: checkMyType(RATE_OPTIONS_ARRAY, searchParams?.rate as RateOptions)
       ? (searchParams?.rate as RateOptions)
       : undefined,
+    level: isNaN(Number(searchParams?.level))
+      ? -1
+      : Number(searchParams?.level),
     tag: Number(searchParams?.tag) || undefined,
     keyword: (searchParams?.keyword as string) || undefined,
   };
+  console.log();
 
   const algorithm = (await getAlgorithms(sortOptions)).data;
   const algorithmKinds = (await getAlgorithmKinds()).data;

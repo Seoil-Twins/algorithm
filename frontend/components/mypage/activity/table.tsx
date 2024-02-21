@@ -5,13 +5,13 @@ import Image from "next/image";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
-import { BoardType } from "@/interfaces/boardType";
+import { BoardType } from "@/types/boardType";
 
 import { getTimeAgo } from "@/utils/day";
 
 import ThemeImage from "@/components/common/themeImage";
 
-import Board from "@/interfaces/board";
+import Board from "@/types/board";
 import NotFound from "@/components/common/notFound";
 
 type TableProps = {

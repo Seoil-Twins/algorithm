@@ -9,7 +9,7 @@ import styles from "./comment.module.scss";
 
 import { useAuth } from "@/providers/authProvider";
 
-import CommentType from "@/interfaces/comment";
+import CommentType from "@/types/comment";
 
 import { IMAGE_URL } from "@/api";
 import { deleteComment, modifyCommentSolved } from "@/api/comment";

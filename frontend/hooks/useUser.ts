@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import { User } from "@/interfaces/user";
+import { User } from "@/types/user";
 
 import { UserKeys, getUser } from "@/api/user";
 
@@ -19,7 +19,7 @@ export const useUser = () => {
       }
     },
     {
-      revalidateOnFocus: false,
+      revalidateOnFocus: true,
       shouldRetryOnError: false,
       refreshInterval: 30 * 60 * 1000,
     },
