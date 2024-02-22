@@ -24,7 +24,7 @@ const Explain = async ({ params }: { params: ExplainProps }) => {
     const explainResponse = await getExplain(params.algorithmId);
     explain.content = explainResponse.data.content;
   } catch (error) {
-    if (error instanceof AxiosError && error.response?.data.status === 404) {
+    if (error instanceof AxiosError && error.response?.status === 404) {
       return (
         <NotFound
           title="아직 해설이 만들어지지 않았습니다."

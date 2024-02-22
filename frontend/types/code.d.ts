@@ -22,7 +22,7 @@ export type AnswerResponse = {
 };
 
 export type PageOptions = {
-  language: string;
+  language: number;
   count: number;
   page: number;
 };

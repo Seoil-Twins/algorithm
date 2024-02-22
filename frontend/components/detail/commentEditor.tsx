@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 import Editor from "../common/editor";
@@ -8,34 +8,52 @@ import Editor from "../common/editor";
 import styles from "./commentEditor.module.scss";
 
 import { IMAGE_URL } from "@/api";
+import { postComment } from "@/api/comment";
 
 import { useAuth } from "@/providers/authProvider";
+import { useParams, useRouter } from "next/navigation";
 
 type CommentEditorProps = {
-  apiUrl: string;
+  apiUrl?: string;
   isVisibleToolbar?: boolean;
 };
 
-const CommentEditor = ({
-  apiUrl,
-  isVisibleToolbar = true,
-}: CommentEditorProps) => {
+const CommentEditor = ({ isVisibleToolbar = true }: CommentEditorProps) => {
+  const param = useParams();
+  const router = useRouter();
   const { user } = useAuth();
+  const boardId = Array.isArray(param.boardId)
+    ? param.boardId[0]
+    : param.boardId;
 
   const [value, setValue] = useState<string>("");
+  const [init, setInit] = useState<boolean>(false);
 
   const handleChange = useCallback((newVal: string) => {
     setValue(newVal);
   }, []);
 
   const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (value.trim() === "") return;
 
-      console.log(apiUrl, value);
+      try {
+        await postComment(boardId, value);
+        setInit(true);
+        router.refresh();
+      } catch (error) {
+        alert("댓글 작성에 실패했습니다.");
+      }
     },
-    [apiUrl, value],
+    [boardId, router, value],
   );
+
+  useEffect(() => {
+    if (init) {
+      setInit(false);
+    }
+  }, [init]);
 
   if (!user) return null;
 
@@ -61,6 +79,7 @@ const CommentEditor = ({
           placeholder="Markdown을 지원하는 댓글창입니다."
           className={styles.editor}
           isVisibleToolbar={isVisibleToolbar}
+          init={init}
         />
       </div>
       <div className={styles.btnBox}>

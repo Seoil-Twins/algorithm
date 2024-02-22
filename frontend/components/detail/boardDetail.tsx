@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Board from "@/types/board";
+import { Board } from "@/types/board";
 import { User } from "@/types/user";
 
 import { getBoardDetail } from "@/api/board";
-import { ResponseComment, getComments } from "@/api/comment";
 import { getUser } from "@/api/user";
+import { getComments } from "@/api/comment";
 
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
@@ -17,6 +17,7 @@ import RecommendPost from "./recommendPost";
 import CommentEditor from "./commentEditor";
 import Comment from "./comment";
 import Pagination from "../common/pagination";
+import { IMAGE_URL } from "@/api";
 
 type BoardDetailProps = {
   boardId: number;
@@ -36,11 +37,11 @@ const BoardDetail = async ({
     user = undefined;
   }
 
-  const board: Board = await getBoardDetail(boardId);
+  const board: Board = (await getBoardDetail(boardId)).data;
 
   const count = Number(searchParams?.count) || 10;
   const page = Number(searchParams?.page) || 1;
-  const comments: ResponseComment = await getComments(boardId, { count, page });
+  const comments = (await getComments(boardId, { count, page })).data;
 
   return (
     <div>
@@ -54,8 +55,8 @@ const BoardDetail = async ({
             <Image
               src={
                 board.user.profile
-                  ? board.user.profile
-                  : "user_profile_default.svg"
+                  ? `${IMAGE_URL}/${board.user.profile}`
+                  : "/svgs/user_profile_default.svg"
               }
               alt="프로필 사진"
               width={38}
@@ -84,11 +85,11 @@ const BoardDetail = async ({
         <EditorViewer className={styles.content} content={board.content} />
         <div className={styles.bottom}>
           <div className={styles.tagBox}>
-            {board.tags?.map((tag, idx) => (
+            {/* {board.tags?.map((tag, idx) => (
               <div key={idx} className={styles.tag}>
                 # {tag}
               </div>
-            ))}
+            ))} */}
           </div>
           <RecommendPost
             apiUrl={`/board/favorite/${board.boardId}`}
@@ -99,8 +100,8 @@ const BoardDetail = async ({
           />
         </div>
         <hr className={styles.line} />
-        <div className={styles.commentTotal}>{comments.total}개의 답변</div>
-        {user && <CommentEditor apiUrl={`/board/comment/${boardId}`} />}
+        <div className={styles.commentTotal}>{board.commentCount}개의 답변</div>
+        {user && <CommentEditor />}
         {comments.total > 0 && (
           <div className={styles.commentBox}>
             {comments.comments.map((comment) => (
@@ -109,7 +110,7 @@ const BoardDetail = async ({
                 comment={comment}
                 userId={board.user.userId}
                 boardTypeId={board.boardType}
-                solved={board.solved}
+                solved={Number(board.solved)}
               />
             ))}
             <Pagination

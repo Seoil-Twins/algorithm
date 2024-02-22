@@ -5,12 +5,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { DropdownItem } from "@/components/common/dropdown";
-import { getBoardDetail } from "@/api/board";
-import BoardForm, {
-  BOARD_TYPE,
-  BOARD_TYPE_VALUE,
-  RequestBoard,
-} from "@/components/common/boardForm";
+import { getBoardDetail, patchBoard } from "@/api/board";
+
+import BoardForm, { BOARD_TYPE } from "@/components/common/boardForm";
+
+import { BOARD_TYPE_VALUE, RequestBoard } from "@/types/board";
 
 type UpdateParams = {
   boardId: number;
@@ -50,7 +49,7 @@ const Update = ({ params }: { params: UpdateParams }) => {
   });
 
   const fetchBoardDetail = useCallback(async () => {
-    const board = await getBoardDetail(boardId);
+    const board = (await getBoardDetail(boardId)).data;
     const newItem: RequestBoard = {
       boardType: board.boardType as BOARD_TYPE_VALUE,
       title: board.title,
@@ -64,11 +63,12 @@ const Update = ({ params }: { params: UpdateParams }) => {
     setRequest(request);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    console.log(request);
+  const handleSubmit = useCallback(async () => {
+    await patchBoard(boardId, request);
+
     router.refresh();
     router.back();
-  }, [request, router]);
+  }, [boardId, request, router]);
 
   useEffect(() => {
     fetchBoardDetail();

@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import styles from "./boardForm.module.scss";
 import { notosansMedium } from "@/styles/_font";
-import { useRouter } from "next/navigation";
 
 import Dropdown, { DropdownItem } from "@/components/common/dropdown";
 import Input from "@/components/common/input";
 import Editor from "@/components/common/editor";
 
-export type BOARD_TYPE_VALUE = 1 | 2 | 3 | 4;
+import { RequestBoard } from "@/types/board";
 
 export const BOARD_TYPE = {
   PUBLIC_QUESTION: 1,
@@ -18,12 +18,6 @@ export const BOARD_TYPE = {
   ALGORITHM_QUESTION: 3,
   ALGORITHM_FEEDBACK: 4,
 } as const;
-
-export type RequestBoard = {
-  title: string;
-  content: string;
-  boardType: BOARD_TYPE_VALUE;
-};
 
 type BoardFormProps = {
   request: RequestBoard;

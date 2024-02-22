@@ -3,11 +3,10 @@
 import React from "react";
 import Image from "next/image";
 
-import {
-  BoardOptions,
-  ResponseBoard,
-  getAlgorithmBoards,
-} from "@/api/algorithm/board/board";
+import { AlgorithmPageOptions } from "@/types/algorithm";
+import { Board } from "@/types/board";
+
+import { getAlgorithmBoards } from "@/api/board";
 import { getBoardTypes } from "@/api/board";
 
 import Table, { TableData } from "@/components/algorithm/table";
@@ -32,8 +31,8 @@ const Content = async ({
   type: ContentProps["type"];
   algorithmId: ContentProps["algorithmId"];
 }) => {
-  const sortOptions: BoardOptions = {
-    count: Number(searchParams?.count) || 20,
+  const sortOptions: AlgorithmPageOptions = {
+    count: Number(searchParams?.count) || 10,
     page: Number(searchParams?.page) || 1,
     kind: type,
     keyword: (searchParams?.keyword as string) || undefined,
@@ -41,35 +40,34 @@ const Content = async ({
 
   const current = sortOptions.page;
   const boardType = await getBoardTypes();
-  const boards = await getAlgorithmBoards(algorithmId!, sortOptions);
+  const boards = (await getAlgorithmBoards(algorithmId!, sortOptions)).data;
+  console.log(boards);
 
-  const tableDatas: TableData[] = boards.contents.map(
-    (board: ResponseBoard) => {
-      return {
-        datas: [
-          <Image
-            src={`${
-              board.solved ? "/svgs/valid_check.svg" : "/svgs/invalid_check.svg"
-            }`}
-            alt="정답 여부 아이콘"
-            width={24}
-            height={24}
-          />,
-          <span>{board.title}</span>,
-          <span>{board.user.nickname}</span>,
-          <span>
-            {
-              boardType
-                .find((type) => type.boardTypeId === board.boardType)
-                ?.title.split(" ")[1]
-            }
-          </span>,
-          <span>{getTimeAgo(board.createdTime)}</span>,
-        ],
-        link: `/forum/${board.boardId}`,
-      };
-    },
-  );
+  const tableDatas: TableData[] = boards.contents.map((board: Board) => {
+    return {
+      datas: [
+        <Image
+          src={`${
+            board.solved ? "/svgs/valid_check.svg" : "/svgs/invalid_check.svg"
+          }`}
+          alt="정답 여부 아이콘"
+          width={24}
+          height={24}
+        />,
+        <span>{board.title}</span>,
+        <span>{board.user.nickname}</span>,
+        <span>
+          {
+            boardType
+              .find((type) => type.boardTypeId === board.boardType)
+              ?.title.split(" ")[1]
+          }
+        </span>,
+        <span>{getTimeAgo(board.createdTime)}</span>,
+      ],
+      link: `/forum/${board.boardId}`,
+    };
+  });
 
   if (boards.total <= 0)
     return (

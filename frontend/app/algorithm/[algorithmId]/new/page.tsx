@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 import { useRouter } from "next/navigation";
 
@@ -9,6 +10,10 @@ import BoardForm, {
   BOARD_TYPE,
   RequestBoard,
 } from "@/components/common/boardForm";
+
+import { AlgorithmPostData } from "@/types/algorithm";
+
+import { postAlgorithmBoard } from "@/api/board";
 
 type NewParams = {
   algorithmId: number;
@@ -39,10 +44,24 @@ const New = ({ params }: { params: NewParams }) => {
     setRequest(request);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    console.log(request);
-    router.push(`/algorithm/${algorithmId}/all`);
-  }, [algorithmId, request, router]);
+  const handleSubmit = useDebouncedCallback(
+    useCallback(async () => {
+      try {
+        const data: AlgorithmPostData = {
+          algorithmId: algorithmId,
+          boardType: request.boardType,
+          title: request.title,
+          content: request.content,
+        };
+
+        await postAlgorithmBoard(data);
+      } catch (error) {
+        alert("게시글 작성에 실패했습니다.");
+      }
+      router.push(`/algorithm/${algorithmId}/all`);
+    }, [algorithmId, request, router]),
+    500,
+  );
 
   return (
     <BoardForm

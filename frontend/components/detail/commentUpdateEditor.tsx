@@ -7,12 +7,14 @@ import Editor from "../common/editor";
 import styles from "./commentUpdateEditor.module.scss";
 
 type CommentUpdateEditorProps = {
+  init: boolean;
   initialValue: string;
   isVisibleToolbar?: boolean;
   onSubmit: (value: string) => void;
 };
 
 const CommentUpdateEditor = ({
+  init = false,
   initialValue,
   isVisibleToolbar = true,
   onSubmit,
@@ -41,6 +43,7 @@ const CommentUpdateEditor = ({
           placeholder="Markdown을 지원하는 댓글창입니다."
           className={styles.editor}
           isVisibleToolbar={isVisibleToolbar}
+          init={init}
         />
       </div>
       <div className={styles.btnBox}>

@@ -330,7 +330,7 @@ const Contents = ({ algorithm }: DetailProps) => {
         <Link
           href={`/algorithm/${
             algorithm.algorithmId
-          }/other-answers?language=${findMyTitle(type)}`}
+          }/other-answers?language=${getCodeValue(type)}`}
         >
           <button className={styles.btn}>다른 사람 풀이 보기</button>
         </Link>

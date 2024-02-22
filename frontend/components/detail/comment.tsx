@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import styles from "./comment.module.scss";
 
 import { useAuth } from "@/providers/authProvider";
 
-import CommentType from "@/types/comment";
+import { Comment as CommentType } from "@/types/comment";
 
 import { IMAGE_URL } from "@/api";
-import { deleteComment, modifyCommentSolved } from "@/api/comment";
+import { deleteComment, patchComment, postSolvedComment } from "@/api/comment";
 
 import EditorViewer from "../common/editorViewer";
 import CommentUpdateEditor from "./commentUpdateEditor";
@@ -27,17 +27,16 @@ type CommentProps = {
 };
 
 const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
+  const param = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const boardId = Array.isArray(param.boardId)
+    ? param.boardId[0]
+    : param.boardId;
 
+  const [init, setInit] = useState<boolean>(false);
   const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
   const [isVisibleEditor, setIsVisibleEditor] = useState<boolean>(false);
-
-  const handleSolved = useCallback(async () => {
-    // call api
-    await modifyCommentSolved(comment.commentId);
-    router.refresh();
-  }, [comment.commentId, router]);
 
   const handleIsVisibleCommentEditor = useCallback(() => {
     setIsVisibleEditor((prev) => !prev);
@@ -47,17 +46,30 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
     setIsVisibleModal((prev) => !prev);
   }, []);
 
+  const handleSolved = useCallback(async () => {
+    await postSolvedComment(boardId, comment.commentId);
+    router.refresh();
+  }, [boardId, router, comment.commentId]);
+
   const handleCommentDelete = useCallback(async () => {
-    await deleteComment(comment.commentId);
+    try {
+      await deleteComment(comment.commentId);
+    } catch (error) {
+      alert("댓글 삭제에 실패했습니다.");
+    }
     router.refresh();
     setIsVisibleModal(false);
   }, [comment.commentId, router]);
 
   const handleCommentUpdate = useCallback(
-    (value: string) => {
-      console.log(value, comment.commentId);
-      router.refresh();
-      setIsVisibleEditor(false);
+    async (value: string) => {
+      try {
+        await patchComment(comment.commentId, value);
+        router.refresh();
+        setIsVisibleEditor(false);
+      } catch (error) {
+        alert("댓글 수정에 실패했습니다.");
+      }
     },
     [comment.commentId, router],
   );
@@ -84,15 +96,24 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
     return null;
   };
 
+  useEffect(() => {
+    if (init) {
+      setInit(false);
+    }
+  }, [init]);
+
+  useEffect(() => {
+    if (!isVisibleEditor) {
+      setInit(true);
+    }
+  }, [isVisibleEditor]);
+
   return (
     <div className={styles.comment}>
       <div className={styles.contentBox}>
         <div className={styles.top}>
           <div className={styles.user}>
-            <Link
-              href={`/user/${comment.user.userId}/question`}
-              className={styles.flex}
-            >
+            <Link href={`/user/${comment.user.userId}/question`}>
               <Image
                 src={
                   comment.user.profile
@@ -104,32 +125,36 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
                 height={38}
                 className={styles.profileImg}
               />
-              <div className={styles.info}>
+            </Link>
+            <div className={styles.info}>
+              <Link href={`/user/${comment.user.userId}/question`}>
                 <div>{comment.user.nickname}</div>
-                <div className={styles.fs14}>
+              </Link>
+              <div className={styles.fs14}>
+                <Link href={`/user/${comment.user.userId}/question`}>
                   <span className={styles.createdTime}>
                     {comment.createdTime}
                   </span>
-                  {comment.user.userId === user?.userId && (
-                    <>
-                      <button
-                        className={styles.blue}
-                        onClick={handleIsVisibleCommentEditor}
-                      >
-                        수정
-                      </button>{" "}
-                      ·{" "}
-                      <button
-                        className={styles.red}
-                        onClick={handleISVisibleModal}
-                      >
-                        삭제
-                      </button>
-                    </>
-                  )}
-                </div>
+                </Link>
+                {comment.user.userId === user?.userId && (
+                  <>
+                    <button
+                      className={styles.blue}
+                      onClick={handleIsVisibleCommentEditor}
+                    >
+                      수정
+                    </button>{" "}
+                    ·{" "}
+                    <button
+                      className={styles.red}
+                      onClick={handleISVisibleModal}
+                    >
+                      삭제
+                    </button>
+                  </>
+                )}
               </div>
-            </Link>
+            </div>
           </div>
           <div className={styles.recommend}>
             <div className={styles.solved}>{renderCheckMark()}</div>
@@ -137,7 +162,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
               <RecommendPost
                 apiUrl={`/comment/favorite/${comment.commentId}`}
                 isRecommend={comment.isRecommend}
-                recommendCount={comment.recommendCount}
+                recommendCount={Number(comment.recommend)}
                 userId={user?.userId}
                 requestId={comment.commentId}
                 padding={10}
@@ -147,6 +172,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
         </div>
         {isVisibleEditor ? (
           <CommentUpdateEditor
+            init={init}
             initialValue={comment.content}
             onSubmit={handleCommentUpdate}
           />

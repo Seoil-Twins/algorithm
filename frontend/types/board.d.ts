@@ -1,4 +1,5 @@
 import { RequiredUser } from "./user";
+import { Comment } from "./comment";
 
 export type Board = {
   boardId: number;
@@ -14,6 +15,7 @@ export type Board = {
   commentCount: number;
   isRecommend?: boolean;
   isView: boolean;
+  comments: Comment[];
   createdTime: string;
 };
 
@@ -27,4 +29,12 @@ export type PageOptions = {
   page: number;
   kind: 1 | 2 | 5;
   keyword?: string;
+};
+
+export type BOARD_TYPE_VALUE = 1 | 2 | 3 | 4;
+
+export type RequestBoard = {
+  title: string;
+  content: string;
+  boardType: BOARD_TYPE_VALUE;
 };

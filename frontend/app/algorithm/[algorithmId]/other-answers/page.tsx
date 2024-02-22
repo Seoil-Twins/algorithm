@@ -1,10 +1,12 @@
 import { ResponseAnswer, getAnswer } from "@/api/code";
+
 import styles from "./otherAnswers.module.scss";
 
 import DetailNav from "@/components/detail/detailNav";
 import Answer from "@/components/algorithm/detail/other-answers/answer";
 import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
+import { getCodeValue } from "@/providers/codeTypeProvider";
 
 const OtherAnswers = async ({
   params,
@@ -14,7 +16,7 @@ const OtherAnswers = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
   const algorithmId = params.algorithmId;
-  const language = searchParams.language || "python";
+  const language = Number(searchParams.language) || 3001;
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
 

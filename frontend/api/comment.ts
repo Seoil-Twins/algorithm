@@ -1,70 +1,46 @@
-import Comment from "@/types/comment";
+import { AxiosResponse } from "axios";
+import { axiosInstance } from ".";
 
-export interface ResponseComment {
-  comments: Comment[];
-  total: number;
-}
-
-export interface PageOptions {
-  count: number;
-  page: number;
-}
+import { CommentResponse, PageOptions } from "@/types/comment";
 
 export const getComments = async (
+  boardId: number,
+  options: PageOptions,
+): Promise<AxiosResponse<CommentResponse>> => {
+  const response = await axiosInstance.get(`/board/comment/${boardId}`, {
+    params: options,
+  });
+  return response;
+};
+
+export const postComment = async (boardId: string, content: string) => {
+  const response = await axiosInstance.post(`/board/comment/${boardId}`, {
+    content,
+  });
+  return response;
+};
+
+export const postSolvedComment = async (
   boardId: string | number,
-  pageOptions: PageOptions,
-): Promise<ResponseComment> => {
-  console.log(boardId, pageOptions);
-
-  return {
-    comments: [
-      {
-        commentId: 1323,
-        boardId: 3,
-        user: {
-          userId: 1,
-          profile:
-            "https://www.birds.cornell.edu/home/wp-content/uploads/2023/09/334289821-Baltimore_Oriole-Matthew_Plante.jpg",
-          nickname: "황야의고라니1111",
-        },
-        content:
-          "제가 생각하기에는 저는 하이 제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이제가 생각하기에는 저는 하이",
-        recommendCount: 1,
-        isRecommend: true,
-        createdTime: "2023-12-25 12:25:25",
-      },
-      {
-        commentId: 1324,
-        boardId: 3,
-        user: {
-          userId: 2,
-          nickname: "황야의고라니",
-        },
-        content: "제가 생각하기에는 저는 똥이 마려워용!!~",
-        recommendCount: -1,
-        isRecommend: false,
-        createdTime: "2023-12-25 12:25:25",
-      },
-      {
-        commentId: 1325,
-        boardId: 3,
-        user: {
-          userId: 9,
-          nickname: "테스트임234",
-        },
-        content: "제가 생각하기에는 저는 똥이 마려워용!!~",
-        recommendCount: 0,
-        createdTime: "2023-12-25 12:25:25",
-      },
-    ],
-    total: 2,
-  };
+  commentId: string | number,
+) => {
+  const response = await axiosInstance.post(
+    `/board/adopt/${boardId}/${commentId}`,
+  );
+  return response;
 };
 
-export const modifyCommentSolved = (commentId: number) => {
-  console.log(commentId);
+export const patchComment = async (
+  commentId: string | number,
+  content: string,
+) => {
+  const response = await axiosInstance.patch(`/board/comment/${commentId}`, {
+    content,
+  });
+  return response;
 };
 
-export const deleteComment = (commentId: number) => {
-  console.log(commentId);
+export const deleteComment = async (commentId: string | number) => {
+  const response = await axiosInstance.delete(`/board/comment/${commentId}`);
+  return response;
 };

@@ -1,3 +1,4 @@
+import { BOARD_TYPE_VALUE } from "@/components/common/boardForm";
 import { Testcase } from "./testcase";
 import { RequiredUser } from "./user";
 
@@ -45,4 +46,19 @@ export type AlgorithmOptions = {
 export type AlgorithmKind = {
   kindId: string;
   kindName: string;
+};
+
+export type AlgorithmPageOptions = {
+  count: number;
+  page: number;
+  kind: 3 | 4 | 6;
+  keyword?: string;
+};
+
+export type AlgorithmPostData = {
+  title: string;
+  content: string;
+  boardType: BOARD_TYPE_VALUE;
+  algorithmId: number;
+  tags?: string[];
 };
