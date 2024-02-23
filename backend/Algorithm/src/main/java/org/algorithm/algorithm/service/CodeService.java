@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
-import org.algorithm.algorithm.dto.CodeDTO;
-import org.algorithm.algorithm.dto.CommentCodeDTO;
-import org.algorithm.algorithm.dto.ResponseUserDTO;
-import org.algorithm.algorithm.dto.UserDTO;
+import org.algorithm.algorithm.dto.*;
 import org.algorithm.algorithm.entity.*;
 import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.*;
@@ -106,22 +103,24 @@ public class CodeService {
         }
     }
 
-    public CodeDTO postCode(CodeDTO codeDTO, UserDTO userDTO) {
+    public ObjectNode postCode(CodeDTO codeDTO, UserDTO userDTO) {
         try {
             System.out.println(codeDTO);
             CodeRunner codeRunner = new CodeRunner(testcaseRepository);
-            Boolean codeResultSolved = false;
+            CodeResponseDTO codeResponseDTO = null;
 
             double startTime = System.currentTimeMillis();
             switch (codeDTO.getType().toString()){
-                case "3001" : codeResultSolved = codeRunner.runCpp(codeDTO); break;
-                case "3002" : codeResultSolved = codeRunner.runPython(codeDTO); break;
-                case "3003" : codeResultSolved = codeRunner.runJava(codeDTO); break;
+                case "3001" : codeResponseDTO = codeRunner.runCpp(codeDTO); break;
+                case "3002" : codeResponseDTO = codeRunner.runPython(codeDTO); break;
+                case "3003" : codeResponseDTO = codeRunner.runJava(codeDTO); break;
                 default: throw new GlobalException("Type이 잘못되었습니다,.");
             }
             double endTime = System.currentTimeMillis();
 
-            double excuteTime = ( endTime - startTime )/ 1000.0;
+            double excuteTime = codeResponseDTO.getExcuteTime();
+            Boolean codeResultSolved = codeResponseDTO.getSolved();
+            System.out.println(codeResultSolved);
 
             AlgorithmEntity algorithmEntity = algorithmRepository.findOneByAlgorithmId(codeDTO.getAlgorithmId());
 
@@ -151,8 +150,14 @@ public class CodeService {
             userTryEntity.setCreatedTime(LocalDateTime.now());
 
             userTryRepository.save(userTryEntity);
-            return CodeDTO.toCodeDTO(savedEntity);
-        }   catch (GlobalException e) {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode response = objectMapper.createObjectNode();
+            ObjectNode response2 = objectMapper.createObjectNode();
+            response.set("code", CodeDTO.toCodeDTOJSON(savedEntity));
+            response.set("results", codeResponseDTO.getResults());
+            return response;
+        }   catch (GlobalException | CompileException e) {
             throw e;
 
         } catch (Exception e) {

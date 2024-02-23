@@ -102,7 +102,7 @@ public class CodeController {
             loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
         }
         if (loginUser != null) {
-            CodeDTO result = codeService.postCode(codeDTO, loginUser);
+            ObjectNode result = codeService.postCode(codeDTO, loginUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태

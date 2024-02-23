@@ -1,7 +1,11 @@
 package org.algorithm.algorithm.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.algorithm.algorithm.dto.CodeDTO;
+import org.algorithm.algorithm.dto.CodeResponseDTO;
 import org.algorithm.algorithm.entity.TestcaseEntity;
+import org.algorithm.algorithm.exception.CompileException;
 import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.repository.TestcaseRepository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -71,29 +75,39 @@ public class CodeRunner {
         }
     }
 
-    public Boolean runCpp(CodeDTO codeDTO){
+    public CodeResponseDTO runCpp(CodeDTO codeDTO) throws IOException, InterruptedException {
 
         TestcaseEntity[] testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmId(codeDTO.getAlgorithmId());
 
 // Java에서 C++ 코드 실행
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode testCaseResults = objectMapper.createObjectNode();
+            int i = 0;
+            Boolean flag = false;
+            double excuteTime = 0.0;
             for(TestcaseEntity testcaseEntity : testcaseEntities) {
+                i++;
                 String[] inputs = testcaseEntity.getInput().split(" ");
                 String[] expectedOutput = testcaseEntity.getOutput().split(" ");
 
                 // 외부 프로세스로 코드를 컴파일하고 실행
+
                 Process compileProcess = Runtime.getRuntime().exec("g++ -o program -x c++ -");
+                if(!compileProcess.isAlive()){
+                    throw new GlobalException("gcc g++를 설치해주세요.");
+                }
                 compileProcess.getOutputStream().write(codeDTO.getCode().getBytes());
                 compileProcess.getOutputStream().close();
 
                 // 컴파일 결과 확인
                 int compileResult = compileProcess.waitFor();
                 if (compileResult != 0) {
-                    System.out.println("CPP 컴파일 에러가 발생했습니다.");
-                    return null;
+                    throw new CompileException("CPP 코드 컴파일 에러가 발생했습니다.");
                 }
 
                 // 생성된 실행 파일 실행하여 결과값 확인
+                double startTime = System.currentTimeMillis();
                 Process executeProcess = Runtime.getRuntime().exec("./program");
 
                 // 입력값 제공
@@ -102,6 +116,9 @@ public class CodeRunner {
                     writer.write(input.trim() + "\n");
                 }
                 writer.close();
+                double endTime = System.currentTimeMillis();
+
+                excuteTime = ( endTime - startTime )/ 1000.0;
 
                 // 결과값 수집
                 BufferedReader reader = new BufferedReader(new InputStreamReader(executeProcess.getInputStream()));
@@ -128,27 +145,38 @@ public class CodeRunner {
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치합니다.");
+                    testCaseResults.put(i+"회차","성공");
                 } else {
                     System.out.println(Arrays.toString(inputs));
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치하지 않습니다.");
-                    return false;
+                    flag = true;
+                    testCaseResults.put(i+"회차","실패");
                 }
             }
-            return true;
+            if(flag)
+                return new CodeResponseDTO(false, excuteTime, testCaseResults);
+            else
+                return new CodeResponseDTO(true, excuteTime, testCaseResults);
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
-        return null;
     }
 
-    public Boolean runPython(CodeDTO codeDTO){
+    public CodeResponseDTO runPython(CodeDTO codeDTO){
         TestcaseEntity[] testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmId(codeDTO.getAlgorithmId());
         // Java에서 python 코드 실행
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode testCaseResults = objectMapper.createObjectNode();
+            int i = 0;
+            Boolean flag = false;
+            double excuteTime = 0.0;
             for(TestcaseEntity testcaseEntity : testcaseEntities) {
+                i++;
                 String[] inputs = testcaseEntity.getInput().split(" ");
                 String[] expectedOutput = testcaseEntity.getOutput().split(" ");
 
@@ -159,8 +187,12 @@ public class CodeRunner {
                 command.addAll(List.of(inputs));  // 모든 추가 인자들을 명령 목록에 추가
 
                 ProcessBuilder pb = new ProcessBuilder(command);
-                Process process = pb.start();
 
+                double startTime = System.currentTimeMillis();
+                Process process = pb.start();
+                double endTime = System.currentTimeMillis();
+
+                excuteTime = ( endTime - startTime )/ 1000.0;
                 // 파이썬 프로세스의 출력을 읽음
                 InputStream is = process.getInputStream();
                 InputStreamReader isr = new InputStreamReader(is);
@@ -173,37 +205,52 @@ public class CodeRunner {
                     results.add(line);
                 }
 
+                if(results.size() <= 0){
+                    throw new CompileException("Python 코드 컴파일 에러가 발생했습니다.");
+                }
+
                 // 결과값 비교
                 if (results.equals(Arrays.asList(expectedOutput))) {
                     System.out.println(Arrays.toString(inputs));
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치합니다.");
+                    testCaseResults.put(i+"회차","성공");
                 } else {
                     System.out.println(Arrays.toString(inputs));
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치하지 않습니다.");
-                    return false;
+                    flag = true;
+                    testCaseResults.put(i+"회차","실패");
                 }
-
-
                 // 프로세스가 종료될 때까지 대기
                 int exitCode = process.waitFor();
                 System.out.println("Python 프로세스 종료 코드: " + exitCode);
             }
-            return true;
-        } catch (Exception e) {
+            if(flag)
+                return new CodeResponseDTO(false, excuteTime, testCaseResults);
+            else
+                return new CodeResponseDTO(true, excuteTime, testCaseResults);
+        } catch (CompileException e) {
+            throw e;
+        }catch(Exception e) {
             throw new GlobalException("error");
         }
     }
 
-    public Boolean runJava(CodeDTO codeDTO){
+    public CodeResponseDTO runJava(CodeDTO codeDTO){
         TestcaseEntity[] testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmId(codeDTO.getAlgorithmId());
         ExecutorService executorService = Executors.newCachedThreadPool();
         // Java에서 python 코드 실행
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode testCaseResults = objectMapper.createObjectNode();
+            int i = 0;
+            Boolean flag = false;
+            double excuteTime = 0.0;
             for(TestcaseEntity testcaseEntity : testcaseEntities) {
+                i++;
                 String[] inputs = testcaseEntity.getInput().split(" ");
                 String[] expectedOutput = testcaseEntity.getOutput().split(" ");
 
@@ -217,10 +264,15 @@ public class CodeRunner {
                 ProcessBuilder pbCompile = new ProcessBuilder("javac", "Main.java");
                 Process processCompile = pbCompile.start();
                 processCompile.waitFor();
+                if (processCompile.waitFor() != 0) {
+                    throw new CompileException("Java 코드 컴파일 에러가 발생했습니다.");
+                }
 
                 // java로 실행
                 ProcessBuilder pbRun = new ProcessBuilder("java", "Main");
                 pbRun.redirectErrorStream(true); // 표준 에러를 표준 출력으로 리디렉션
+
+                double startTime = System.currentTimeMillis();
                 Process processRun = pbRun.start();
 
 
@@ -230,6 +282,9 @@ public class CodeRunner {
                     inputWriter.write(input.trim() + "\n");
                 }
                 inputWriter.close(); // [ 3  5 ]   ->   [ 8 ]
+                double endTime = System.currentTimeMillis();
+
+                excuteTime = ( endTime - startTime )/ 1000.0;
 
                 // 실행 결과 출력
                 BufferedReader reader = new BufferedReader(new InputStreamReader(processRun.getInputStream()));
@@ -250,6 +305,7 @@ public class CodeRunner {
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치합니다.");
+                    testCaseResults.put(i+"회차","성공");
 
                     SseEmitter emitter = new SseEmitter();
 
@@ -267,11 +323,17 @@ public class CodeRunner {
                     System.out.println(results);
                     System.out.println(Arrays.asList(expectedOutput));
                     System.out.println("결과값이 일치하지 않습니다.");
-                    return false;
+                    flag = true;
+                    testCaseResults.put(i+"회차","실패");
                 }
             }
-            return true;
+            if(flag)
+                return new CodeResponseDTO(false, excuteTime, testCaseResults);
+            else
+                return new CodeResponseDTO(true, excuteTime, testCaseResults);
 
+        }catch (CompileException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -110,6 +110,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
+    @ExceptionHandler(CompileException.class)
+    public ResponseEntity<Object> handleCompileException(CompileException ex) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("errorCode", HttpStatus.BAD_REQUEST.value());
+        errorNode.put("message",ex.getMessage());
+
+        // 적절한 HTTP 상태 코드 선택, 예: HttpStatus.INTERNAL_SERVER_ERROR
+        return new ResponseEntity<>(errorNode, HttpStatus.BAD_REQUEST);
+    }
+
 
 
     // ErrorResponse 클래스 정의

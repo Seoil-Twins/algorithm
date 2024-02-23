@@ -1,6 +1,9 @@
 package org.algorithm.algorithm.dto;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +40,21 @@ public class CodeDTO {
         codeDTO.setCreatedTime(codeEntity.getCreatedTime());
 
         return codeDTO;
+    }
+
+    public static ObjectNode toCodeDTOJSON(CodeEntity codeEntity){
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode response = objectMapper.createObjectNode();
+
+        response.put("codeId",codeEntity.getCodeId());
+        response.put("userId",codeEntity.getUserId());
+        response.put("algorithmId",codeEntity.getAlgorithmId());
+        response.put("code",codeEntity.getCode());
+        response.put("type",codeEntity.getType());
+        response.put("solved",codeEntity.getSolved());
+        response.put("createdTime", String.valueOf(codeEntity.getCreatedTime()));
+
+        return response;
     }
 
 }
