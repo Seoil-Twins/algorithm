@@ -15,10 +15,7 @@ import org.algorithm.algorithm.entity.EmailVerifyEntity;
 import org.algorithm.algorithm.entity.UserEntity;
 import org.algorithm.algorithm.entity.UserLinkEntity;
 import org.algorithm.algorithm.entity.UserProfileEntity;
-import org.algorithm.algorithm.exception.EmailException;
-import org.algorithm.algorithm.exception.NicknameException;
-import org.algorithm.algorithm.exception.NotFoundException;
-import org.algorithm.algorithm.exception.SQLException;
+import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.EmailVerifyRepository;
 import org.algorithm.algorithm.repository.UserLinkRepository;
 import org.algorithm.algorithm.repository.UserProfileRepository;
@@ -441,6 +438,9 @@ public class UserService {
 
     public ObjectNode userLinkPost(int userId, UserLinkEntity userLinkEntity) {
         try {
+
+            if(userLinkRepository.findUserLinkEntityByDomain(userLinkEntity.getDomain()) != null)
+                throw new DuplicatedExcepiton("Already Exist Domain ! ");
 
             userLinkEntity.setUserId(userId);
             userLinkEntity.setCreatedTime(LocalDateTime.now());

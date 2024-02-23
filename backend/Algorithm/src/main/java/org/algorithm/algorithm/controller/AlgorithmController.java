@@ -67,14 +67,14 @@ public class AlgorithmController {
         }
 
         Set<String> validRate = new HashSet<>(Arrays.asList("h","l"));
-        if (!validRate.contains(rate)) {
+        if (!validRate.contains(rate) && rate != null) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : rate ( rate only 'h', 'l' )")
             );
         }
 
         Set<String> validTag = new HashSet<>(Arrays.asList("1001","1002","1003","1004","1005","1006","1007","1008","1009","1010","1011","1012","1013","1014"));
-        if (!validTag.contains(tag)) {
+        if (!validTag.contains(tag) && tag != null) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : tag ( tag range 1001 ~ 1014 )" + " input : ")
             );
