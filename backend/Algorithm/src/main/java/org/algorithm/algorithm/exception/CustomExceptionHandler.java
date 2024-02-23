@@ -38,10 +38,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleSQLException(SQLException ex) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode errorNode = objectMapper.createObjectNode();
-        errorNode.put("errorCode", HttpStatus.NO_CONTENT.value());
+        errorNode.put("errorCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorNode.put("message",ex.getMessage());
 
-        return new ResponseEntity<>(errorNode, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(errorNode, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(NicknameException.class)

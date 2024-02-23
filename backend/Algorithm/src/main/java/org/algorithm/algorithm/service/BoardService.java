@@ -440,6 +440,13 @@ public class BoardService {
         // boardId로 tags 추출 코드 작성 요망
 //        String[] tags = ["자유분방","천방지축"];
         List<String> tagList = tagRepository.findValuesByBoardId(boardDTO.getBoardId());
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode tagNode = mapper.createArrayNode();
+
+        // tagList를 ArrayNode에 추가
+            for (String tag : tagList) {
+                tagNode.add(tag);
+            }
 
         // boardId로 commentCount 추출 코드 작성 요망
         String commentCount = boardRepository.findCommentCountByBoardId(boardDTO.getBoardId());
@@ -461,7 +468,7 @@ public class BoardService {
             boardNode.put("solved", solved);
         boardNode.put("views", views);
         boardNode.put("recommendCount", recommendCount);
-        boardNode.put("tags", tagList.toString());
+        boardNode.set("tags", tagNode);
         boardNode.put("commentCount", commentCount);
         boardNode.put("isRecommend", isRecommend);
         boardNode.put("isView", isView);
@@ -513,6 +520,13 @@ public class BoardService {
         // boardId로 tags 추출 코드 작성 요망
 //        String[] tags = ["자유분방","천방지축"];
         List<String> tagList = tagRepository.findValuesByBoardId(boardDTO.getBoardId());
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode tagNode = mapper.createArrayNode();
+
+        // tagList를 ArrayNode에 추가
+        for (String tag : tagList) {
+            tagNode.add(tag);
+        }
 
         // boardId로 commentCount 추출 코드 작성 요망
         String commentCount = boardRepository.findCommentCountByBoardId(boardDTO.getBoardId());
@@ -528,7 +542,7 @@ public class BoardService {
             boardNode.put("solved", solved);
         boardNode.put("views", views);
         boardNode.put("recommendCount", recommendCount);
-        boardNode.put("tags", tagList.toString());
+        boardNode.set("tags", tagNode);
         boardNode.put("commentCount", commentCount);
         boardNode.put("createdTime", String.valueOf(boardDTO.getCreatedTime()));
 
