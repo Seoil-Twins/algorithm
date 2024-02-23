@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
-    BoardEntity findBoardEntityByBoardId(long boardId);
-    Page<BoardEntity> findBoardEntitiesByBoardType(Pageable pageable, long boardType);
-    Page<BoardEntity> findBoardEntitiesByBoardTypeIn(Pageable pageable, List<Long> boardTypes);
+    BoardEntity findBoardEntityByBoardIdOrderByCreatedTime(long boardId);
+    Page<BoardEntity> findBoardEntitiesByBoardTypeOrderByCreatedTimeDesc(Pageable pageable, long boardType);
+    Page<BoardEntity> findBoardEntitiesByBoardTypeInOrderByCreatedTimeDesc(Pageable pageable, List<Long> boardTypes);
 
-    Page<BoardEntity> findBoardEntitiesByBoardTypeAndAlgorithmId(Pageable pageable, Long boardType, Long algorithmId);
-    Page<BoardEntity> findBoardEntitiesByBoardTypeInAndAlgorithmId(Pageable pageable, List<Long> boardTypes, Long algorithmId);
+    Page<BoardEntity> findBoardEntitiesByBoardTypeAndAlgorithmIdOrderByCreatedTimeDesc(Pageable pageable, Long boardType, Long algorithmId);
+    Page<BoardEntity> findBoardEntitiesByBoardTypeInAndAlgorithmIdOrderByCreatedTimeDesc(Pageable pageable, List<Long> boardTypes, Long algorithmId);
 
     @Query(value = "SELECT b.* " +
             "FROM board b " +

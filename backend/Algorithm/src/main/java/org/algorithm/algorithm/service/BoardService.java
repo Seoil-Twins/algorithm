@@ -64,24 +64,24 @@ public class BoardService {
                 boardTypes.add(2L);
                 boardTypes.add(3L);
                 boardTypes.add(4L);
-                boardEntities = boardRepository.findBoardEntitiesByBoardTypeIn(pageable, boardTypes);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeInOrderByCreatedTimeDesc(pageable, boardTypes);
             }
             else if(boardType == 5)
             {
                 List<Long> boardTypes = new ArrayList<>();
                 boardTypes.add(1L);
                 boardTypes.add(2L);
-                boardEntities = boardRepository.findBoardEntitiesByBoardTypeIn(pageable, boardTypes);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeInOrderByCreatedTimeDesc(pageable, boardTypes);
             }
             else if(boardType == 6)
             {
                 List<Long> boardTypes = new ArrayList<>();
                 boardTypes.add(3L);
                 boardTypes.add(4L);
-                boardEntities = boardRepository.findBoardEntitiesByBoardTypeIn(pageable, boardTypes);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeInOrderByCreatedTimeDesc(pageable, boardTypes);
             }
             else {
-                boardEntities = boardRepository.findBoardEntitiesByBoardType(pageable, boardType);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeOrderByCreatedTimeDesc(pageable, boardType);
             }
 
             List<BoardEntity> resultValue = boardEntities.getContent();
@@ -106,7 +106,7 @@ public class BoardService {
 
     public ObjectNode getBoardDetail(int boardId, UserDTO userDTO) {
         try {
-            BoardEntity boardEntity = boardRepository.findBoardEntityByBoardId(boardId);
+            BoardEntity boardEntity = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
 
 
             BoardDTO boardDTO = BoardDTO.toBoardDTO(boardEntity);
@@ -156,7 +156,7 @@ public class BoardService {
            ObjectMapper objectMapper = new ObjectMapper();
            ObjectNode commentNode = objectMapper.createObjectNode();
 
-           BoardEntity boardEntity = boardRepository.findBoardEntityByBoardId(boardId);
+           BoardEntity boardEntity = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
            BoardDTO boardDTO = BoardDTO.toBoardDTO(boardEntity);
            ArrayNode commentList = insertCommentsNode(boardDTO);
 
@@ -180,10 +180,10 @@ public class BoardService {
                 List<Long> boardTypes = new ArrayList<>();
                 boardTypes.add(3L);
                 boardTypes.add(4L);
-                boardEntities = boardRepository.findBoardEntitiesByBoardTypeInAndAlgorithmId(pageable, boardTypes, algorithmId);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeInAndAlgorithmIdOrderByCreatedTimeDesc(pageable, boardTypes, algorithmId);
             }
             else {
-                boardEntities = boardRepository.findBoardEntitiesByBoardTypeAndAlgorithmId(pageable, boardType, algorithmId);
+                boardEntities = boardRepository.findBoardEntitiesByBoardTypeAndAlgorithmIdOrderByCreatedTimeDesc(pageable, boardType, algorithmId);
             }
 
             List<BoardEntity> resultValue = boardEntities.getContent();
@@ -237,7 +237,7 @@ public class BoardService {
             commentDTO.setCreatedTime(LocalDateTime.now());
             commentDTO.setBoardId(boardId);
 
-            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+            if(boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId) == null)
                 throw new NotFoundException("Board Not Found. board_id : " + boardId);
 
 
@@ -256,13 +256,13 @@ public class BoardService {
     public void postAdopt(Long boardId,Long commentId, UserDTO userDTO) {
         try {
 
-            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+            if(boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId) == null)
                 throw new NotFoundException("Board Not Found. board_id : " + boardId);
 
             if(commentRepository.findByCommentId(commentId) == null)
                 throw new NotFoundException("Comment Not Found. comment_id : " + commentId);
 
-            if(boardRepository.findBoardEntityByBoardId(boardId).getUserId() != userDTO.getUserId())
+            if(boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId).getUserId() != userDTO.getUserId())
                 throw new AuthorizedException("Only Writer Adopt");
 
             AdoptEntity adoptEntity = new AdoptEntity();
@@ -282,7 +282,7 @@ public class BoardService {
 
     public void patchBoard(BoardDTO boardDTO, Long boardId, UserDTO userDTO){
         try {
-            if(boardRepository.findBoardEntityByBoardId(boardId) == null)
+            if(boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId) == null)
                 throw new NotFoundException("Board Not Found. board_id : " + boardId);
 
             if(boardDTO.getAlgorithmId() != null) {
@@ -290,7 +290,7 @@ public class BoardService {
                     throw new NotFoundException("Algorithm Not Found. algorithm_id : " + boardDTO.getAlgorithmId());
             }
 
-            BoardEntity existingBoard = boardRepository.findBoardEntityByBoardId(boardId);
+            BoardEntity existingBoard = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
 
             if(existingBoard.getUserId() != userDTO.getUserId())
                 throw new AuthorizedException("Only Writer Update Board");
@@ -583,7 +583,7 @@ public class BoardService {
             commentNode.put("commentId",commentDTO.getCommentId());
             commentNode.set("user",userNode);
             commentNode.put("content",commentDTO.getContent());
-            commentNode.put("recommend",recommend);
+            commentNode.put("recommendCount",recommend);
             commentNode.put("createdTime", String.valueOf(commentDTO.getCreatedTime()));
             commentsList.add(commentNode);
         }
