@@ -17,31 +17,22 @@ import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
 
 type ContentProps = {
-  type: 3 | 4 | 6;
   algorithmId: number;
+  options: AlgorithmPageOptions;
 };
 const tableHeaders = ["상태", "제목", "닉네임", "분류", "일자"];
 
-const Content = async ({
-  searchParams,
-  type,
-  algorithmId,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-  type: ContentProps["type"];
-  algorithmId: ContentProps["algorithmId"];
-}) => {
+const Content = async ({ algorithmId, options }: ContentProps) => {
   const sortOptions: AlgorithmPageOptions = {
-    count: Number(searchParams?.count) || 10,
-    page: Number(searchParams?.page) || 1,
-    kind: type,
-    keyword: (searchParams?.keyword as string) || undefined,
+    count: options.count,
+    page: options.page,
+    kind: options.kind,
+    keyword: (options.keyword as string) || undefined,
   };
 
   const current = sortOptions.page;
   const boardType = await getBoardTypes();
   const boards = (await getAlgorithmBoards(algorithmId!, sortOptions)).data;
-  console.log(boards);
 
   const tableDatas: TableData[] = boards.contents.map((board: Board) => {
     return {

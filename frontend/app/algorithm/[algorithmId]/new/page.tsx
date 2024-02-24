@@ -1,19 +1,14 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
-
-import { useRouter } from "next/navigation";
+import React, { useCallback, useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useFormState } from "react-dom";
 
 import { DropdownItem } from "@/components/common/dropdown";
-import BoardForm, {
-  BOARD_TYPE,
-  RequestBoard,
-} from "@/components/common/boardForm";
+import BoardForm, { BOARD_TYPE } from "@/components/common/boardForm";
 
-import { AlgorithmPostData } from "@/types/algorithm";
-
-import { postAlgorithmBoard } from "@/api/board";
+import { RequestBoard } from "@/types/board";
+import { addBoard } from "@/app/actions/baord";
 
 type NewParams = {
   algorithmId: number;
@@ -32,7 +27,6 @@ const dropdownItems: DropdownItem[] = [
 
 const New = ({ params }: { params: NewParams }) => {
   const algorithmId = params.algorithmId;
-  const router = useRouter();
 
   const [request, setRequest] = useState<RequestBoard>({
     boardType: BOARD_TYPE.ALGORITHM_QUESTION,
@@ -40,37 +34,45 @@ const New = ({ params }: { params: NewParams }) => {
     content: "",
   });
 
+  const [state, formAction] = useFormState(
+    async (_prevState: any, formdata: FormData) => {
+      return await addBoard(
+        algorithmId,
+        BOARD_TYPE.ALGORITHM_QUESTION,
+        request.content,
+        formdata,
+      );
+    },
+    null,
+  );
+
   const handleChangeRequest = useCallback((request: RequestBoard) => {
     setRequest(request);
   }, []);
 
-  const handleSubmit = useDebouncedCallback(
-    useCallback(async () => {
-      try {
-        const data: AlgorithmPostData = {
-          algorithmId: algorithmId,
-          boardType: request.boardType,
-          title: request.title,
-          content: request.content,
-        };
+  useEffect(() => {
+    const options: any = {
+      position: "top-center",
+      duration: 3000,
+    };
 
-        await postAlgorithmBoard(data);
-      } catch (error) {
-        alert("게시글 작성에 실패했습니다.");
-      }
-      router.push(`/algorithm/${algorithmId}/all`);
-    }, [algorithmId, request, router]),
-    500,
-  );
+    if (state?.status === 400) {
+      toast.error(state.data || "게시글 작성에 실패했습니다.", options);
+    } else if (state?.status === 500) {
+      toast.error("서버 에러가 발생하였습니다.", options);
+    }
+  }, [state]);
 
   return (
-    <BoardForm
-      dropdownItems={dropdownItems}
-      request={request}
-      btnTitle="작성"
-      onSubmit={handleSubmit}
-      onChangeRequest={handleChangeRequest}
-    />
+    <>
+      <Toaster />
+      <BoardForm
+        dropdownItems={dropdownItems}
+        request={request}
+        onChangeRequest={handleChangeRequest}
+        action={formAction}
+      />
+    </>
   );
 };
 

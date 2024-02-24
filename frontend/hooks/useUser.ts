@@ -19,7 +19,7 @@ export const useUser = () => {
       }
     },
     {
-      revalidateOnFocus: true,
+      revalidateOnFocus: false,
       shouldRetryOnError: false,
       refreshInterval: 30 * 60 * 1000,
     },

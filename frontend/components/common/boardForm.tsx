@@ -11,6 +11,7 @@ import Input from "@/components/common/input";
 import Editor from "@/components/common/editor";
 
 import { RequestBoard } from "@/types/board";
+import SubmitButton from "./submitButton";
 
 export const BOARD_TYPE = {
   PUBLIC_QUESTION: 1,
@@ -22,23 +23,20 @@ export const BOARD_TYPE = {
 type BoardFormProps = {
   request: RequestBoard;
   dropdownItems: DropdownItem[];
-  btnTitle: string;
+  action: (payload: FormData) => void;
   onChangeRequest: (request: RequestBoard) => void;
-  onSubmit: () => void;
 };
 
 const BoardForm = ({
   request,
   dropdownItems,
-  btnTitle,
+  action,
   onChangeRequest,
-  onSubmit,
 }: BoardFormProps) => {
   const router = useRouter();
 
   const titleRef = useRef<HTMLDivElement>(null);
 
-  const [isErrorTitle, setIsErrorTitle] = useState<boolean>(false);
   const [isVisibleDropdown, setIsVisibleDropdown] = useState<boolean>(false);
 
   const handleVisibleDropdown = useCallback((value: boolean) => {
@@ -85,28 +83,8 @@ const BoardForm = ({
     router.back();
   }, [router]);
 
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-
-      if (!request.title || request.title.length <= 0) {
-        setIsErrorTitle(true);
-        window.scrollTo({
-          top: titleRef.current?.offsetTop && titleRef.current?.offsetTop - 200,
-        });
-        titleRef.current?.focus();
-        return;
-      }
-
-      setIsErrorTitle(false);
-      onSubmit();
-    },
-    [request, onSubmit],
-  );
-
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={styles.form} action={action}>
       <div>
         <div className={styles.boardTitle}>
           <span className={`${notosansMedium.className}`}>카테고리</span>
@@ -132,11 +110,12 @@ const BoardForm = ({
         </div>
         <div className={styles.title} ref={titleRef}>
           <Input
+            name="title"
             value={request.title}
             onChange={handleTitle}
             placeholder="제목 입력"
-            errorMsg="제목을 입력해주세요."
-            isError={isErrorTitle}
+            minLength={2}
+            required
           />
         </div>
       </div>
@@ -155,9 +134,11 @@ const BoardForm = ({
         <button type="button" className={styles.cancel} onClick={handleCancel}>
           취소
         </button>
-        <button type="submit" className={styles.submit}>
-          {btnTitle}
-        </button>
+        <SubmitButton
+          btnTitle="작성"
+          pendingTitle="작성중"
+          className={styles.submit}
+        />
       </div>
     </form>
   );

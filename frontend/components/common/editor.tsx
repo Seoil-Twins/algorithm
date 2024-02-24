@@ -83,7 +83,13 @@ const Editor = ({
   return (
     <div className={styles.editorBox}>
       {isVisibleToolbar && <Toolbar editor={editor} />}
-      <EditorContent editor={editor} className={className} />
+      <EditorContent
+        editor={editor}
+        className={className}
+        name="contents"
+        minLength={5}
+        required
+      />
     </div>
   );
 };

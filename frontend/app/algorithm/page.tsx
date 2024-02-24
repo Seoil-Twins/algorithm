@@ -57,7 +57,6 @@ const Algorithm = async ({
     tag: Number(searchParams?.tag) || undefined,
     keyword: (searchParams?.keyword as string) || undefined,
   };
-  console.log();
 
   const algorithm = (await getAlgorithms(sortOptions)).data;
   const algorithmKinds = (await getAlgorithmKinds()).data;

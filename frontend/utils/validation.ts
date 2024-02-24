@@ -8,7 +8,7 @@ export interface ValidationError {
 }
 
 export type Info<T, K extends keyof T> = {
-  [key in K]: Property & ValidationError;
+  [key in K]: Property & Partial<ValidationError>;
 };
 
 const notError: ValidationError = {

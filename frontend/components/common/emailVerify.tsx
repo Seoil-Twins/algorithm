@@ -37,9 +37,11 @@ const EmailVerify = ({
     <div className={styles.emailVerify}>
       <div>
         <Input
+          name="email"
           type="email"
           title="이메일"
           placeholder="이메일 입력"
+          pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
           value={emailInfo.email.value}
           disabled={emailInfo.email.disabled}
           isError={emailInfo.email.isError}
@@ -58,8 +60,8 @@ const EmailVerify = ({
         </button>
       </div>
       <Input
+        type="text"
         placeholder="인증 번호 입력"
-        length={6}
         value={emailInfo.verifyCode.value}
         disabled={emailInfo.verifyCode.disabled}
         isError={emailInfo.verifyCode.isError}

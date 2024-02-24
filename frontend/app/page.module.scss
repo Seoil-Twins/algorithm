@@ -145,7 +145,7 @@
 @media screen and (min-width: 769px) {
   .algorithmCardBox {
     grid-template-columns: repeat(auto-fill, minmax(413.33px, 1fr));
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-rows: repeat(auto-fill, minmax(413.33px, 1fr));
   }
 }
 
