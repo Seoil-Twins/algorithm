@@ -117,11 +117,13 @@ public class BoardService {
                 boardNode = createBoardNode(boardDTO);
 
             boardNode.put("comments",insertCommentsNode(boardDTO));
-            if(Objects.equals(boardNode.get("solved").toString(), "true")){
-                if(boardDTO.getBoardType() != 4L)
-                    boardNode.put("solved",adoptRepository.findCommentIdByBoardId(boardId));
-            }
 
+            if(boardNode.get("solved") != null) {
+                if (Objects.equals(boardNode.get("solved").toString(), "true")) {
+                    if (boardDTO.getBoardType() != 4L)
+                        boardNode.put("solved", adoptRepository.findCommentIdByBoardId(boardId));
+                }
+            }
             return boardNode;
         }
         catch (Exception e){
@@ -276,7 +278,36 @@ public class BoardService {
             throw e;
         }
         catch (Exception e){
-            throw new SQLException(" Board Algorithm All SQL Error ! ");
+            throw new SQLException(" Board Adopt SQL Error ! ");
+        }
+    }
+
+    public void postAdoptFeedback(Long boardId, UserDTO userDTO) throws BadRequestException {
+        try {
+            BoardEntity boardEntity = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
+            if(boardEntity == null)
+                throw new NotFoundException("Board Not Found. board_id : " + boardId);
+
+            if(boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId).getUserId() != userDTO.getUserId())
+                throw new AuthorizedException("Only Writer Adopt");
+
+            if(adoptFeedbackRepository.findByBoardId(boardId) != null)
+                throw new DuplicatedExcepiton("Already Exist Adopt");
+
+            if(boardEntity.getBoardType() != 4)
+                throw new BadRequestException("Only Feedback Item Allow");
+
+            AdoptFeedbackEntity adoptFeedbackEntity = new AdoptFeedbackEntity();
+            adoptFeedbackEntity.setBoardId(boardId);
+
+            adoptFeedbackRepository.save(adoptFeedbackEntity);
+
+        }
+        catch(NotFoundException | AuthorizedException | DuplicatedExcepiton | BadRequestException e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new SQLException(" Board Adopt-Feedback SQL Error ! ");
         }
     }
 
