@@ -1,5 +1,5 @@
-import { getBoardTypes } from "@/api/board";
-import { getMyFavorites } from "@/api/user";
+import { getBoardTypes } from "@/app/actions/baord";
+import { getMyFavorites } from "@/app/actions/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -11,19 +11,28 @@ const Answer = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const favorites = await getMyFavorites({ page, count });
   const boardTypes = await getBoardTypes();
+  let favorites;
+  try {
+    const responseFavorites = await getMyFavorites({ page, count });
+    favorites = responseFavorites.data;
+  } catch (error) {
+    favorites = {
+      results: [],
+      totals: 0,
+    };
+  }
 
   return (
     <>
       <Table
-        items={favorites.data.results}
+        items={favorites.results}
         boardTypes={boardTypes}
         errorTitle="좋아요한 게시글이 없습니다."
       />
       <Pagination
         count={count}
-        total={favorites.data.totals}
+        total={favorites.totals}
         current={page}
         marginTop={25}
       />

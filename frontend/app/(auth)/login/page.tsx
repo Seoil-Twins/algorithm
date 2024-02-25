@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFormState } from "react-dom";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./login.module.scss";
@@ -12,8 +12,7 @@ import Input from "@/components/common/input";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { getUser } from "@/api/user";
-import { login as loginAPI } from "@/app/actions/user";
+import { getUser, login as loginAPI } from "@/app/actions/user";
 import SubmitButton from "@/components/common/submitButton";
 
 const Login = () => {
@@ -39,28 +38,26 @@ const Login = () => {
   }, []);
 
   const success = useCallback(async () => {
-    const userResponse = await getUser();
-    login(userResponse.data);
-
-    router.replace(redirectUrl.current || "/");
+    try {
+      const user = (await getUser()).data;
+      login(user);
+      router.replace(redirectUrl.current || "/");
+    } catch (error) {
+      toast.error("로그인에 실패하였습니다.\n나중에 다시 시도 해주세요.");
+    }
   }, [router, login]);
 
   useEffect(() => {
     if (!state) return;
 
-    const options: any = {
-      position: "top-center",
-      duration: 3000,
-    };
-
     if (state.status === 200) {
       success();
     } else if (state?.status === 400) {
-      toast.error(state.data || "서버 에러가 발생하였습니다.", options);
+      toast.error(state.data || "서버 에러가 발생하였습니다.");
     } else if (state?.status === 406) {
-      toast.error(state.data || "서버 에러가 발생하였습니다.", options);
+      toast.error(state.data || "서버 에러가 발생하였습니다.");
     } else if (state?.status === 500) {
-      toast.error("서버 에러가 발생하였습니다.", options);
+      toast.error("서버 에러가 발생하였습니다.");
     }
   }, [state, success]);
 
@@ -73,7 +70,6 @@ const Login = () => {
 
   return (
     <>
-      <Toaster />
       <form className={styles.formBox} action={formAction}>
         <div className={`${styles.title} ${notosansMedium.className}`}>
           로그인
@@ -86,11 +82,10 @@ const Login = () => {
             name="email"
             type="email"
             title="이메일"
-            pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
             placeholder="이메일 입력"
             value={email}
             onChange={handleEmail}
-            // required
+            required
           />
         </div>
         <div className={styles.mb20}>

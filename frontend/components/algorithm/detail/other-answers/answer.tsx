@@ -70,12 +70,11 @@ const Answer = ({ answer }: AnswerProps) => {
           <Comment key={idx} comment={comment} />
         ))}
       </div>
-      {user && (
-        <CommentEditor
-          apiUrl={`/code/comment/${answer.codeId}`}
-          isVisibleToolbar={false}
-        />
-      )}
+      <CommentEditor
+        type="code"
+        requestId={String(answer.codeId)}
+        isVisibleToolbar={false}
+      />
     </div>
   );
 };

@@ -4,12 +4,11 @@ import React from "react";
 import Image from "next/image";
 
 import { AlgorithmPageOptions } from "@/types/algorithm";
-import { Board } from "@/types/board";
-
-import { getAlgorithmBoards } from "@/api/board";
-import { getBoardTypes } from "@/api/board";
+import { Board, BoardResponse } from "@/types/board";
 
 import Table, { TableData } from "@/components/algorithm/table";
+
+import { getAlgorithmBoards, getBoardTypes } from "@/app/actions/baord";
 
 import { getTimeAgo } from "@/utils/day";
 
@@ -32,7 +31,21 @@ const Content = async ({ algorithmId, options }: ContentProps) => {
 
   const current = sortOptions.page;
   const boardType = await getBoardTypes();
-  const boards = (await getAlgorithmBoards(algorithmId!, sortOptions)).data;
+
+  const responseBoards = await getAlgorithmBoards(algorithmId!, sortOptions);
+  let boards: BoardResponse | undefined = undefined;
+  if (responseBoards.status === 200) {
+    boards = responseBoards.data as BoardResponse;
+  } else if (responseBoards.status === 404) {
+    boards = { contents: [], total: 0 };
+  } else {
+    return (
+      <NotFound
+        title="서버와의 통신 중 오류가 발생하였습니다."
+        description="잠시 후 다시 시도해주세요."
+      />
+    );
+  }
 
   const tableDatas: TableData[] = boards.contents.map((board: Board) => {
     return {

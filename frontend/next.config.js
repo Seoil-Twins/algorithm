@@ -9,11 +9,6 @@ const nextConfig = {
     includePaths: [path.join(__dirname, "styles")],
     prependData: `@import "styles/_variables.scss";@import "styles/_mixin.scss";`,
   },
-  headers: [
-    {
-      key: "Access-Control-Allow-Origin",
-    },
-  ],
   images: {
     remotePatterns: [
       {

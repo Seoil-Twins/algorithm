@@ -2,15 +2,6 @@
 import Image from "next/image";
 
 import {
-  checkMyType,
-  getAlgorithmKinds,
-  getAlgorithms,
-  KIND_OPTIONS_ARRAY,
-  RATE_OPTIONS_ARRAY,
-  SOLVED_OPTIONS_ARRAY,
-  SORT_OPTIONS_ARRAY,
-} from "@/api/algorithm";
-import {
   AlgorithmOptions,
   Algorithm as AlgorithmType,
   KindOptions,
@@ -18,6 +9,15 @@ import {
   SolvedOptions,
   SortOptions,
 } from "@/types/algorithm";
+import {
+  KIND_OPTIONS_ARRAY,
+  RATE_OPTIONS_ARRAY,
+  SOLVED_OPTIONS_ARRAY,
+  SORT_OPTIONS_ARRAY,
+  checkMyType,
+} from "@/types/constants";
+
+import { getAlgorithmKinds, getAlgorithms } from "../actions/algorithm";
 
 import Navigation from "@/components/algorithm/navigation";
 import Table, { TableData } from "@/components/algorithm/table";

@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useFormState } from "react-dom";
+
+import { BOARD_TYPE_VALUE, Board, RequestBoard } from "@/types/board";
+import { BOARD_TYPE } from "@/types/constants";
+
+import { getBoardDetail, patchBoard } from "@/app/actions/baord";
 
 import { DropdownItem } from "@/components/common/dropdown";
-import { getBoardDetail, patchBoard } from "@/api/board";
-
-import BoardForm, { BOARD_TYPE } from "@/components/common/boardForm";
-
-import { BOARD_TYPE_VALUE, RequestBoard } from "@/types/board";
+import BoardForm from "@/components/common/boardForm";
 
 type UpdateParams = {
   boardId: number;
@@ -48,8 +50,32 @@ const Update = ({ params }: { params: UpdateParams }) => {
     content: "",
   });
 
+  const [state, formAction] = useFormState(
+    async (_prevState: any, formdata: FormData) => {
+      return await patchBoard(
+        boardId,
+        request.boardType,
+        request.content,
+        formdata,
+      );
+    },
+    null,
+  );
+
   const fetchBoardDetail = useCallback(async () => {
-    const board = (await getBoardDetail(boardId)).data;
+    const response = await getBoardDetail(boardId);
+    if (response.status === 401) {
+      toast.error("오직 작성자만 수정할 수 있습니다.");
+      router.back();
+      return;
+    }
+    if (response.status === 404) {
+      toast.error("게시글이 존재하지 않습니다.");
+      router.back();
+      return;
+    }
+
+    const board = response.data as Board;
     const newItem: RequestBoard = {
       boardType: board.boardType as BOARD_TYPE_VALUE,
       title: board.title,
@@ -57,18 +83,11 @@ const Update = ({ params }: { params: UpdateParams }) => {
     };
 
     setRequest(newItem);
-  }, [boardId]);
+  }, [boardId, router]);
 
   const handleChangeRequest = useCallback((request: RequestBoard) => {
     setRequest(request);
   }, []);
-
-  const handleSubmit = useCallback(async () => {
-    await patchBoard(boardId, request);
-
-    router.refresh();
-    router.back();
-  }, [boardId, request, router]);
 
   useEffect(() => {
     fetchBoardDetail();
@@ -79,6 +98,23 @@ const Update = ({ params }: { params: UpdateParams }) => {
       setIsMounted(true);
     }
   }, [isMounted, request]);
+
+  useEffect(() => {
+    if (!state) return;
+
+    if (state.status === 200) {
+      toast.success("게시글이 수정되었습니다.");
+      router.push(`/forum/${boardId}`);
+    } else if (state.status === 400) {
+      toast.error(state.data || "게시글 수정에 실패했습니다.");
+    } else if (state.status === 500) {
+      toast.error("서버 에러가 발생하였습니다.");
+    } else if (state.status === 401) {
+      router.replace(
+        `/login?error=unauthorized&redirect_url=/forum/${boardId}/update`,
+      );
+    }
+  }, [state, router, boardId]);
 
   if (!isMounted) return null;
 
@@ -91,9 +127,8 @@ const Update = ({ params }: { params: UpdateParams }) => {
           : dropdownForumItems
       }
       request={request}
-      btnTitle="수정"
-      onSubmit={handleSubmit}
       onChangeRequest={handleChangeRequest}
+      action={formAction}
     />
   );
 };

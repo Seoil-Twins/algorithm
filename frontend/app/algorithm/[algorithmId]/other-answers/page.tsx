@@ -1,4 +1,8 @@
-import { ResponseAnswer, getAnswer } from "@/api/code";
+import { AnswerResponse } from "@/types/code";
+
+import { getTitleByCode } from "@/types/constants";
+
+import { getAnswer } from "@/app/actions/code";
 
 import styles from "./otherAnswers.module.scss";
 
@@ -6,7 +10,6 @@ import DetailNav from "@/components/detail/detailNav";
 import Answer from "@/components/algorithm/detail/other-answers/answer";
 import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
-import { getCodeValue } from "@/providers/codeTypeProvider";
 
 const OtherAnswers = async ({
   params,
@@ -25,8 +28,20 @@ const OtherAnswers = async ({
     page,
     language,
   });
-  // 추후 total 생성 시 .data만 추가
-  const answers: ResponseAnswer = { ...answersResponse.data, total: 3 };
+  let answers;
+
+  if (answersResponse.status === 200) {
+    answers = { ...(answersResponse.data as AnswerResponse), total: 3 };
+
+    answers.codes = answers.codes.map((code) => {
+      const newCode = `<pre><code class="language-${getTitleByCode(
+        language,
+      )} hljs">${code.code}</code></pre>`;
+      return { ...code, code: newCode };
+    });
+  } else {
+    answers = { total: 0, codes: [] };
+  }
 
   if (answers.total <= 0)
     return (

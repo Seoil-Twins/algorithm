@@ -99,29 +99,6 @@ const levelDropdownItems: DropdownItems = {
     },
   ],
 };
-const kindDropdownItems: DropdownItems = {
-  queryKey: "kind",
-  placeholder: "언어",
-  isVisible: false,
-  items: [
-    {
-      title: "전체",
-      value: "a",
-    },
-    {
-      title: "C++",
-      value: "c",
-    },
-    {
-      title: "Python",
-      value: "p",
-    },
-    {
-      title: "Java",
-      value: "j",
-    },
-  ],
-};
 const rateDropdownItems: DropdownItems = {
   queryKey: "rate",
   placeholder: "정답률",
@@ -177,7 +154,6 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
     const newDropdownItems = [
       sortDropdownItems,
       levelDropdownItems,
-      kindDropdownItems,
       rateDropdownItems,
       newTagDropdownItems,
     ];

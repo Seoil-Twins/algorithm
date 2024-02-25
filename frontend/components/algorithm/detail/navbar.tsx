@@ -21,7 +21,7 @@ import {
 } from "@/providers/codeTypeProvider";
 import { useAuth } from "@/providers/authProvider";
 
-import { checkMyType } from "@/api/algorithm";
+import { checkMyType } from "@/types/constants";
 
 type AlgorithmNavbarProps = {
   algorithm: Algorithm;

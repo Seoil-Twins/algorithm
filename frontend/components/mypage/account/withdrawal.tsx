@@ -1,42 +1,48 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { deleteUser } from "@/api/user";
-
 import { useAuth } from "@/providers/authProvider";
+import { useFormState } from "react-dom";
+import { deleteUser } from "@/app/actions/user";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Withdrawal = () => {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   const [isCheck, setIsCheck] = useState<boolean>(false);
+  const [state, formAction] = useFormState(async () => {
+    if (!user?.userId) return;
+
+    return await deleteUser(isCheck, user.userId);
+  }, null);
 
   const handleIsCheck = useCallback(() => {
     setIsCheck((prev) => !prev);
   }, []);
 
-  const handleWithdrawal = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      if (!user) return;
-      if (!isCheck) {
-        alert("회원 탈퇴에 동의해주세요.");
-        return;
-      }
+  useEffect(() => {
+    if (!state) return;
 
-      // 회원 탈퇴 API
-      await deleteUser(user.userId);
+    if (state.status === 200) {
       logout();
-    },
-    [user, isCheck, logout],
-  );
+      router.replace("/");
+    } else {
+      toast.error(state.data, {
+        position: "top-center",
+        duration: 3000,
+      });
+    }
+  }, [router, state, logout]);
 
   return (
-    <form className={styles.form} onSubmit={handleWithdrawal}>
+    <form className={styles.form} action={formAction}>
       <p>
         회원 탈퇴일부터 계정 정보(아이디/이메일/닉네임)는 <br />
         <Link

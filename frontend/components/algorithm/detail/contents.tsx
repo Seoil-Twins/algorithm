@@ -9,18 +9,19 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import { Resizable } from "re-resizable";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 import { Algorithm } from "@/types/algorithm";
-import { CodeOptions } from "@/types/code";
+import { RequestCode } from "@/types/code";
 
-import { sendCode } from "@/api/code";
+import { sendCode } from "@/app/actions/code";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
 import {
   CodeType,
-  findMyTitle,
   getCodeValue,
   useCodeType,
 } from "@/providers/codeTypeProvider";
@@ -61,6 +62,7 @@ const defaultCode = (type?: CodeType) => {
 };
 
 const Contents = ({ algorithm }: DetailProps) => {
+  const router = useRouter();
   const { type } = useCodeType();
   const { resolvedTheme } = useTheme();
 
@@ -100,19 +102,25 @@ const Contents = ({ algorithm }: DetailProps) => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    try {
-      const options: CodeOptions = {
-        algorithmId: algorithm.algorithmId,
-        code,
-        type: getCodeValue(type),
-      };
+    const options: RequestCode = {
+      algorithmId: algorithm.algorithmId,
+      code,
+      type: getCodeValue(type),
+    };
 
-      const response = await sendCode(options);
-      console.log(response);
-    } catch (error) {
-      alert("에러가 발생하였습니다. 나중에 다시 시도해주세요.");
+    const response = await sendCode(options);
+
+    if (response.status === 201) {
+      console.log(response.data);
+    } else if (response.status === 401) {
+      toast.error("로그인이 필요한 서비스입니다.");
+      router.push(
+        `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
+      );
+    } else {
+      toast.error("서버와의 통신 중 오류가 발생하였습니다.");
     }
-  }, [algorithm.algorithmId, code, type]);
+  }, [algorithm.algorithmId, code, router, type]);
 
   useEffect(() => {
     const initalCode = defaultCode(type);

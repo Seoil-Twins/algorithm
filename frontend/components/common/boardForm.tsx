@@ -3,22 +3,15 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { RequestBoard } from "@/types/board";
+
 import styles from "./boardForm.module.scss";
 import { notosansMedium } from "@/styles/_font";
 
 import Dropdown, { DropdownItem } from "@/components/common/dropdown";
 import Input from "@/components/common/input";
 import Editor from "@/components/common/editor";
-
-import { RequestBoard } from "@/types/board";
 import SubmitButton from "./submitButton";
-
-export const BOARD_TYPE = {
-  PUBLIC_QUESTION: 1,
-  PUBLIC_FREE: 2,
-  ALGORITHM_QUESTION: 3,
-  ALGORITHM_FEEDBACK: 4,
-} as const;
 
 type BoardFormProps = {
   request: RequestBoard;
@@ -111,6 +104,7 @@ const BoardForm = ({
         <div className={styles.title} ref={titleRef}>
           <Input
             name="title"
+            type="text"
             value={request.title}
             onChange={handleTitle}
             placeholder="제목 입력"

@@ -10,8 +10,6 @@ type EditorViewerProps = {
 };
 
 const EditorViewer = ({ content, className }: EditorViewerProps) => {
-  console.log(content);
-
   useEffect(() => {
     const regex = /<pre><code(?:\s+class="[^"]*")?>([\s\S]*?)<\/code><\/pre>/g;
     if (!content.match(regex)) return;

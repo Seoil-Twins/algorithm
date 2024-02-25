@@ -17,15 +17,15 @@ const notError: ValidationError = {
 };
 
 export const validationNickname = (nickname?: string) => {
-  if (!nickname || nickname.length < 2)
+  if (!nickname || nickname.length <= 1)
     return {
       isError: true,
       errMsg: "2글자 이상 입력해주세요.",
     };
-  else if (nickname.length > 8) {
+  else if (nickname.length > 16) {
     return {
       isError: true,
-      errMsg: "8글자 이하 입력해주세요.",
+      errMsg: "16글자 이하 입력해주세요.",
     };
   }
 
@@ -45,7 +45,7 @@ export const validationEmail = (email?: string) => {
   if (!isValidEmail) {
     return {
       isError: true,
-      errMsg: "유효하지 않은 이메일입니다.",
+      errMsg: "형식에 맞지 않는 이메일입니다.",
     };
   }
 

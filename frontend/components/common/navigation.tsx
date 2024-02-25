@@ -8,7 +8,7 @@ import styles from "./navigation.module.scss";
 import Sidebar from "./sidebar";
 import Navbar from "./navbar";
 
-import { AUTH_PATHS } from "@/constants";
+import { AUTH_PATHS } from "@/types/constants";
 
 import { useAuth } from "@/providers/authProvider";
 

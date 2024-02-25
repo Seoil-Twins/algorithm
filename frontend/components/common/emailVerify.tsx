@@ -9,8 +9,6 @@ import Input from "./input";
 type Info = {
   value: string;
   disabled: boolean;
-  isError: boolean;
-  errMsg: string;
 };
 
 export type EmailInfo = {
@@ -41,12 +39,10 @@ const EmailVerify = ({
           type="email"
           title="이메일"
           placeholder="이메일 입력"
-          pattern="[a-zA-Z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
           value={emailInfo.email.value}
           disabled={emailInfo.email.disabled}
-          isError={emailInfo.email.isError}
-          errorMsg={emailInfo.email.errMsg}
           onChange={(changedValue: string) => onChange(changedValue, "email")}
+          required
         />
         <button
           type="button"
@@ -64,11 +60,11 @@ const EmailVerify = ({
         placeholder="인증 번호 입력"
         value={emailInfo.verifyCode.value}
         disabled={emailInfo.verifyCode.disabled}
-        isError={emailInfo.verifyCode.isError}
-        errorMsg={emailInfo.verifyCode.errMsg}
         onChange={(changedValue: string) =>
           onChange(changedValue, "verifyCode")
         }
+        maxLength={6}
+        required
       />
       <button
         type="button"

@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     // remove Cookie
-    removeUser();
+    await removeUser();
     router.refresh();
   };
 

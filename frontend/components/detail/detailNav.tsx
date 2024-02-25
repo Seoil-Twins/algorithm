@@ -5,11 +5,11 @@ import { useRouter, useParams, usePathname } from "next/navigation";
 import { AxiosError } from "axios";
 import Link from "next/link";
 
-import { deleteBoard } from "@/api/board";
-
 import styles from "./detailNav.module.scss";
 
 import Modal from "../common/modal";
+import { deleteBoard } from "@/app/actions/baord";
+import toast from "react-hot-toast";
 
 type DetailNavProps = {
   isEditable: boolean;
@@ -33,10 +33,13 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
 
   const handleDelete = useCallback(async () => {
     try {
-      await deleteBoard(boardId);
+      const response = await deleteBoard(boardId);
+      if (response.status !== 200) {
+        toast.error("글 삭제에 실패했습니다.");
+      }
 
+      toast.success("글이 삭제되었습니다.");
       router.back();
-      router.refresh();
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 401) {
         router.push(`/login?error=unauthorized&redirect=${pathname}`);

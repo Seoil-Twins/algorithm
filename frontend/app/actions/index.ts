@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const enviroment = process.env.NEXT_PUBLIC_ENVIROMENT;
 const API_URL =
@@ -16,9 +16,31 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-export type ActionResponse = {
+export type ActionResponse<T = any> = {
   status: number;
-  data?: any;
+  data: T;
+};
+
+export type ActionError = {
+  status: number;
+  data: string;
+};
+
+export const errorHandler = (error: any): ActionError => {
+  if (error instanceof AxiosError) {
+    return {
+      status: error.response?.data.errorCode || error.response?.status || 500,
+      data:
+        (typeof error.response?.data === "object"
+          ? error.response?.data.message
+          : error.response?.data) || "서버와의 통신 중 오류가 발생했습니다.",
+    };
+  }
+
+  return {
+    status: 500,
+    data: "서버와의 통신 중 오류가 발생했습니다.",
+  };
 };
 
 /**

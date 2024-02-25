@@ -1,3 +1,4 @@
+import { Comment } from "./comment";
 import { RequiredUser } from "./user";
 
 export type Code = {
@@ -11,10 +12,19 @@ export type Code = {
   createdTime: string;
 };
 
+export type SummaryCode = Pick<
+  Code,
+  "codeId" | "code" | "type" | "recommendCount" | "createdTime"
+>;
+export type SummaryComment = Pick<
+  Comment,
+  "commentId" | "user" | "content" | "createdTime"
+>;
+
 export type ResponseAnswerItem = {
   user: RequiredUser;
-  comments: Pick<Comment, "commentId" | "user" | "content" | "createdTime">[];
-} & Pick<Code, "codeId" | "code" | "type" | "recommendCount" | "createdTime">;
+  comments: SummaryComment[];
+} & SummaryCode;
 
 export type AnswerResponse = {
   codes: ResponseAnswerItem[];
@@ -27,7 +37,7 @@ export type PageOptions = {
   page: number;
 };
 
-export type CodeOptions = {
+export type RequestCode = {
   algorithmId: number;
   code: string;
   type: number;

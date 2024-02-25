@@ -4,15 +4,20 @@ import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-
-import styles from "./comment.module.scss";
-
-import { useAuth } from "@/providers/authProvider";
+import toast from "react-hot-toast";
 
 import { Comment as CommentType } from "@/types/comment";
 
-import { IMAGE_URL } from "@/api";
-import { deleteComment, patchComment, postSolvedComment } from "@/api/comment";
+import { IMAGE_URL } from "@/app/actions";
+import {
+  deleteComment,
+  patchComment,
+  postSolvedComment,
+} from "@/app/actions/comment";
+
+import { useAuth } from "@/providers/authProvider";
+
+import styles from "./comment.module.scss";
 
 import EditorViewer from "../common/editorViewer";
 import CommentUpdateEditor from "./commentUpdateEditor";
@@ -47,38 +52,43 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
   }, []);
 
   const handleSolved = useCallback(async () => {
-    await postSolvedComment(boardId, comment.commentId);
-    router.refresh();
+    const response = await postSolvedComment(boardId, comment.commentId);
+
+    if (response.status === 200) {
+      router.refresh();
+    } else {
+      toast.error("채택에 실패했습니다.");
+    }
   }, [boardId, router, comment.commentId]);
 
   const handleCommentDelete = useCallback(async () => {
-    try {
-      await deleteComment(comment.commentId);
-    } catch (error) {
-      alert("댓글 삭제에 실패했습니다.");
+    const response = await deleteComment(comment.commentId);
+
+    if (response.status === 200) {
+      router.refresh();
+      setIsVisibleModal(false);
+    } else {
+      toast.error("삭제에 실패했습니다.");
     }
-    router.refresh();
-    setIsVisibleModal(false);
   }, [comment.commentId, router]);
 
   const handleCommentUpdate = useCallback(
     async (value: string) => {
-      try {
-        await patchComment(comment.commentId, value);
+      const response = await patchComment(comment.commentId, value);
+
+      if (response.status === 200) {
         router.refresh();
         setIsVisibleEditor(false);
-      } catch (error) {
-        alert("댓글 수정에 실패했습니다.");
+      } else {
+        toast.error("수정에 실패했습니다.");
       }
     },
     [comment.commentId, router],
   );
 
   const renderCheckMark = () => {
-    if (boardTypeId !== 2 && userId === user?.userId) {
-      return comment.commentId === solved ? (
-        <Image src="/svgs/valid_check.svg" alt="채택" width={32} height={32} />
-      ) : (
+    if (boardTypeId !== 2 && userId === user?.userId && !solved) {
+      return (
         <button onClick={handleSolved}>
           <Image
             src="/svgs/non_check.svg"
@@ -88,12 +98,11 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
           />
         </button>
       );
-    } else if (userId !== user?.userId && comment.commentId === solved) {
+    } else if (solved === comment.commentId) {
       return (
         <Image src="/svgs/valid_check.svg" alt="채택" width={32} height={32} />
       );
     }
-    return null;
   };
 
   useEffect(() => {
@@ -136,23 +145,24 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
                     {comment.createdTime}
                   </span>
                 </Link>
-                {comment.user.userId === user?.userId && (
-                  <>
-                    <button
-                      className={styles.blue}
-                      onClick={handleIsVisibleCommentEditor}
-                    >
-                      수정
-                    </button>{" "}
-                    ·{" "}
-                    <button
-                      className={styles.red}
-                      onClick={handleISVisibleModal}
-                    >
-                      삭제
-                    </button>
-                  </>
-                )}
+                {comment.user.userId === user?.userId &&
+                  comment.commentId !== solved && (
+                    <>
+                      <button
+                        className={styles.blue}
+                        onClick={handleIsVisibleCommentEditor}
+                      >
+                        수정
+                      </button>{" "}
+                      ·{" "}
+                      <button
+                        className={styles.red}
+                        onClick={handleISVisibleModal}
+                      >
+                        삭제
+                      </button>
+                    </>
+                  )}
               </div>
             </div>
           </div>

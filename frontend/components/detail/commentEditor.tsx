@@ -2,52 +2,46 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useFormState } from "react-dom";
 
-import Editor from "../common/editor";
-
-import styles from "./commentEditor.module.scss";
-
-import { IMAGE_URL } from "@/api";
-import { postComment } from "@/api/comment";
+import { IMAGE_URL } from "@/app/actions";
+import { postComment } from "@/app/actions/comment";
 
 import { useAuth } from "@/providers/authProvider";
-import { useParams, useRouter } from "next/navigation";
+
+import Editor from "../common/editor";
+import styles from "./commentEditor.module.scss";
+import SubmitButton from "../common/submitButton";
 
 type CommentEditorProps = {
-  apiUrl?: string;
+  requestId: string;
+  type?: "comment" | "code";
   isVisibleToolbar?: boolean;
 };
 
-const CommentEditor = ({ isVisibleToolbar = true }: CommentEditorProps) => {
-  const param = useParams();
+const CommentEditor = ({
+  requestId,
+  type = "comment",
+  isVisibleToolbar = true,
+}: CommentEditorProps) => {
   const router = useRouter();
   const { user } = useAuth();
-  const boardId = Array.isArray(param.boardId)
-    ? param.boardId[0]
-    : param.boardId;
 
   const [value, setValue] = useState<string>("");
   const [init, setInit] = useState<boolean>(false);
 
+  const [state, formAction] = useFormState(
+    async (_prevState: any, _formdata: FormData) => {
+      return await postComment(type, requestId, value);
+    },
+    null,
+  );
+
   const handleChange = useCallback((newVal: string) => {
     setValue(newVal);
   }, []);
-
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      if (value.trim() === "") return;
-
-      try {
-        await postComment(boardId, value);
-        setInit(true);
-        router.refresh();
-      } catch (error) {
-        alert("댓글 작성에 실패했습니다.");
-      }
-    },
-    [boardId, router, value],
-  );
 
   useEffect(() => {
     if (init) {
@@ -55,15 +49,31 @@ const CommentEditor = ({ isVisibleToolbar = true }: CommentEditorProps) => {
     }
   }, [init]);
 
-  if (!user) return null;
+  useEffect(() => {
+    if (!state) return;
+
+    if (state.status === 201) {
+      setInit(true);
+      toast.success("댓글이 작성되었습니다.");
+      router.refresh();
+    } else if (state.status === 401 && type === "comment") {
+      router.push(`/login?error=unauthorized&redirect_url=/forum/${requestId}`);
+    } else if (state.status === 401 && type === "code") {
+      router.push(
+        `/login?error=unauthorized&redirect_url=/algorithm/${requestId}/other-answers`,
+      );
+    } else {
+      toast.error("서버와 통신 중에 오류가 발생했습니다.");
+    }
+  }, [requestId, type, router, state]);
 
   return (
-    <form className={styles.commentEditor} onSubmit={handleSubmit}>
+    <form className={styles.commentEditor} action={formAction}>
       <div className={styles.editorBox}>
         <div className={styles.profileImgBox}>
           <Image
             src={
-              user.profile
+              user?.profile
                 ? `${IMAGE_URL}/${user.profile}`
                 : "/svgs/user_profile_default.svg"
             }
@@ -83,9 +93,11 @@ const CommentEditor = ({ isVisibleToolbar = true }: CommentEditorProps) => {
         />
       </div>
       <div className={styles.btnBox}>
-        <button type="submit" className={`${styles.btn} ${styles.comment}`}>
-          답변 작성
-        </button>
+        <SubmitButton
+          btnTitle="답변 작성"
+          pendingTitle="작성 중"
+          className={`${styles.btn} ${styles.comment}`}
+        />
       </div>
     </form>
   );

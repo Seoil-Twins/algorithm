@@ -2,19 +2,30 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { IMAGE_URL } from "@/api";
-import { ResponseBoard, getBoardTypes } from "@/api/board";
+import { getBoardTypes } from "@/app/actions/baord";
+import { BoardResponse } from "@/types/board";
 
 import { notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
 import { getTimeAgo } from "@/utils/day";
+import NotFound from "../common/notFound";
 
 type TableProps = {
-  item: ResponseBoard;
+  item: BoardResponse;
 };
 
 const Table = async ({ item }: TableProps) => {
   const boardType = await getBoardTypes();
+
+  if (item.total === 0 || item.contents.length <= 0) {
+    return (
+      <NotFound
+        title="아직 게시된 게시글이 없습니다."
+        description="새로운 게시글의 주인공이 되어보세요 !"
+      />
+    );
+  }
 
   return (
     <div className={styles.table}>
@@ -54,7 +65,7 @@ const Table = async ({ item }: TableProps) => {
                 {content.solved !== undefined && (
                   <>
                     <div className={styles.infoBox}>
-                      {typeof content.solved === "number" ? (
+                      {content.solved ? (
                         <>
                           <Image
                             src="/svgs/answer_check_active.svg"
