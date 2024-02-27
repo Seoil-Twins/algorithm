@@ -1,11 +1,10 @@
 "use server";
 
-import { AxiosError } from "axios";
 import { revalidatePath } from "next/cache";
 
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
 
-import { Board, BoardResponse, PageOptions, RequestBoard } from "@/types/board";
+import { Board, BoardResponse, PageOptions } from "@/types/board";
 import { BoardType } from "@/types/boardType";
 import { AlgorithmPageOptions } from "@/types/algorithm";
 
@@ -202,6 +201,8 @@ export const patchBoard = async (
       content,
       title,
     });
+    revalidatePath("/forum/*", "layout");
+    revalidatePath("/algorithm/[algorithmId]/*", "layout");
     return {
       status: response.status,
       data: response.data,

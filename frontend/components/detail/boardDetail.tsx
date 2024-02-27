@@ -91,16 +91,17 @@ const BoardDetail = async ({
               <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
           </Link>
-          {board.boardType === BOARD_TYPE.ALGORITHM_FEEDBACK && board.solved ? (
-            <Image
-              src="/svgs/valid_check.svg"
-              alt="채택"
-              width={32}
-              height={32}
-            />
-          ) : (
-            <FeedbackSolve boardId={board.boardId} />
-          )}
+          {board.boardType === BOARD_TYPE.ALGORITHM_FEEDBACK &&
+            (board.solved ? (
+              <Image
+                src="/svgs/valid_check.svg"
+                alt="채택"
+                width={32}
+                height={32}
+              />
+            ) : (
+              <FeedbackSolve boardId={board.boardId} />
+            ))}
         </div>
         {board.solved && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>

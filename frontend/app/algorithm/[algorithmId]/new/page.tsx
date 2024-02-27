@@ -20,11 +20,11 @@ type NewParams = {
 const dropdownItems: DropdownItem[] = [
   {
     title: "질문",
-    value: 3,
+    value: BOARD_TYPE.ALGORITHM_QUESTION,
   },
   {
     title: "피드백",
-    value: 4,
+    value: BOARD_TYPE.ALGORITHM_FEEDBACK,
   },
 ];
 
