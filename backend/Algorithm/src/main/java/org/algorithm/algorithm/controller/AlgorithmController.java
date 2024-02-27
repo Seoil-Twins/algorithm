@@ -29,7 +29,7 @@ public class AlgorithmController {
     private final AlgorithmService algorithmService;
     @GetMapping("/algorithm")
     public ResponseEntity<?> getAllAlgorithm(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
-                                             @RequestParam(required = false, defaultValue = "5", value = "count") int count,
+                                             @RequestParam(required = false, defaultValue = "10", value = "count") int count,
                                              @RequestParam(required = false, defaultValue = "a", value = "solved") String solved, // a : 전체, s : 푼 문제, ns : 안푼 문제
                                              @RequestParam(required = false, defaultValue = "r", value = "sort") String sort, // r : 최신순, or : 오래된순, t : 시도순
                                              @RequestParam(required = false, defaultValue = "0", value = "level") String level, // -1은 전체, 0~5
@@ -45,43 +45,45 @@ public class AlgorithmController {
             );
         }
 
-        Set<String> validSort = new HashSet<>(Arrays.asList("r","or","t"));
+        Set<String> validSort = new HashSet<>(Arrays.asList("r","or","t","R","OR","T"));
         if (!validSort.contains(sort)) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : sort ( sort only 'r', 'or', 't' : default 'r' )")
             );
         }
 
-        Set<String> validSolved = new HashSet<>(Arrays.asList("a","s","ns"));
+        Set<String> validSolved = new HashSet<>(Arrays.asList("a","s","ns","A","S","NS"));
         if (!validSolved.contains(solved)) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : solved ( solved only 'a', 's', 'ns' : default 'a' )")
             );
         }
 
-        Set<String> validKind = new HashSet<>(Arrays.asList("a","c","p","j"));
+        Set<String> validKind = new HashSet<>(Arrays.asList("a","c","p","j","A","C","P","J"));
         if (!validKind.contains(kind)) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : kind ( kind only 'a', 'c', 'p' ,'j' : default 'a' )")
             );
         }
 
-        Set<String> validRate = new HashSet<>(Arrays.asList("h","l"));
-        if (!validRate.contains(rate)) {
+        Set<String> validRate = new HashSet<>(Arrays.asList("h","l","H","L"));
+        if (!validRate.contains(rate) && rate != null) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : rate ( rate only 'h', 'l' )")
             );
+        } else if (rate != null){
+            rate = rate.toLowerCase();
         }
 
         Set<String> validTag = new HashSet<>(Arrays.asList("1001","1002","1003","1004","1005","1006","1007","1008","1009","1010","1011","1012","1013","1014"));
-        if (!validTag.contains(tag)) {
+        if (!validTag.contains(tag) && tag != null) {
             return ResponseEntity.badRequest().body(
                     new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : tag ( tag range 1001 ~ 1014 )" + " input : ")
             );
         }
 
         HttpSession session = request.getSession(false); // default true
-        AlgorithmRequestDTO algorithmRequestDTO = new AlgorithmRequestDTO(page,count,solved,sort,level,kind,rate,tag,keyword);
+        AlgorithmRequestDTO algorithmRequestDTO = new AlgorithmRequestDTO(page,count,solved.toLowerCase(),sort.toLowerCase(),level,kind.toLowerCase(),rate,tag,keyword);
         UserDTO loginUser = null;
         if(session != null){
             // 상수로 뺼 예정

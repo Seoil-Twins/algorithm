@@ -38,10 +38,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleSQLException(SQLException ex) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode errorNode = objectMapper.createObjectNode();
-        errorNode.put("errorCode", HttpStatus.NO_CONTENT.value());
+        errorNode.put("errorCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorNode.put("message",ex.getMessage());
 
-        return new ResponseEntity<>(errorNode, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(errorNode, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(NicknameException.class)
@@ -108,6 +108,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorNode,HttpStatus.NOT_FOUND);
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 
+    }
+
+    @ExceptionHandler(CompileException.class)
+    public ResponseEntity<Object> handleCompileException(CompileException ex) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("errorCode", HttpStatus.BAD_REQUEST.value());
+        errorNode.put("message",ex.getMessage());
+
+        // 적절한 HTTP 상태 코드 선택, 예: HttpStatus.INTERNAL_SERVER_ERROR
+        return new ResponseEntity<>(errorNode, HttpStatus.BAD_REQUEST);
     }
 
 

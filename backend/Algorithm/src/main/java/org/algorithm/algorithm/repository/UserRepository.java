@@ -1,10 +1,13 @@
 package org.algorithm.algorithm.repository;
 
+import org.algorithm.algorithm.entity.BoardEntity;
 import org.algorithm.algorithm.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
@@ -25,13 +28,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "    (SELECT COUNT(*) FROM user_try WHERE user_id = :userId AND solved = true) AS solved,\n" +
             "    (SELECT COUNT(*) FROM favorite WHERE user_id = :userId) AS favorite", nativeQuery = true)
     String findSolvedByUserId(@Param("userId") int userId);
-
-    @Query(value = "SELECT board.*, COUNT(board_view.board_id) AS views " +
-            "FROM board " +
-            "LEFT JOIN board_view ON board.board_id = board_view.board_id " +
-            "WHERE board.user_id = :userId AND board.board_type IN (1, 3)" +
-            "GROUP BY board.board_id, board.title, board.content, board.user_id;", nativeQuery = true)
-    String[] findQuestionByUserId(@Param("userId") int userId);
 
     @Query(value = "SELECT board.*, COUNT(board_view.board_id) AS views " +
             "FROM board " +

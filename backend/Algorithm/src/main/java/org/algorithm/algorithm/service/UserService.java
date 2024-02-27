@@ -9,20 +9,13 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.SendFailedException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.algorithm.algorithm.dto.BoardDTO;
 import org.algorithm.algorithm.dto.EmailVerifyDTO;
+import org.algorithm.algorithm.dto.ResponseUserDTO;
 import org.algorithm.algorithm.dto.UserDTO;
-import org.algorithm.algorithm.entity.EmailVerifyEntity;
-import org.algorithm.algorithm.entity.UserEntity;
-import org.algorithm.algorithm.entity.UserLinkEntity;
-import org.algorithm.algorithm.entity.UserProfileEntity;
-import org.algorithm.algorithm.exception.EmailException;
-import org.algorithm.algorithm.exception.NicknameException;
-import org.algorithm.algorithm.exception.NotFoundException;
-import org.algorithm.algorithm.exception.SQLException;
-import org.algorithm.algorithm.repository.EmailVerifyRepository;
-import org.algorithm.algorithm.repository.UserLinkRepository;
-import org.algorithm.algorithm.repository.UserProfileRepository;
-import org.algorithm.algorithm.repository.UserRepository;
+import org.algorithm.algorithm.entity.*;
+import org.algorithm.algorithm.exception.*;
+import org.algorithm.algorithm.repository.*;
 import org.algorithm.algorithm.util.Const;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
@@ -38,10 +31,7 @@ import org.springframework.stereotype.Service;
 import java.beans.PropertyDescriptor;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.algorithm.algorithm.util.Const.EMAILSENDER;
 
@@ -54,6 +44,14 @@ public class UserService {
     private final EmailVerifyRepository emailVerifyRepository; // 먼저 jpa, mysql dependency 추가
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender javaMailSender;
+
+    public final ResponseUserRepository responseUserRepository;
+    public final RecommendBoardRepository recommendBoardRepository;
+    public final BoardViewRepository boardViewRepository;
+    public final AdoptFeedbackRepository adoptFeedbackRepository;
+    public final AdoptRepository adoptRepository;
+    public final TagRepository tagRepository;
+    public final BoardRepository boardRepository;
 
 
     public void save(UserDTO userDTO) {
@@ -203,40 +201,34 @@ public class UserService {
 
     public ObjectNode userMypageQuestion(UserDTO userDTO) {
         try {
-            String[] resultValue = userRepository.findQuestionByUserId((int) userDTO.getUserId());
+            List<BoardEntity> resultValue = boardRepository.findQuestionByUserId(userDTO.getUserId());
 
 
             ObjectMapper objectMapper = new ObjectMapper();
             ArrayNode linksArrayNode = objectMapper.createArrayNode();
 
 
-            for (String linkString : resultValue) {
-                String[] linkParts = linkString.split(",");
+            for (BoardEntity linkParts : resultValue) {
+                BoardDTO boardDTO = BoardDTO.toBoardDTO(linkParts);
                 String tempId = null;
-                if (linkParts.length == Const.BOARD.size()) {
-                    ObjectNode linkNode = objectMapper.createObjectNode();
-                    for (int i = 0; i < Const.BOARD.size(); i++) {
-                        String column = Const.BOARD.get(i);
-                        String value = linkParts[i];
-                        if (Objects.equals(column, "board_id")) {
-                            tempId = linkParts[i];
-                        }
-                        linkNode.put(column, value);
-                    }
-                    linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
-                    linksArrayNode.add(linkNode);
-                }
+                ObjectNode linkNode = createBoardNode(boardDTO, userDTO);
+//                linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
+                linksArrayNode.add(linkNode);
+                System.out.println(linkNode);
+
             }
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("userId", objectMapper.convertValue(userDTO.getUserId(), JsonNode.class));
             responseNode.set("results", linksArrayNode);
-            responseNode.set("totals", objectMapper.convertValue(resultValue.length, JsonNode.class));
+            responseNode.set("totals", objectMapper.convertValue(resultValue.size(), JsonNode.class));
             System.out.println(responseNode);
 
             return responseNode;
         }
         catch(Error e) {
             throw new SQLException("GET MyPage Question Error ! ");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
     public ObjectNode userMypageFeedback(UserDTO userDTO) {
@@ -442,6 +434,9 @@ public class UserService {
     public ObjectNode userLinkPost(int userId, UserLinkEntity userLinkEntity) {
         try {
 
+            if(userLinkRepository.findUserLinkEntityByDomain(userLinkEntity.getDomain()) != null)
+                throw new DuplicatedExcepiton("Already Exist Domain ! ");
+
             userLinkEntity.setUserId(userId);
             userLinkEntity.setCreatedTime(LocalDateTime.now());
 
@@ -576,6 +571,69 @@ public class UserService {
         catch(Error e){
             throw new SQLException(" User Delete SQL Error ! ");
         }
+    }
+
+    private ObjectNode createBoardNode(BoardDTO boardDTO, UserDTO userDTO) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode boardNode = objectMapper.createObjectNode();
+        Set<Long> validSolved = new HashSet<>(Arrays.asList(1L,3L,4L));
+        Set<Long> feedbackSolved = new HashSet<>(Arrays.asList(4L));
+
+        // boardId로 recommendCount 추출
+        String recommendCount = recommendBoardRepository.findCountByBoardId(boardDTO.getBoardId());
+        if(recommendCount == null)
+            recommendCount = "0";
+
+        // boardId로 views 추출 코드
+        String views = boardViewRepository.countByBoardId(boardDTO.getBoardId());
+        if(views == null)
+            views = "0";
+
+        // boardId로 solved 추출 코드 작성 요망
+        Boolean solved;
+        if(feedbackSolved.contains(boardDTO.getBoardType())) {
+            solved = adoptFeedbackRepository.findByBoardId(boardDTO.getBoardId()) != null;
+        }
+        else
+            solved = adoptRepository.findByBoardId(boardDTO.getBoardId()) != null;
+
+        // boardId로 tags 추출 코드 작성 요망
+//        String[] tags = ["자유분방","천방지축"];
+        List<String> tagList = tagRepository.findValuesByBoardId(boardDTO.getBoardId());
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode tagNode = mapper.createArrayNode();
+
+        // tagList를 ArrayNode에 추가
+        for (String tag : tagList) {
+            tagNode.add(tag);
+        }
+
+        // boardId로 commentCount 추출 코드 작성 요망
+        String commentCount = boardRepository.findCommentCountByBoardId(boardDTO.getBoardId());
+        if (commentCount == null)
+            commentCount = "0";
+//
+////        // boardId로 isRecommend 추출 코드 작성 요망
+//        Boolean isRecommend = recommendBoardRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userDTO.getUserId()) != null;
+////
+////        // boardId로 isView 추출 코드 작성 요망
+//        Boolean isView = boardViewRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userDTO.getUserId()) != null;
+
+        boardNode.put("boardId", boardDTO.getBoardId());
+        boardNode.put("boardType", boardDTO.getBoardType());
+        boardNode.put("title", boardDTO.getTitle());
+        boardNode.put("content", boardDTO.getContent());
+        if(validSolved.contains(boardDTO.getBoardType()))
+            boardNode.put("solved", solved);
+        boardNode.put("views", views);
+        boardNode.put("recommendCount", recommendCount);
+        boardNode.set("tags", tagNode);
+        boardNode.put("commentCount", commentCount);
+//        boardNode.put("isRecommend", isRecommend);
+//        boardNode.put("isView", isView);
+        boardNode.put("createdTime", String.valueOf(boardDTO.getCreatedTime()));
+
+        return boardNode;
     }
 
 }

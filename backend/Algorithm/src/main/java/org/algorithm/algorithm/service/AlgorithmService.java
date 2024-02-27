@@ -16,12 +16,14 @@ import org.algorithm.algorithm.util.ErrorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -44,7 +46,6 @@ public class AlgorithmService {
             Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(
                     AlgorithmSpecification.withDynamicQuery(
-                            algorithmRequestDTO.getSort(),
                             algorithmRequestDTO.getLevel(),
                             algorithmRequestDTO.getTag(),
                             algorithmRequestDTO.getKeyword()),
@@ -168,10 +169,16 @@ public class AlgorithmService {
     public ObjectNode getAll(AlgorithmRequestDTO algorithmRequestDTO) {
         try {
             System.out.println(algorithmRequestDTO);
-            Pageable pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount());
+            Pageable pageable = null;
+
+            if ("r".equals(algorithmRequestDTO.getSort())) { // "r"이면 내림차순
+                pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount(), Sort.by("createdTime").descending());
+            } else { // "or"이면 오름차순
+                pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount(), Sort.by("createdTime").ascending());
+            }
+
             Page<AlgorithmEntity> algorithmEntities = algorithmRepository.findAll(
                     AlgorithmSpecification.withDynamicQuery(
-                            algorithmRequestDTO.getSort(),
                             algorithmRequestDTO.getLevel(),
                             algorithmRequestDTO.getTag(),
                             algorithmRequestDTO.getKeyword()),
@@ -184,6 +191,8 @@ public class AlgorithmService {
 
             List<AlgorithmEntity> resultValue = algorithmEntities.getContent();
             ArrayNode response = objectMapper.createArrayNode();
+
+            List<LocalDateTime> times = new ArrayList<>();
 
 
 
@@ -235,7 +244,7 @@ public class AlgorithmService {
                 dtoNode.put("content",algorithmDTO.getContent());
                 dtoNode.put("testcase",testcaseArrayNode);
                 dtoNode.put("correctRate",Math.round(correctRate*100));
-
+                times.add(algorithmDTO.getCreatedTime());
                 response.add(dtoNode);
             }
 
@@ -250,7 +259,7 @@ public class AlgorithmService {
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
                 list.forEach(sortedResponse::add);
-            } else {
+            } else if(Objects.equals(algorithmRequestDTO.getRate(), "l")) {
                 response.forEach(list::add);
 
                 // correctRate를 기준으로 오름차순 정렬
@@ -258,11 +267,15 @@ public class AlgorithmService {
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
                 list.forEach(sortedResponse::add);
+            } else {
+                response.forEach(sortedResponse::add);
             }
 
             ObjectNode responseJSON = objectMapper.createObjectNode();
             responseJSON.set("algorithms", sortedResponse);
             responseJSON.put("total",total);
+
+            System.out.println(times);
 
             return responseJSON;
         }
