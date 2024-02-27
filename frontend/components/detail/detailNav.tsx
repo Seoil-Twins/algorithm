@@ -1,11 +1,15 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import { useRouter, useParams, usePathname } from "next/navigation";
+import { AxiosError } from "axios";
+import Link from "next/link";
 
 import styles from "./detailNav.module.scss";
-import { useCallback, useState } from "react";
-import Link from "next/link";
+
 import Modal from "../common/modal";
+import { deleteBoard } from "@/app/actions/baord";
+import toast from "react-hot-toast";
 
 type DetailNavProps = {
   isEditable: boolean;
@@ -13,7 +17,9 @@ type DetailNavProps = {
 
 const DetailNav = ({ isEditable }: DetailNavProps) => {
   const router = useRouter();
+  const pathname = usePathname();
   const params = useParams();
+  const boardId = Number(params.boardId);
 
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -25,11 +31,25 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
     setIsVisible((prev) => !prev);
   }, []);
 
-  const handleDelete = useCallback(() => {
-    console.log("Delete API");
-    setIsVisible(false);
-    router.back();
-  }, [router]);
+  const handleDelete = useCallback(async () => {
+    try {
+      const response = await deleteBoard(boardId);
+      if (response.status !== 200) {
+        toast.error("글 삭제에 실패했습니다.");
+      }
+
+      toast.success("글이 삭제되었습니다.");
+      router.back();
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        router.push(`/login?error=unauthorized&redirect=${pathname}`);
+      } else {
+        alert("글 삭제에 실패했습니다.");
+      }
+    } finally {
+      setIsVisible(false);
+    }
+  }, [boardId, pathname, router]);
 
   return (
     <nav className={styles.detailNav}>

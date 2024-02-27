@@ -5,20 +5,24 @@ import { Extension, ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { cpp } from "@codemirror/lang-cpp";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
-import DOMPurify from "isomorphic-dompurify";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { Resizable } from "re-resizable";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-import { Algorithm } from "@/interfaces/algorithm";
+import { Algorithm } from "@/types/algorithm";
+import { RequestCode } from "@/types/code";
+
+import { sendCode } from "@/app/actions/code";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
 import {
   CodeType,
-  findMyTitle,
+  getCodeValue,
   useCodeType,
 } from "@/providers/codeTypeProvider";
 
@@ -51,13 +55,14 @@ const defaultCode = (type?: CodeType) => {
   if (type === "c") {
     return `int main() {\n${"  "}\n${"  "}return 0;\n}`;
   } else if (type === "j") {
-    return `public class Solution {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
+    return `public class Main {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
   }
 
   return "";
 };
 
 const Contents = ({ algorithm }: DetailProps) => {
+  const router = useRouter();
   const { type } = useCodeType();
   const { resolvedTheme } = useTheme();
 
@@ -96,9 +101,26 @@ const Contents = ({ algorithm }: DetailProps) => {
     setIsVisibleResetModal((prev) => !prev);
   }, []);
 
-  const handleSubmit = useCallback(() => {
-    console.log(code);
-  }, [code]);
+  const handleSubmit = useCallback(async () => {
+    const options: RequestCode = {
+      algorithmId: algorithm.algorithmId,
+      code,
+      type: getCodeValue(type),
+    };
+
+    const response = await sendCode(options);
+
+    if (response.status === 201) {
+      console.log(response.data);
+    } else if (response.status === 401) {
+      toast.error("로그인이 필요한 서비스입니다.");
+      router.push(
+        `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
+      );
+    } else {
+      toast.error("서버와의 통신 중 오류가 발생하였습니다.");
+    }
+  }, [algorithm.algorithmId, code, router, type]);
 
   useEffect(() => {
     const initalCode = defaultCode(type);
@@ -316,7 +338,7 @@ const Contents = ({ algorithm }: DetailProps) => {
         <Link
           href={`/algorithm/${
             algorithm.algorithmId
-          }/other-answers?language=${findMyTitle(type)}`}
+          }/other-answers?language=${getCodeValue(type)}`}
         >
           <button className={styles.btn}>다른 사람 풀이 보기</button>
         </Link>

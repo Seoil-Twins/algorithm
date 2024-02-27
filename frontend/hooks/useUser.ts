@@ -3,20 +3,20 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import { User } from "@/interfaces/user";
-
-import { UserKeys, getUser } from "@/api/user";
+import { User } from "@/types/user";
+import { UserKeys } from "@/types/constants";
+import { getUser, logout } from "@/app/actions/user";
 
 export const useUser = () => {
   const { data, isLoading, isValidating } = useSWR(
     UserKeys.getUser,
     async () => {
-      try {
-        const userResponse = await getUser();
-        return userResponse.data;
-      } catch (error) {
+      const userResponse = await getUser();
+
+      if (userResponse.status !== 200) {
         return null;
       }
+      return userResponse.data as User;
     },
     {
       revalidateOnFocus: false,
@@ -26,13 +26,13 @@ export const useUser = () => {
   );
   const [user, setUser] = useState<User | undefined | null>(data || undefined);
 
-  const addUser = async (user: User) => {
+  const addUser = async (user: User | undefined | null) => {
     setUser(user);
   };
 
-  const removeUser = () => {
-    // remove cookie
+  const removeUser = async () => {
     setUser(null);
+    await logout();
   };
 
   useEffect(() => {

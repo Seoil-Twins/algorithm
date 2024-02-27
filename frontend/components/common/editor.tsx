@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 
 import StarterKit from "@tiptap/starter-kit";
@@ -27,6 +27,7 @@ type EditorProps = {
   isVisibleToolbar?: boolean;
   placeholder?: string;
   className?: string;
+  init?: boolean;
   onChange: (value: string) => void;
 };
 
@@ -35,6 +36,7 @@ const Editor = ({
   isVisibleToolbar = true,
   placeholder,
   className,
+  init = false,
   onChange,
 }: EditorProps) => {
   const editor = useEditor({
@@ -68,12 +70,26 @@ const Editor = ({
     },
   });
 
+  useEffect(() => {
+    console.log(init);
+    if (init) {
+      editor?.commands.setContent("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [init]);
+
   if (!editor) return null;
 
   return (
     <div className={styles.editorBox}>
       {isVisibleToolbar && <Toolbar editor={editor} />}
-      <EditorContent editor={editor} className={className} />
+      <EditorContent
+        editor={editor}
+        className={className}
+        name="contents"
+        minLength={5}
+        required
+      />
     </div>
   );
 };

@@ -2,7 +2,6 @@
 
 import DOMPurify from "isomorphic-dompurify";
 import hljs from "highlight.js";
-
 import { useEffect } from "react";
 
 type EditorViewerProps = {

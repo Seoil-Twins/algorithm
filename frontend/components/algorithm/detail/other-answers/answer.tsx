@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { IMAGE_URL } from "@/api";
-import { ResponseAnswerItem } from "@/api/code";
+import { ResponseAnswerItem } from "@/types/code";
 
 import styles from "./answer.module.scss";
 import { notosansBold } from "@/styles/_font";
@@ -70,12 +70,11 @@ const Answer = ({ answer }: AnswerProps) => {
           <Comment key={idx} comment={comment} />
         ))}
       </div>
-      {user && (
-        <CommentEditor
-          apiUrl={`/code/comment/${answer.codeId}`}
-          isVisibleToolbar={false}
-        />
-      )}
+      <CommentEditor
+        type="code"
+        requestId={String(answer.codeId)}
+        isVisibleToolbar={false}
+      />
     </div>
   );
 };

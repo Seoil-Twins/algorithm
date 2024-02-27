@@ -9,27 +9,23 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 import AlgorithmCard from "@/components/home/algorithmCard";
 import PostCard from "@/components/home/postCard";
 
-import { Algorithm } from "@/interfaces/algorithm";
+import { Algorithm } from "@/types/algorithm";
+import { Board } from "@/types/board";
 
-import { getRecommendAlgorithms } from "@/api/algorithm/algorithm";
-import { getRecommendPosts } from "@/api/board";
-import Board from "@/interfaces/board";
+import { getRecommendAlgorithms } from "./actions/algorithm";
+import { getRecommendPosts } from "./actions/baord";
 
 const Home = async () => {
-  let recommendAlgorithms: Algorithm[] = [];
-  let recommendPosts: Board[] = [];
-
-  try {
-    const recommendAlgorithmsResponse = await getRecommendAlgorithms();
-    recommendAlgorithms = recommendAlgorithmsResponse.data;
-  } catch (error) {
-    recommendAlgorithms = [];
+  const responseAlgorithms = await getRecommendAlgorithms();
+  let algorithms: Algorithm[] = [];
+  if (responseAlgorithms.status === 200) {
+    algorithms = responseAlgorithms.data.algorithms;
   }
 
-  try {
-    recommendPosts = await getRecommendPosts();
-  } catch (error) {
-    recommendPosts = [];
+  const responsePosts = await getRecommendPosts();
+  let posts: Board[] = [];
+  if (responsePosts.status === 200) {
+    posts = responsePosts.data.contents;
   }
 
   return (
@@ -72,7 +68,7 @@ const Home = async () => {
           height="100%"
         ></iframe>
       </div>
-      {recommendAlgorithms.length > 0 && (
+      {algorithms.length > 0 && (
         <>
           <div className={styles.cardTop}>
             <div className={styles.topBox}>
@@ -85,7 +81,7 @@ const Home = async () => {
             </div>
           </div>
           <div className={`${styles.cardBox} ${styles.algorithmCardBox}`}>
-            {recommendAlgorithms.map((algorithm: Algorithm) => (
+            {algorithms.map((algorithm: Algorithm) => (
               <AlgorithmCard
                 key={algorithm.algorithmId}
                 algorithm={algorithm}
@@ -94,7 +90,7 @@ const Home = async () => {
           </div>
         </>
       )}
-      {recommendPosts.length > 0 && (
+      {posts.length > 0 && (
         <>
           <div className={styles.cardTop}>
             <div className={styles.topBox}>
@@ -107,7 +103,7 @@ const Home = async () => {
             </div>
           </div>
           <div className={`${styles.cardBox} ${styles.postCardBox}`}>
-            {recommendPosts.map((post) => (
+            {posts.map((post) => (
               <PostCard key={post.boardId} post={post} />
             ))}
           </div>

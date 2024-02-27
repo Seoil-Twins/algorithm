@@ -1,23 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
-import {
-  ResponseNotification,
-  UserKeys,
-  getNotifications,
-  updateNotifications,
-} from "@/api/user";
-
-import styles from "./notification.module.scss";
+import { ResponseNotification } from "@/types/user";
 
 import { useAuth } from "@/providers/authProvider";
+
+import styles from "./notification.module.scss";
 
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
+import { UserKeys } from "@/types/constants";
+import { getNotifications, updateNotifications } from "@/app/actions/user";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type NotificationSettings = {
   title: string;
@@ -70,6 +69,7 @@ const defaultNotifications: NotificationSettings[] = [
 
 const Notification = () => {
   const { user } = useAuth();
+  const { mutate } = useSWRConfig();
   const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
     UserKeys.getNotification,
     getNotifications,
@@ -77,13 +77,17 @@ const Notification = () => {
 
   const [notifications, setNotifications] =
     useState<NotificationSettings[]>(defaultNotifications);
+  const prevNotifications = useRef<NotificationSettings[]>();
 
   const updateNotification = useDebouncedCallback(
     useCallback(
-      async (notifications: NotificationSettings[]) => {
+      async (request: NotificationSettings[]) => {
         if (!user) return;
 
-        const notificationSettings: ResponseNotification = notifications.reduce(
+        // 이전 값 deep copy
+        prevNotifications.current = JSON.parse(JSON.stringify(notifications));
+
+        const notificationSettings: ResponseNotification = request.reduce(
           (result, { paramKey, value }) => {
             result[paramKey] = value;
             return result;
@@ -91,13 +95,20 @@ const Notification = () => {
           {} as ResponseNotification,
         );
 
-        try {
-          await updateNotifications(user.userId, notificationSettings);
-        } catch (error) {
-          alert("나중에 다시 시도해주세요.");
+        const response = await updateNotifications(
+          user.userId,
+          notificationSettings,
+        );
+        if (response.status === 200) {
+          mutate(UserKeys.getNotification);
+          toast.success("알림 설정을 변경하였습니다.");
+        } else {
+          setNotifications(prevNotifications.current!);
+          toast.error("알림 설정을 변경하는데 실패했습니다.");
         }
       },
-      [user],
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [user, mutate],
     ),
     600,
   );
@@ -105,25 +116,28 @@ const Notification = () => {
   const handleChange = useCallback(
     (idx: number, value: boolean) => {
       setNotifications((prev) => {
-        const newNotification = [...prev];
+        const newNotification = JSON.parse(JSON.stringify(notifications));
         newNotification[idx].value = value;
 
         updateNotification(newNotification);
-
         return newNotification;
       });
     },
-    [updateNotification],
+    [notifications, updateNotification],
   );
 
   const callFetchNotification = useCallback(async () => {
-    if (notificationsWithAPI?.data) {
-      setNotifications((prev) =>
-        prev.map((notification: NotificationSettings) => ({
+    if (!notificationsWithAPI) return;
+
+    if (notificationsWithAPI.data) {
+      setNotifications((prev) => {
+        prevNotifications.current = prev;
+
+        return prev.map((notification: NotificationSettings) => ({
           ...notification,
-          value: notificationsWithAPI?.data[notification.paramKey],
-        })),
-      );
+          value: notificationsWithAPI.data[notification.paramKey],
+        }));
+      });
     }
   }, [notificationsWithAPI]);
 

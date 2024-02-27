@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import AlramType from "@/interfaces/alram";
+import AlramType from "@/types/alram";
 
 import { IMAGE_URL } from "@/api";
 

@@ -1,35 +1,25 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AxiosError } from "axios";
 import { useDebouncedCallback } from "use-debounce";
+import toast from "react-hot-toast";
+import { useFormState } from "react-dom";
+
+import {
+  compareVerifyCode,
+  sendVerifyCode as sendVerifyCodeAPI,
+  signup,
+} from "@/app/actions/user";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./signup.module.scss";
 
-import { useAuth } from "@/providers/authProvider";
-
-import {
-  Info,
-  ValidationError,
-  changeErrorInfo,
-  validationEmail,
-  validationNickname,
-  validationPassword,
-} from "@/utils/validation";
-
-import {
-  signup,
-  sendVerifyCode as sendVerifyCodeAPI,
-  compareVerifyCode,
-  getUser,
-} from "@/api/user";
-
 import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
+import SubmitButton from "@/components/common/submitButton";
 
 interface SignupProperty {
   nickname: string;
@@ -45,45 +35,46 @@ type SignupInfo = {
   [key in SignupKeys]: {
     value: SignupProperty[key];
     disabled?: boolean;
-  } & ValidationError;
+  };
 };
 
 const Signup = () => {
   const router = useRouter();
-  const { login } = useAuth();
 
   const [signupInfo, setSignupInfo] = useState<SignupInfo>({
     nickname: {
       value: "",
-      errMsg: "",
-      isError: false,
     },
     email: {
       value: "",
-      errMsg: "",
-      isError: false,
       disabled: false,
     },
     verifyCode: {
       value: "",
-      errMsg: "인증 번호가 맞지 않습니다.",
-      isError: false,
       disabled: true,
     },
     password: {
       value: "",
-      errMsg: "올바른 비밀번호 형식이 아닙니다.",
-      isError: false,
     },
     confirmPassword: {
       value: "",
-      errMsg: "비밀번호가 맞지 않습니다.",
-      isError: false,
     },
   });
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [isCheck, setIsCheck] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
+
+  const [state, formAction] = useFormState(
+    async (_: any, formData: FormData) => {
+      return await signup(
+        isCheck,
+        isVerified,
+        signupInfo.email.value,
+        formData,
+      );
+    },
+    null,
+  );
 
   const handleSignupInfo = useCallback(
     (changedValue: string, name: SignupKeys) => {
@@ -104,66 +95,44 @@ const Signup = () => {
 
   const sendVerifyCode = useDebouncedCallback(
     useCallback(async () => {
-      const isEmailValid = validationEmail(signupInfo.email.value);
-
-      if (isEmailValid.isError) {
-        const newProfileInfo = changeErrorInfo(
-          signupInfo,
-          "email",
-          isEmailValid.isError,
-          isEmailValid.errMsg,
-        ) as SignupInfo;
-        setSignupInfo(newProfileInfo);
-        return;
-      } else if (!signupInfo.verifyCode.disabled || isVerified) {
+      if (!signupInfo.verifyCode.disabled || isVerified) {
         return;
       }
 
       // 이메일 전송 API 구현
       try {
         setIsSending(true);
-        await sendVerifyCodeAPI({
+        const response = await sendVerifyCodeAPI({
           email: signupInfo.email.value,
         });
-        setIsSending(false);
 
-        const {
-          ["email"]: emailField,
-          ["verifyCode"]: verifyCodeField,
-          ...prev
-        } = signupInfo;
-
-        setSignupInfo({
-          ...prev,
-          email: {
-            ...emailField,
-            isError: false,
-            errMsg: "",
-            disabled: true,
-          },
-          verifyCode: {
-            ...verifyCodeField,
-            disabled: false,
-          },
-        });
-      } catch (error) {
-        if (
-          error instanceof AxiosError &&
-          error.response?.data.errorCode === 40920
-        ) {
-          const { ["email"]: emailField, ...prev } = signupInfo;
+        if (response.status === 200) {
+          const {
+            ["email"]: emailField,
+            ["verifyCode"]: verifyCodeField,
+            ...prev
+          } = signupInfo;
 
           setSignupInfo({
             ...prev,
             email: {
               ...emailField,
-              isError: true,
-              errMsg: "중복된 이메일입니다.",
+              disabled: true,
+            },
+            verifyCode: {
+              ...verifyCodeField,
+              disabled: false,
             },
           });
+        } else if (response.status === 40920) {
+          toast.error("이미 가입된 이메일입니다.");
+        } else if (response.status === 400) {
+          toast.error(response.data);
         } else {
-          alert("나중에 다시 시도해주세요.");
+          toast.error("서버와의 통신 중 오류가 발생하였습니다.");
         }
+      } catch (error) {
+        toast.error("나중에 다시 시도해주세요.");
       } finally {
         setIsSending(false);
       }
@@ -175,10 +144,6 @@ const Signup = () => {
     useCallback(async () => {
       if (signupInfo.verifyCode.disabled || isVerified) return;
 
-      let isError = false;
-      let errMsg = "인증 번호가 맞지 않습니다.";
-      const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
-
       try {
         const response = await compareVerifyCode({
           email: signupInfo.email.value,
@@ -187,29 +152,14 @@ const Signup = () => {
 
         if (response.status === 200) {
           setIsVerified(true);
+        } else if (response.status === 406) {
+          toast.error("인증 번호가 맞지 않습니다.");
+        } else {
+          toast.error("나중에 다시 시도해주세요.");
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 400) {
-            isError = true;
-            errMsg = "인증 번호가 맞지 않습니다.";
-          } else if (error.response?.status === 500) {
-            isError = true;
-            errMsg =
-              "예상치 못한 오류가 발생하였습니다.\n나중에 다시 시도해주세요.";
-          }
-        }
+        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
       }
-
-      setSignupInfo({
-        ...prev,
-        verifyCode: {
-          ...verifyCodeField,
-          isError,
-          disabled: !isError,
-          errMsg,
-        },
-      });
     }, [isVerified, signupInfo]),
     500,
   );
@@ -218,126 +168,25 @@ const Signup = () => {
     setIsCheck((prev) => !prev);
   }, []);
 
-  const validation = useCallback(() => {
-    let isValid = true;
-    let newSignupInfo: Info<SignupInfo, SignupKeys> = {
-      ...signupInfo,
-    };
+  const success = useCallback(() => {
+    router.replace("/login");
+  }, [router]);
 
-    const isNicknameValid = validationNickname(signupInfo.nickname.value);
-    newSignupInfo = changeErrorInfo<SignupInfo, "nickname">(
-      newSignupInfo,
-      "nickname",
-      isNicknameValid.isError,
-      isNicknameValid.errMsg,
-    ) as SignupInfo;
+  useEffect(() => {
+    if (!state) return;
 
-    const isEmailValid = validationEmail(signupInfo.email.value);
-    newSignupInfo = changeErrorInfo<SignupInfo, "email">(
-      newSignupInfo,
-      "email",
-      isEmailValid.isError,
-      isEmailValid.errMsg,
-    ) as SignupInfo;
-
-    const isPasswordValid = validationPassword(signupInfo.password.value);
-    newSignupInfo = changeErrorInfo<SignupInfo, "password">(
-      newSignupInfo,
-      "password",
-      isPasswordValid.isError,
-    ) as SignupInfo;
-
-    const notMatchedPassword =
-      signupInfo.password.value !== signupInfo.confirmPassword.value;
-    newSignupInfo = changeErrorInfo<SignupInfo, "confirmPassword">(
-      newSignupInfo,
-      "confirmPassword",
-      notMatchedPassword,
-    ) as SignupInfo;
-
-    newSignupInfo = changeErrorInfo<SignupInfo, "verifyCode">(
-      newSignupInfo,
-      "verifyCode",
-      !isVerified,
-      "인증이 필요합니다.",
-    ) as SignupInfo;
-
-    if (
-      isNicknameValid.isError ||
-      isEmailValid.isError ||
-      isPasswordValid.isError ||
-      notMatchedPassword
-    ) {
-      isValid = false;
+    if (state?.status === 201) {
+      toast.success(state.data);
+      success();
+    } else {
+      toast.error(state?.data || "서버 에러가 발생하였습니다.");
     }
-
-    setSignupInfo(newSignupInfo);
-    return isValid;
-  }, [signupInfo, isVerified]);
-
-  const handleClickSignup = useDebouncedCallback(
-    useCallback(async () => {
-      const isValid = validation();
-      if (!isValid) return;
-      else if (!isCheck) {
-        alert("약관에 동의해주세요.");
-        return;
-      }
-
-      const email = signupInfo.email.value,
-        nickname = signupInfo.nickname.value,
-        password = signupInfo.password.value;
-
-      // 회원가입 API 호출 및 처리 로직
-      try {
-        const singupResponse = await signup({
-          email,
-          nickname,
-          userPw: password,
-        });
-
-        if (singupResponse.status === 201) {
-          const userResponse = await getUser();
-          login(userResponse.data);
-
-          router.refresh();
-          router.replace("/");
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            router.replace("/login");
-          } else if (error.response?.data.errorCode === 40910) {
-            const { ["nickname"]: nicknameField, ...prev } = signupInfo;
-            setSignupInfo({
-              ...prev,
-              nickname: {
-                ...nicknameField,
-                errMsg: "중복된 닉네임입니다.",
-                isError: true,
-              },
-            });
-          }
-        } else {
-          alert(
-            "알 수 없는 오류가 발생하였습니다.\n 나중에 다시 시도해주세요.",
-          );
-        }
-      }
-    }, [isCheck, signupInfo, router, validation, login]),
-    500,
-  );
+  }, [state, success]);
 
   return (
     <>
       <Spinner isVisible={isSending} isPage />
-      <form
-        className={styles.formBox}
-        onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          handleClickSignup();
-        }}
-      >
+      <form className={styles.formBox} action={formAction}>
         <div className={`${styles.title} ${notosansMedium.className}`}>
           회원가입
         </div>
@@ -346,15 +195,17 @@ const Signup = () => {
         </div>
         <div className={styles.mb20}>
           <Input
+            name="nickname"
             type="text"
             title="닉네임"
-            placeholder="닉네임 입력"
+            placeholder="닉네임 입력 (2 ~ 16자)"
             value={signupInfo.nickname.value}
-            isError={signupInfo.nickname.isError}
-            errorMsg={signupInfo.nickname.errMsg}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "nickname")
             }
+            minLength={2}
+            maxLength={16}
+            required
           />
         </div>
         <div className={styles.mb20}>
@@ -371,28 +222,29 @@ const Signup = () => {
         <div className={styles.mb20}>
           <div className={styles.mb10}>
             <Input
+              name="password"
               type="password"
               title="비밀번호"
+              pattern="(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$"
               placeholder="영문자, 숫자, 특수문자 포함 최소 8 ~ 20자"
               value={signupInfo.password.value}
-              isError={signupInfo.password.isError}
-              errorMsg={signupInfo.password.errMsg}
               onChange={(changedValue: string) =>
                 handleSignupInfo(changedValue, "password")
               }
               usePasswordToggle
+              required
             />
           </div>
           <Input
+            name="confirmPassword"
             type="password"
             placeholder="비밀번호 확인 입력"
             value={signupInfo.confirmPassword.value}
-            isError={signupInfo.confirmPassword.isError}
-            errorMsg={signupInfo.confirmPassword.errMsg}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "confirmPassword")
             }
             usePasswordToggle
+            required
           />
         </div>
         <div className={styles.termsBox}>
@@ -401,6 +253,7 @@ const Signup = () => {
             id="terms"
             className={styles.checkBox}
             onChange={handleClickCheckBox}
+            required
           />
           <Link
             href="/terms-of-use"
@@ -419,12 +272,11 @@ const Signup = () => {
             동의합니다.
           </label>
         </div>
-        <button
-          type="submit"
+        <SubmitButton
+          btnTitle="회원가입"
+          pendingTitle="회원가입 중"
           className={`${styles.button} ${notosansBold.className}`}
-        >
-          회원가입
-        </button>
+        />
       </form>
     </>
   );

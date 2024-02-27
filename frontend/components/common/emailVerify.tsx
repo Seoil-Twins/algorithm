@@ -9,8 +9,6 @@ import Input from "./input";
 type Info = {
   value: string;
   disabled: boolean;
-  isError: boolean;
-  errMsg: string;
 };
 
 export type EmailInfo = {
@@ -37,14 +35,14 @@ const EmailVerify = ({
     <div className={styles.emailVerify}>
       <div>
         <Input
+          name="email"
           type="email"
           title="이메일"
           placeholder="이메일 입력"
           value={emailInfo.email.value}
           disabled={emailInfo.email.disabled}
-          isError={emailInfo.email.isError}
-          errorMsg={emailInfo.email.errMsg}
           onChange={(changedValue: string) => onChange(changedValue, "email")}
+          required
         />
         <button
           type="button"
@@ -58,15 +56,15 @@ const EmailVerify = ({
         </button>
       </div>
       <Input
+        type="text"
         placeholder="인증 번호 입력"
-        length={6}
         value={emailInfo.verifyCode.value}
         disabled={emailInfo.verifyCode.disabled}
-        isError={emailInfo.verifyCode.isError}
-        errorMsg={emailInfo.verifyCode.errMsg}
         onChange={(changedValue: string) =>
           onChange(changedValue, "verifyCode")
         }
+        maxLength={6}
+        required
       />
       <button
         type="button"

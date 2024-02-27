@@ -1,6 +1,11 @@
 "use client";
 
-import React, { HTMLInputTypeAttribute, useCallback, useState } from "react";
+import React, {
+  HTMLInputTypeAttribute,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import Image from "next/image";
 
 import styles from "./input.module.scss";
@@ -12,15 +17,10 @@ type PasswordVisibilityToggleProps = {
 };
 
 type BaseInputProps = {
-  type?: HTMLInputTypeAttribute;
-  placeholder?: string;
-  value: string;
-  disabled?: boolean;
-  length?: number;
-  multiple?: boolean;
+  type: HTMLInputTypeAttribute;
   onChange?: (value: string) => void;
   onChangeFile?: (file: File | FileList) => void;
-};
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">;
 
 type InputProps = {
   title?: string;
@@ -44,46 +44,33 @@ const PasswordVisibilityToogle = ({
   );
 };
 
-const BaseInput = ({
-  type,
-  placeholder,
-  value,
-  onChange,
-  disabled,
-  length,
-}: BaseInputProps) => {
+const BaseInput = ({ type, onChange, ...props }: BaseInputProps) => {
   return (
     <input
       type={type}
-      placeholder={placeholder}
-      value={value}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         onChange?.(event.target.value)
       }
-      disabled={disabled}
       className={styles.input}
-      maxLength={length}
       autoComplete="none"
-      min={1}
+      {...props}
     />
   );
 };
 
 const Input = ({
   title,
-  type = "text",
-  placeholder = "",
-  value = "",
-  length,
-  disabled = false,
+  type,
   usePasswordToggle = false,
   isError = false,
   errorMsg = "",
-  multiple = false,
   onChange,
   onChangeFile,
+  ...props
 }: InputProps) => {
-  const [inputType, setInputType] = useState<HTMLInputTypeAttribute>(type);
+  const [inputType, setInputType] = useState<HTMLInputTypeAttribute>(
+    type || "text",
+  );
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const handleChange = useCallback(
@@ -97,10 +84,10 @@ const Input = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       if (!event.target.files) return;
 
-      if (multiple) onChangeFile?.(event.target.files);
+      if (props.multiple) onChangeFile?.(event.target.files);
       else onChangeFile?.(event.target.files[0]);
     },
-    [multiple, onChangeFile],
+    [props.multiple, onChangeFile],
   );
 
   const handleClickHideOrShow = useCallback(() => {
@@ -126,21 +113,14 @@ const Input = ({
       )}
       <div className={`${styles.inputBox} ${isError ? styles.error : null}`}>
         {type !== "file" ? (
-          <BaseInput
-            type={inputType}
-            value={value}
-            onChange={handleChange}
-            placeholder={placeholder}
-            disabled={disabled}
-            length={length}
-          />
+          <BaseInput type={inputType} onChange={handleChange} {...props} />
         ) : (
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            multiple={multiple}
             onChange={handleFile}
             className={styles.input}
+            {...props}
           />
         )}
         {type === "password" && usePasswordToggle && (

@@ -1,5 +1,5 @@
-import { getBoardTypes } from "@/api/board";
-import { getMyComments } from "@/api/user";
+import { getBoardTypes } from "@/app/actions/baord";
+import { getMyComments } from "@/app/actions/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -11,19 +11,28 @@ const Comment = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const comments = await getMyComments({ page, count });
   const boardTypes = await getBoardTypes();
+  let comments;
+  try {
+    const responseComment = await getMyComments({ page, count });
+    comments = responseComment.data;
+  } catch (error) {
+    comments = {
+      results: [],
+      totals: 0,
+    };
+  }
 
   return (
     <>
       <Table
-        items={comments.data.results}
+        items={comments.results}
         boardTypes={boardTypes}
         errorTitle="작성하신 댓글이 없습니다."
       />
       <Pagination
         count={count}
-        total={comments.data.totals}
+        total={comments.totals}
         current={page}
         marginTop={25}
       />

@@ -1,12 +1,11 @@
 import React from "react";
 
+import { getUserSolved } from "@/app/actions/user";
+
 import SubNavigation, {
   NavItem,
 } from "@/components/mypage/activity/subNavigation";
 import Content from "@/components/mypage/content";
-
-import { getUserSolved } from "@/api/user";
-
 import Solved from "@/components/mypage/activity/solved";
 
 const navItems: NavItem[] = [
@@ -38,6 +37,13 @@ const navItems: NavItem[] = [
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const response = await getUserSolved();
+  if (response.status !== 200) {
+    response.data = {
+      solved: 0,
+      tried: 0,
+      favorite: 0,
+    };
+  }
 
   return (
     <div>

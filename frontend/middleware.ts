@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-import { AUTH_PATHS, NO_AUTH_PATHS } from "./constants";
-
-const routes = ["/((?!api|static|.*\\..*|_next).*)"];
+import { AUTH_PATHS, NO_AUTH_PATHS } from "./types/constants";
 
 export default async function middrleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -70,5 +68,5 @@ export default async function middrleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [...NO_AUTH_PATHS, ...AUTH_PATHS, ...routes],
+  matcher: ["/((?!api|static|.*\\..*|_next).*)"],
 };

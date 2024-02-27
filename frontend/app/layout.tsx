@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import React from "react";
+import { Toaster } from "react-hot-toast";
 
 import "./globals.scss";
 import "highlight.js/styles/stackoverflow-dark.min.css";
@@ -36,6 +37,12 @@ export default async function RootLayout({
           <CodeTypeProvider>
             <ThemeProvider>
               <Navigation />
+              <Toaster
+                position="top-center"
+                toastOptions={{
+                  duration: 3000,
+                }}
+              />
               <div className="mainCenterBox">{children}</div>
               <Footer />
             </ThemeProvider>

@@ -1,4 +1,9 @@
-export interface User {
+export type PageOptions = {
+  page: number;
+  count: number;
+};
+
+export type User = {
   userId: number;
   email: string;
   nickname: string;
@@ -12,6 +17,17 @@ export interface User {
   tried: number;
   solved: number;
   createdTime: string;
-}
+};
 
 export type RequiredUser = Pick<User, "userId" | "profile" | "nickname">;
+
+export type ResponseNotification = {
+  annoNofi: boolean;
+  postNofi: boolean;
+  commentNofi: boolean;
+  likeNofi: boolean;
+  answerNofi: boolean;
+  eventNofi: boolean;
+};
+
+export type RequestNotification = Partial<ResponseNotification>;

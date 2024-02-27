@@ -1,12 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import Board from "@/interfaces/board";
-import { User } from "@/interfaces/user";
+import { User } from "@/types/user";
+import { CommentResponse } from "@/types/comment";
 
-import { getBoardDetail } from "@/api/board";
-import { ResponseComment, getComments } from "@/api/comment";
-import { getUser } from "@/api/user";
+import { getComments } from "@/app/actions/comment";
+import { IMAGE_URL } from "@/app/actions";
+import { getUser } from "@/app/actions/user";
+import { getBoardDetail } from "@/app/actions/baord";
 
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
@@ -15,8 +16,11 @@ import DetailNav from "./detailNav";
 import EditorViewer from "../common/editorViewer";
 import RecommendPost from "./recommendPost";
 import CommentEditor from "./commentEditor";
-import Comment from "./comment";
 import Pagination from "../common/pagination";
+import NotFound from "../common/notFound";
+import Comment from "./comment";
+import { BOARD_TYPE } from "@/types/constants";
+import FeedbackSolve from "./feedbackSolve";
 
 type BoardDetailProps = {
   boardId: number;
@@ -29,18 +33,36 @@ const BoardDetail = async ({
   boardId: BoardDetailProps["boardId"];
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  let user: User | undefined = undefined;
-  try {
-    user = (await getUser()).data;
-  } catch (error) {
+  const userResponse = await getUser();
+  let user;
+  if (userResponse.status === 200) {
+    user = userResponse.data as User;
+  } else {
     user = undefined;
   }
 
-  const board: Board = await getBoardDetail(boardId);
+  const boardResponse = await getBoardDetail(boardId);
+  if (typeof boardResponse.data === "string") {
+    return (
+      <NotFound
+        title="게시글이 존재하지 않습니다."
+        description="URL을 다시 확인해주세요."
+      />
+    );
+  }
+  const board = boardResponse.data;
 
   const count = Number(searchParams?.count) || 10;
   const page = Number(searchParams?.page) || 1;
-  const comments: ResponseComment = await getComments(boardId, { count, page });
+  const commentsResponse = await getComments(boardId, { count, page });
+
+  let comments: CommentResponse = {
+    total: 0,
+    comments: [],
+  };
+  if (commentsResponse.status === 200) {
+    comments = commentsResponse.data as CommentResponse;
+  }
 
   return (
     <div>
@@ -54,8 +76,8 @@ const BoardDetail = async ({
             <Image
               src={
                 board.user.profile
-                  ? board.user.profile
-                  : "user_profile_default.svg"
+                  ? `${IMAGE_URL}/${board.user.profile}`
+                  : "/svgs/user_profile_default.svg"
               }
               alt="프로필 사진"
               width={38}
@@ -69,38 +91,47 @@ const BoardDetail = async ({
               <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
           </Link>
+          {board.boardType === BOARD_TYPE.ALGORITHM_FEEDBACK &&
+            (board.solved ? (
+              <Image
+                src="/svgs/valid_check.svg"
+                alt="채택"
+                width={32}
+                height={32}
+              />
+            ) : (
+              <FeedbackSolve boardId={board.boardId} />
+            ))}
         </div>
-        {typeof board.solved === "number" && (
+        {board.solved && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>
             해결 완료
           </span>
         )}
-        {board.solved === null && (
-          <span className={styles.notSolved}>미해결</span>
-        )}
+        {!board.solved && <span className={styles.notSolved}>미해결</span>}
         <div className={`${styles.title} ${notosansBold.className}`}>
           {board.title}
         </div>
         <EditorViewer className={styles.content} content={board.content} />
         <div className={styles.bottom}>
           <div className={styles.tagBox}>
-            {board.tags?.map((tag, idx) => (
+            {/* {board.tags?.map((tag, idx) => (
               <div key={idx} className={styles.tag}>
                 # {tag}
               </div>
-            ))}
+            ))} */}
           </div>
           <RecommendPost
             apiUrl={`/board/favorite/${board.boardId}`}
             isRecommend={board.isRecommend}
-            recommendCount={board.recommendCount}
+            recommendCount={Number(board.recommendCount)}
             userId={user?.userId}
             requestId={board.boardId}
           />
         </div>
         <hr className={styles.line} />
-        <div className={styles.commentTotal}>{comments.total}개의 답변</div>
-        {user && <CommentEditor apiUrl={`/board/comment/${boardId}`} />}
+        <div className={styles.commentTotal}>{board.commentCount}개의 답변</div>
+        <CommentEditor requestId={String(board.boardId)} />
         {comments.total > 0 && (
           <div className={styles.commentBox}>
             {comments.comments.map((comment) => (
@@ -109,7 +140,7 @@ const BoardDetail = async ({
                 comment={comment}
                 userId={board.user.userId}
                 boardTypeId={board.boardType}
-                solved={board.solved}
+                solved={Number(board.solved)}
               />
             ))}
             <Pagination

@@ -5,13 +5,13 @@ import Image from "next/image";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
-import { BoardType } from "@/interfaces/boardType";
+import { BoardType } from "@/types/boardType";
 
 import { getTimeAgo } from "@/utils/day";
 
 import ThemeImage from "@/components/common/themeImage";
 
-import Board from "@/interfaces/board";
+import { Board } from "@/types/board";
 import NotFound from "@/components/common/notFound";
 
 type TableProps = {
@@ -22,9 +22,9 @@ type TableProps = {
 
 const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
   const getTitleById = useCallback(
-    (type: number) => {
+    (type: number | string) => {
       for (const boardType of boardTypes) {
-        if (boardType.boardTypeId === type) {
+        if (boardType.boardTypeId === Number(type)) {
           return boardType.title;
         }
       }
@@ -40,13 +40,10 @@ const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
         <NotFound title={errorTitle} description={""} size={70} marginTop={0} />
       )}
       {items.map((item: Board) => (
-        <Link
-          href={`/forum/${item.boardType}/${item.boardId}`}
-          key={item.boardId}
-        >
+        <Link href={`/forum/${item.board_id}`} key={item.boardId}>
           <div className={styles.container}>
             <div className={`${styles.kind} ${notosansBold.className}`}>
-              {getTitleById(item.boardType)}
+              {getTitleById(item.board_type)}
             </div>
             <div
               className={`${styles.title} ${notosansMedium.className} ${
@@ -82,7 +79,7 @@ const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
                 width={18}
                 height={18}
               />
-              <span className={styles.mr10}>{item.favorites}</span>
+              <span className={styles.mr10}>{item.recommendCount}</span>
               {item.commentCount !== undefined && (
                 <>
                   <ThemeImage

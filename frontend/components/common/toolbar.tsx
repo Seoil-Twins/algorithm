@@ -7,11 +7,17 @@ import styles from "./toolbar.module.scss";
 
 import EditorInputModal, { ModalItem } from "./editorInputModal";
 
+import { postBoardImage } from "@/api/board";
+import { useParams } from "next/navigation";
+
 type ToolbarProps = {
   editor: Editor;
 };
 
 const Toolbar = ({ editor }: ToolbarProps) => {
+  const param = useParams();
+  const boardId = param.boardId;
+
   const linkKeys = useMemo(() => ["url", "text"], []);
   const [isVisibleLinkModal, setIsVisibleLinkModal] = useState<boolean>(false);
   const [linkItems, setLinkItems] = useState<ModalItem[]>([
@@ -245,12 +251,13 @@ const Toolbar = ({ editor }: ToolbarProps) => {
     [imageItems, changeValue],
   );
 
-  const setImage = useCallback(() => {
+  const setImage = useCallback(async () => {
     const url = imageItems[0].value;
     const file = imageItems[1].value;
 
     if (file && typeof file === "object") {
       // upload 후 src 받아서 처리
+      // await postBoardImage(boardId, file);
       editor.commands.setImage({ src: URL.createObjectURL(file) });
     } else {
       editor.commands.setImage({ src: url as string });
@@ -262,7 +269,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
 
     setImageItems(newImageItems);
     setIsVisibleImageModal(false);
-  }, [editor.commands, imageItems]);
+  }, [boardId, imageItems, param, editor.commands]);
 
   const handleImageFile = useCallback(
     (key: string, file: File) => {

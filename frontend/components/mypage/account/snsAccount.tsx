@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./snsAccount.module.scss";
@@ -179,7 +180,7 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
 
   useEffect(() => {
     if (errorCode) {
-      alert("나중에 다시 시도해주세요.");
+      toast.error("계정 연동에 실패했습니다.");
     }
   }, [errorCode]);
 

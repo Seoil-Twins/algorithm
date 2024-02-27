@@ -2,33 +2,28 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { AxiosError } from "axios";
 import { useSWRConfig } from "swr";
+import toast from "react-hot-toast";
+import { useFormState } from "react-dom";
+
+import { User } from "@/types/user";
+import { UserKeys } from "@/types/constants";
+
+import { IMAGE_URL } from "@/app/actions";
+import {
+  compareVerifyCode,
+  sendVerifyCode as sendVerifyCodeAPI,
+  updateProfileImg,
+  updateProfileUser,
+} from "@/app/actions/user";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./userProfileForm.module.scss";
 
-import { User } from "@/interfaces/user";
-
-import {
-  updateProfileImg,
-  updateProfileUser,
-  sendVerifyCode as sendVerifyCodeAPI,
-  compareVerifyCode,
-  UserKeys,
-} from "@/api/user";
-import { IMAGE_URL } from "@/api";
-
 import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
-
-import {
-  ValidationError,
-  changeErrorInfo,
-  validationEmail,
-  validationNickname,
-} from "@/utils/validation";
+import SubmitButton from "@/components/common/submitButton";
 
 interface UserProfileProperty {
   nickname: string;
@@ -42,7 +37,7 @@ type UserProfile = {
   [key in UserProfileKeys]: {
     value: UserProfileProperty[key];
     disabled?: boolean;
-  } & ValidationError;
+  };
 };
 
 type UserProfileProps = {
@@ -56,19 +51,13 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
     email: {
       value: user?.email,
-      isError: false,
-      errMsg: "",
       disabled: true,
     },
     nickname: {
       value: user?.nickname,
-      isError: false,
-      errMsg: "",
     },
     verifyCode: {
       value: "",
-      errMsg: "인증 번호가 맞지 않습니다.",
-      isError: false,
       disabled: true,
     },
   });
@@ -77,6 +66,20 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
   );
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [isChangeNickname, setIsChangeNickname] = useState<boolean>(false);
+  const [isChangeEmail, setIsChangeEmail] = useState<boolean>(false);
+  const [state, formAction] = useFormState(
+    async (_: any, formData: FormData) => {
+      return await updateProfileUser(
+        isVerified,
+        isChangeEmail,
+        isChangeNickname,
+        profileInfo.email.value,
+        formData,
+      );
+    },
+    null,
+  );
 
   const handleProfileInfo = useCallback(
     (changedValue: string, name: UserProfileKeys) => {
@@ -95,233 +98,67 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
     [],
   );
 
-  const validationProfile = useCallback(() => {
-    let isValid = true;
-    let newProfileInfo: UserProfile = {
-      ...profileInfo,
-    };
-
-    const isNicknameValid = validationNickname(profileInfo.nickname.value);
-    newProfileInfo = changeErrorInfo<UserProfile, "nickname">(
-      newProfileInfo,
-      "nickname",
-      isNicknameValid.isError,
-      isNicknameValid.errMsg,
-    ) as UserProfile;
-
-    const isEmailValid = validationEmail(profileInfo.email.value);
-    newProfileInfo = changeErrorInfo<UserProfile, "email">(
-      newProfileInfo,
-      "email",
-      isEmailValid.isError,
-      isEmailValid.errMsg,
-    ) as UserProfile;
-
-    const isNotVerifiedEmail =
-      !isVerified && user?.email != profileInfo.email.value;
-    if (isNotVerifiedEmail) {
-      newProfileInfo = changeErrorInfo<UserProfile, "verifyCode">(
-        newProfileInfo,
-        "verifyCode",
-        true,
-        "인증이 필요합니다.",
-      ) as UserProfile;
-    }
-
-    if (isNicknameValid.isError || isEmailValid.isError || isNotVerifiedEmail)
-      isValid = false;
-
-    setProfileInfo(newProfileInfo);
-    return isValid;
-  }, [isVerified, profileInfo, user?.email]);
-
-  const handleSubmitProfile = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-
-      const isValid = validationProfile();
-      if (!isValid) {
-        profileInfo.nickname.value = user.nickname;
-        profileInfo.email.value = user.email;
-        return;
-      }
-
-      try {
-        const data: { email?: string; nickname?: string } = {};
-
-        if (user.nickname !== profileInfo.nickname.value) {
-          data.nickname = profileInfo.nickname.value;
-        }
-        if (user.email !== profileInfo.email.value && isVerified) {
-          data.email = profileInfo.email.value;
-        }
-
-        const response = await updateProfileUser(user.userId, data);
-
-        if (response.status === 200) {
-          setIsVerified(false);
-          setProfileInfo((prev: UserProfile) => {
-            const {
-              ["nickname"]: nicknameField,
-              ["email"]: emailField,
-              ["verifyCode"]: verifyCodeField,
-              ...rest
-            } = prev;
-
-            return {
-              ...rest,
-              nickname: {
-                ...nicknameField,
-                value: response.data.nickname,
-              },
-              email: {
-                ...emailField,
-                value: response.data.email,
-                disabled: true,
-              },
-              verifyCode: {
-                ...verifyCodeField,
-                value: "",
-                disabled: true,
-              },
-            } as UserProfile;
-          });
-
-          await mutate(UserKeys.getUser);
-        }
-
-        setIsProfileDisabled(true);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.data.errorCode === 40910) {
-            const { ["nickname"]: nicknameField, ...prev } = profileInfo;
-            setProfileInfo({
-              ...prev,
-              nickname: {
-                ...nicknameField,
-                errMsg: "중복된 닉네임입니다.",
-                isError: true,
-              },
-            });
-          }
-        } else {
-          alert(
-            "알 수 없는 오류가 발생하였습니다.\n 나중에 다시 시도해주세요.",
-          );
-        }
-      }
-    },
-    [
-      profileInfo,
-      user.nickname,
-      user.email,
-      user.userId,
-      isVerified,
-      mutate,
-      validationProfile,
-    ],
-  );
-
   const handleProfileImg = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const files = event.target.files;
       if (!files || !user) return;
 
       const profile = files[0];
+      const response = await updateProfileImg(user.userId, {
+        image: profile,
+      });
 
-      try {
-        const response = await updateProfileImg(user.userId, {
-          image: profile,
-        });
-
-        if (response.status === 200) {
-          mutate(UserKeys.getUser);
-          setProfileImg(response.data.profile);
-        }
-      } catch (error) {
-        alert("나중에 다시 시도해주세요.");
+      if (response.status === 200) {
+        mutate(UserKeys.getUser);
+        setProfileImg(response.data.profile);
+      } else {
+        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
       }
     },
     [user, mutate],
   );
 
   const sendVerifyCode = useCallback(async () => {
-    const changeErrorInfo = (
-      name: UserProfileKeys,
-      isError: boolean,
-      errMsg?: string,
-    ) => {
-      const { [name]: updatedField } = profileInfo;
-      const newProfileInfo = {
-        ...profileInfo,
-        [name]: {
-          ...updatedField,
-          isError,
-          errMsg,
-        },
-      };
-
-      return newProfileInfo;
-    };
-
-    const isEmailValid = validationEmail(profileInfo.email.value);
-
-    if (isEmailValid.isError) {
-      const newProfileInfo = changeErrorInfo(
-        "email",
-        isEmailValid.isError,
-        isEmailValid.errMsg,
-      );
-      setProfileInfo(newProfileInfo);
+    if (!profileInfo.verifyCode.disabled || isVerified) return;
+    else if (user?.email === profileInfo.email.value) {
+      toast.error("이메일을 변경하고 시도해주세요.");
       return;
-    } else if (!profileInfo.verifyCode.disabled || isVerified) return;
-    else if (user?.email === profileInfo.email.value) return;
+    }
 
     // 이메일 전송 API 구현
     try {
       setIsSending(true);
-      await sendVerifyCodeAPI({
+      const response = await sendVerifyCodeAPI({
         email: profileInfo.email.value,
       });
-      setIsSending(false);
 
-      const {
-        ["email"]: emailField,
-        ["verifyCode"]: verifyCodeField,
-        ...prev
-      } = profileInfo;
-
-      setProfileInfo({
-        ...prev,
-        email: {
-          ...emailField,
-          isError: false,
-          errMsg: "",
-          disabled: true,
-        },
-        verifyCode: {
-          ...verifyCodeField,
-          disabled: false,
-        },
-      });
-    } catch (error) {
-      if (
-        error instanceof AxiosError &&
-        error.response?.data.errorCode === 40920
-      ) {
-        const { ["email"]: emailField, ...prev } = profileInfo;
+      if (response.status === 200) {
+        const {
+          ["email"]: emailField,
+          ["verifyCode"]: verifyCodeField,
+          ...prev
+        } = profileInfo;
 
         setProfileInfo({
           ...prev,
           email: {
             ...emailField,
-            isError: true,
-            errMsg: "중복된 이메일입니다.",
+            disabled: true,
+          },
+          verifyCode: {
+            ...verifyCodeField,
+            disabled: false,
           },
         });
+      } else if (response.status === 40920) {
+        toast.error("이미 가입된 이메일입니다.");
+      } else if (response.status === 400) {
+        toast.error(response.data);
       } else {
-        alert("나중에 다시 시도해주세요.");
+        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
       }
+    } catch (error) {
+      toast.error("나중에 다시 시도해주세요.");
     } finally {
       setIsSending(false);
     }
@@ -329,10 +166,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
 
   const checkVerifyCode = useCallback(async () => {
     if (profileInfo.verifyCode.disabled || isVerified) return;
-
-    let isError = false;
-    let errMsg = "인증 번호가 맞지 않습니다.";
-    const { ["verifyCode"]: verifyCodeField, ...prev } = profileInfo;
 
     try {
       const response = await compareVerifyCode({
@@ -342,28 +175,15 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
 
       if (response.status === 200) {
         setIsVerified(true);
+      } else if (response.status === 406) {
+        toast.error("인증 번호가 맞지 않습니다.");
+      } else {
+        toast.error("나중에 다시 시도해주세요.");
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 400) {
-          isError = true;
-          errMsg = "인증 번호가 맞지 않습니다.";
-        } else if (error.response?.status === 500) {
-          isError = true;
-          errMsg =
-            "예상치 못한 오류가 발생하였습니다.\n나중에 다시 시도해주세요.";
-        }
-      }
+      console.log(error);
+      toast.error("서버와의 통신 중 오류가 발생하였습니다.");
     }
-
-    setProfileInfo({
-      ...prev,
-      verifyCode: {
-        ...verifyCodeField,
-        isError,
-        errMsg,
-      },
-    });
   }, [isVerified, profileInfo]);
 
   const handleCancel = useCallback(() => {
@@ -387,13 +207,11 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
           ...emailField,
           value: user?.email,
           disabled: true,
-          isError: false,
         },
         verifyCode: {
           ...verifyCodeField,
           value: "",
           disabled: true,
-          isError: false,
         },
       };
     });
@@ -415,6 +233,46 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       };
     });
   }, []);
+
+  useEffect(() => {
+    if (!state) return;
+
+    if (state.status === 200) {
+      toast.success("정보를 성공적으로 변경하였습니다.");
+      setIsVerified(false);
+      setIsProfileDisabled(true);
+      setProfileInfo((prev: UserProfile) => {
+        const user = state.data as User;
+        const {
+          ["nickname"]: nicknameField,
+          ["email"]: emailField,
+          ["verifyCode"]: verifyCodeField,
+          ...rest
+        } = prev;
+
+        return {
+          ...rest,
+          nickname: {
+            ...nicknameField,
+            value: user.nickname,
+          },
+          email: {
+            ...emailField,
+            value: user.email,
+            disabled: true,
+          },
+          verifyCode: {
+            ...verifyCodeField,
+            value: "",
+            disabled: true,
+          },
+        } as UserProfile;
+      });
+      mutate(UserKeys.getUser);
+    } else {
+      toast.error((state.data as string) || "서버 에러가 발생하였습니다.");
+    }
+  }, [state, mutate]);
 
   useEffect(() => {
     if (!user) return;
@@ -440,10 +298,27 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
     });
   }, [user]);
 
+  useEffect(() => {
+    if (profileInfo.email.value !== user.email) {
+      setIsChangeEmail(true);
+    } else {
+      setIsChangeEmail(false);
+    }
+  }, [profileInfo.email.value, user.email]);
+
+  useEffect(() => {
+    if (profileInfo.nickname.value !== user.nickname) {
+      setIsChangeNickname(true);
+    } else {
+      setIsChangeNickname(false);
+    }
+  }, [profileInfo.nickname.value, user.nickname]);
+
   return (
     <>
       <Spinner isVisible={isSending} isPage />
-      <form className={styles.form} onSubmit={handleSubmitProfile}>
+      <form className={styles.form} action={formAction}>
+        <input type="hidden" name="userId" value={user.userId} />
         <div className={styles.profile}>
           <label htmlFor="profile">
             <Image
@@ -475,22 +350,24 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         </div>
         <Input
           title="닉네임"
+          name="nickname"
+          type="text"
           value={profileInfo.nickname.value}
           disabled={isProfileDisabled}
-          isError={profileInfo.nickname.isError}
-          errorMsg={profileInfo.nickname.errMsg}
           onChange={(changedValue: string) =>
             handleProfileInfo(changedValue, "nickname")
           }
+          minLength={2}
+          maxLength={8}
+          required
         />
         {isProfileDisabled && !isVerified ? (
           <Input
             title="이메일"
+            name="email"
             type="email"
             value={profileInfo.email.value}
             disabled={profileInfo.email.disabled}
-            isError={profileInfo.email.isError}
-            errorMsg={profileInfo.email.errMsg}
             onChange={(changedValue: string) =>
               handleProfileInfo(changedValue, "email")
             }
@@ -522,12 +399,11 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
                 value="취소"
                 onClick={handleCancel}
               />
-              <button
-                type="submit"
+              <SubmitButton
+                btnTitle="수정"
+                pendingTitle="수정 중"
                 className={`${styles.update} ${notosansBold.className}`}
-              >
-                수정
-              </button>
+              />
             </>
           )}
         </div>

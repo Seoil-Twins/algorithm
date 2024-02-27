@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
-import CommentType from "@/interfaces/comment";
+import { SummaryComment } from "@/types/code";
 
-import { IMAGE_URL } from "@/api";
-import { deleteComment } from "@/api/comment";
+import { IMAGE_URL } from "@/app/actions";
+import { deleteComment, patchComment } from "@/app/actions/comment";
 
 import { useAuth } from "@/providers/authProvider";
 
@@ -16,20 +18,19 @@ import { notosansMedium } from "@/styles/_font";
 
 import EditorViewer from "@/components/common/editorViewer";
 import CommentUpdateEditor from "@/components/detail/commentUpdateEditor";
-import Link from "next/link";
 import Modal from "@/components/common/modal";
 
 type CommentProps = {
-  comment: Pick<CommentType, "commentId" | "user" | "content" | "createdTime">;
+  comment: SummaryComment;
 };
 
 const Comment = ({ comment }: CommentProps) => {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [content, setContent] = useState<string>(comment.content);
   const [isVisibleModal, setIsVisibleModal] = useState<boolean>(false);
   const [isVisibleEditor, setIsVisibleEditor] = useState<boolean>(false);
+  const [init, setInit] = useState<boolean>(false);
 
   const handleIsVisibleCommentEditor = useCallback(() => {
     setIsVisibleEditor((prev) => !prev);
@@ -39,20 +40,42 @@ const Comment = ({ comment }: CommentProps) => {
     setIsVisibleModal((prev) => !prev);
   }, []);
 
-  const handleSubmit = useCallback(
-    (value: string) => {
-      console.log(value, comment.commentId);
-      setContent(value);
-      setIsVisibleEditor(false);
+  const handleCommentUpdate = useCallback(
+    async (value: string) => {
+      const response = await patchComment(comment.commentId, value);
+
+      if (response.status === 200) {
+        router.refresh();
+        setIsVisibleEditor(false);
+      } else {
+        toast.error("수정에 실패했습니다.");
+      }
     },
-    [comment.commentId],
+    [comment.commentId, router],
   );
 
   const handleCommentDelete = useCallback(async () => {
-    await deleteComment(comment.commentId);
-    router.refresh();
-    setIsVisibleModal(false);
+    const response = await deleteComment(comment.commentId);
+
+    if (response.status === 200) {
+      router.refresh();
+      setIsVisibleModal(false);
+    } else {
+      toast.error("삭제에 실패했습니다.");
+    }
   }, [comment.commentId, router]);
+
+  useEffect(() => {
+    if (init) {
+      setInit(false);
+    }
+  }, [init]);
+
+  useEffect(() => {
+    if (!isVisibleEditor) {
+      setInit(true);
+    }
+  }, [isVisibleEditor]);
 
   return (
     <div className={styles.comment}>
@@ -94,12 +117,13 @@ const Comment = ({ comment }: CommentProps) => {
         </div>
         {isVisibleEditor ? (
           <CommentUpdateEditor
-            initialValue={content}
-            onSubmit={handleSubmit}
+            initialValue={comment.content}
+            onSubmit={handleCommentUpdate}
             isVisibleToolbar={false}
+            init={init}
           />
         ) : (
-          <EditorViewer content={content} />
+          <EditorViewer content={comment.content} />
         )}
       </div>
       <Modal

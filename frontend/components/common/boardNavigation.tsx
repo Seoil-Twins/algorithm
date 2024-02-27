@@ -75,7 +75,7 @@ const BoardNavigation = ({
           <input
             type="text"
             placeholder={placeholder}
-            value={keyword}
+            value={keyword || ""}
             onChange={handleKeyword}
             onKeyDown={handleEnter}
           />
