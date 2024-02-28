@@ -102,6 +102,11 @@ const Contents = ({ algorithm }: DetailProps) => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
+    if (code.trim() === "") {
+      toast.error("코드를 작성해주세요.");
+      return;
+    }
+
     const options: RequestCode = {
       algorithmId: algorithm.algorithmId,
       code,
@@ -110,8 +115,8 @@ const Contents = ({ algorithm }: DetailProps) => {
 
     const response = await sendCode(options);
 
-    if (response.status === 201) {
-      console.log(response.data);
+    if (response.status === 200) {
+      console.log(response.status, response.data);
     } else if (response.status === 401) {
       toast.error("로그인이 필요한 서비스입니다.");
       router.push(

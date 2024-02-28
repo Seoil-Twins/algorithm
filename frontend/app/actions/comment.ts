@@ -1,6 +1,5 @@
 import { CommentResponse, PageOptions } from "@/types/comment";
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
-import { revalidatePath } from "next/cache";
 
 export const getComments = async (
   boardId: number,

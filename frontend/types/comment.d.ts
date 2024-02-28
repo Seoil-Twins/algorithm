@@ -5,7 +5,7 @@ export type Comment = {
   boardId: number;
   user: RequiredUser;
   content: string;
-  recommend: number;
+  recommendCount: number;
   isRecommend?: boolean;
   createdTime: string;
 };

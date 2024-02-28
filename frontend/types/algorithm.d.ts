@@ -28,7 +28,6 @@ export type AlgorithmResponse = {
 
 export type SolvedOptions = "a" | "s" | "ns";
 export type SortOptions = "r" | "or" | "t";
-export type KindOptions = "a" | "c" | "p" | "j";
 export type RateOptions = "h" | "l";
 
 export type AlgorithmOptions = {
@@ -37,7 +36,6 @@ export type AlgorithmOptions = {
   solved: SolvedOptions;
   sort: SortOptions;
   level: number;
-  kind: KindOptions;
   rate?: RateOptions;
   tag?: number;
   keyword?: string;

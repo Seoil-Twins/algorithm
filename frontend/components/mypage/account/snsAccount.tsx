@@ -180,9 +180,15 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
 
   useEffect(() => {
     if (errorCode) {
-      toast.error("계정 연동에 실패했습니다.");
+      if (errorCode === "409") {
+        toast.error("이미 연동된 계정입니다.");
+      } else {
+        toast.error("계정 연동에 실패했습니다.");
+      }
+
+      router.replace("/account");
     }
-  }, [errorCode]);
+  }, [router, errorCode]);
 
   return (
     <div className={styles.linking}>
