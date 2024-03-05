@@ -40,4 +40,15 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
             "GROUP BY board.board_id, board.title, board.content, board.user_id;", nativeQuery = true)
     List<BoardEntity> findQuestionByUserId(@Param("userId") long userId);
 
+    @Query(value = "select type_name from board_type where board_type_id = 1;", nativeQuery = true)
+    String find1Type();
+
+    @Query(value = "select type_name from board_type where board_type_id = 2;", nativeQuery = true)
+    String find2Type();
+
+    @Query(value = "select type_name from board_type where board_type_id = 3;", nativeQuery = true)
+    String find3Type();
+
+    @Query(value = "select type_name from board_type where board_type_id = 4;", nativeQuery = true)
+    String find4Type();
 }

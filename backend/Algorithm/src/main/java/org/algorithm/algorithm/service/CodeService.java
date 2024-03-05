@@ -367,7 +367,7 @@ public class CodeService {
         }
     }
 
-    private ObjectNode createCodeNode(CodeDTO codeDTO) {
+    public ObjectNode createCodeNode(CodeDTO codeDTO) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode codeNode = objectMapper.createObjectNode();
 

@@ -102,6 +102,12 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardByAlgorithmId(page, count, algorithmId, boardType, loginUser));
     }
 
+    @GetMapping("/board/board-type")
+    public ResponseEntity<?> getBoardType() {
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardType());
+    }
+
     @PostMapping("/board")
     public ResponseEntity<?> postBoard(@RequestBody BoardDTO boardDTO,
                                        HttpServletRequest request) {
