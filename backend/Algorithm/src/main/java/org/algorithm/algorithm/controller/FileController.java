@@ -55,6 +55,7 @@ public class FileController {
         return ResponseEntity.ok(fileService.storeBoardImage(file,boardId,"board/"+boardId));
     }
 
+
     @DeleteMapping("/board/image/delete/{board_image_id}")
     public ResponseEntity<HttpStatus> handleDeleteBoardImage(@PathVariable("board_image_id") long boardImageId) {
         fileService.deleteBoardImage(boardImageId);

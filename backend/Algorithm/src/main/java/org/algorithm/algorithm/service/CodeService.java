@@ -27,6 +27,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class CodeService {
 
+    public final NotificationService notificationService;
+
     public final CodeRepository codeRepository;
     public final CommentCodeRepository commentCodeRepository;
     public final UserProfileRepository userProfileRepository;
@@ -191,7 +193,7 @@ public class CodeService {
         }
     }
 
-    public HttpStatus postRecommendCode(Long codeId, UserDTO userDTO, long value) {
+    public HttpStatus postRecommendCode(Long codeId, UserDTO userDTO, Boolean value) {
         try {
             CodeEntity targetCodeEntity = codeRepository.findCodeEntityByCodeId(codeId);
 
@@ -208,9 +210,11 @@ public class CodeService {
 
             recommendCodeEntity.setUserId(userDTO.getUserId());
             recommendCodeEntity.setCodeId(codeId);
-            recommendCodeEntity.setValue(value);
+            recommendCodeEntity.setValue(value ? 1 : -1);
 
             recommendCodeRepository.save(recommendCodeEntity);
+
+            notificationService.postNotification(codeId, 1L,6L, userDTO);
 
             return HttpStatus.CREATED;
 

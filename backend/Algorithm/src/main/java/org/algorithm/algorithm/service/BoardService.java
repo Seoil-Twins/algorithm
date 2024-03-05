@@ -34,6 +34,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BoardService {
 
+    public final NotificationService notificationService;
+
     public final AlgorithmRepository algorithmRepository;
     public final AlgorithmKindRepository algorithmKindRepository;
     public final BoardRepository boardRepository;
@@ -272,6 +274,9 @@ public class BoardService {
             adoptEntity.setCommentId(commentId);
 
             adoptRepository.save(adoptEntity);
+
+
+            notificationService.postNotification(commentId, 3L,3L, userDTO);
 
         }
         catch(NotFoundException | AuthorizedException e){

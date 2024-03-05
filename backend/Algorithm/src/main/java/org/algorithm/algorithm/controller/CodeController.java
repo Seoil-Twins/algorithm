@@ -134,15 +134,9 @@ public class CodeController {
     }
 
     @PostMapping("/code/recommend/{code_id}")
-    public ResponseEntity<?> postRecommendCode(@PathVariable(value = "code_id")Long codeId, @RequestParam(value = "value")long value,
+    public ResponseEntity<?> postRecommendCode(@PathVariable(value = "code_id")Long codeId,
+                                               @RequestParam(required = false, value = "value") Boolean value,
                                              HttpServletRequest request) throws BadRequestException {
-
-        System.out.println(value);
-        if(!(value == -1L || value == 1L)){
-            return ResponseEntity.badRequest().body(
-                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "value Only -1 or 1")
-            );
-        }
 
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
