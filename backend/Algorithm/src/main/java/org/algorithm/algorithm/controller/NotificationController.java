@@ -33,6 +33,30 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
+    @GetMapping("/notification/{user_id}")
+    public ResponseEntity<?> getNofitication(@PathVariable(value="user_id") Long userId,
+                                             @RequestParam(required = false, defaultValue = "1", value = "page") int page,
+                                             @RequestParam(required = false, defaultValue = "10", value = "count") int count,
+                                              HttpServletRequest request) throws BadRequestException {
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            // 상수로 뺼 예정
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+
+        if (loginUser != null) {
+
+            // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
+
+            return ResponseEntity.ok(notificationService.getNotification(userId,page, count));
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
+        }
+    }
+
     @PostMapping("/notification/{target_id}")
     public ResponseEntity<?> postNotification(@PathVariable(value="target_id") Long targetId,
                                               @RequestParam(value = "targetType", required = true) Long targetType,
@@ -51,6 +75,28 @@ public class NotificationController {
             // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
 
             return ResponseEntity.ok(notificationService.postNotification(targetId, targetType,notificationType, loginUser));
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
+        }
+    }
+
+    @DeleteMapping("/notification/{notification_id}")
+    public ResponseEntity<?> postNotification(@PathVariable(value="notification_id") Long notificationId,
+                                              HttpServletRequest request) throws BadRequestException {
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            // 상수로 뺼 예정
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+
+        if (loginUser != null) {
+
+            // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
+
+            return ResponseEntity.ok(notificationService.deleteNotification(notificationId, loginUser));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");

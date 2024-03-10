@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -28,4 +29,6 @@ public class NotificationEntity {
     private String title;
     @Column(name = "content")
     private String content;
+    @Column(name = "created_time")
+    private LocalDateTime createdTime;
 }

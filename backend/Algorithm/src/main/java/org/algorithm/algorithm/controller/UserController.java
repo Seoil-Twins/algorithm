@@ -16,6 +16,9 @@ import org.algorithm.algorithm.exception.GlobalException;
 import org.algorithm.algorithm.exception.UpdateException;
 import org.algorithm.algorithm.service.UserService;
 import org.algorithm.algorithm.util.Const;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -27,6 +30,8 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.concurrent.TimeUnit;
+
 
 @RestController
 @ResponseBody
@@ -36,6 +41,7 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final StringRedisTemplate redisTemplate;
 
 
     @GetMapping("/registrationForm")
@@ -258,7 +264,11 @@ public class UserController {
         ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", session.getId()).httpOnly(true).path("/").maxAge(2592000).build();
 
         ObjectNode responseUser = userService.userSelf(login);
-
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+        redisTemplate.opsForValue().set(responseCookie.toString(), String.valueOf(responseUser.get("userId")), 30, TimeUnit.MINUTES);
+        String userId = responseUser.get("userId").toString(); // 또는 toString()
+        redisTemplate.opsForValue().set(responseCookie.toString(), userId, 30, TimeUnit.MINUTES);
+        System.out.println(responseUser);
         return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseUser);
     }
 

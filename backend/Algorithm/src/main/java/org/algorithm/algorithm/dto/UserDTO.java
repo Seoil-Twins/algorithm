@@ -7,13 +7,16 @@ import lombok.Setter;
 import lombok.ToString;
 import org.algorithm.algorithm.entity.UserEntity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @ToString
-public class UserDTO {
+public class UserDTO implements Serializable {
+    private static final long serialVersionUID = 1L;  // 고유한 serialVersionUID 정의
+
     private long userId;
     private String userPw;
     private String email;

@@ -10,30 +10,16 @@ import org.algorithm.algorithm.dto.BoardDTO;
 import org.algorithm.algorithm.dto.ResponseUserDTO;
 import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.entity.*;
-import org.algorithm.algorithm.exception.NotFoundException;
-import org.algorithm.algorithm.exception.BadRequestException;
-import org.algorithm.algorithm.exception.SQLException;
-import org.algorithm.algorithm.exception.StorageException;
+import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.parser.Entity;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +33,36 @@ public class NotificationService {
     public final CommentRepository commentRepository;
 
     public final UserRepository userRepository;
+    public final ResponseUserRepository responseUserRepository;
+    public final UserProfileRepository userProfileRepository;
+
+    public ObjectNode getNotification(Long userId,int page, int count) {
+        try {
+            Pageable pageable = PageRequest.of(page-1, count);
+            Page<NotificationEntity> notificationEntities =  notificationRepository.findAllByUserId(pageable,userId);
+
+            // 랭킹을  찾지 못하면 오류 반환
+            if (notificationEntities == null) {
+                throw new NotFoundException("notification Not Found ! ");
+            }
+
+            List<NotificationEntity> resultValue = notificationEntities.getContent();
+            List<ObjectNode> responseList = new ArrayList<>();
+
+            for (NotificationEntity notificationEntity : resultValue) {
+                ObjectNode notificationNode = createNotificationNode(notificationEntity);
+                responseList.add(notificationNode);
+            }
+
+            return createResultNode(responseList);
+        }
+        catch(NotFoundException | BadRequestException e){
+            throw e;
+        }
+        catch(Error e){
+            throw new SQLException("Notification SQL Error ! ");
+        }
+    }
 
     public NotificationEntity postNotification(Long targetId, Long targetType, Long notificationType, UserDTO userDTO){
         try {
@@ -123,6 +139,7 @@ public class NotificationService {
                 notificationEntity.setTargetType(targetType);
                 notificationEntity.setTitle(userEntity.getNickname() + title);
                 notificationEntity.setContent(boardEntity.getTitle());
+                notificationEntity.setCreatedTime(LocalDateTime.now());
             }
             else {
                 throw new BadRequestException("targetType 1 ~ 3");
@@ -141,4 +158,98 @@ public class NotificationService {
             throw new SQLException("Ranking SQL Error ! ");
         }
     }
+
+    public ResponseEntity<?> deleteNotification(Long notificationId, UserDTO userDTO) {
+        try {
+            NotificationEntity notificationEntitiy =  notificationRepository.findNotificationEntityByNotificationId(notificationId);
+
+            // 랭킹을  찾지 못하면 오류 반환
+            if (notificationEntitiy == null) {
+                throw new NotFoundException("notification Not Found ! ");
+            }
+
+            if(userDTO.getUserId() != notificationEntitiy.getUserId())
+                throw new AuthorizedException("Only Writer Delete Notification ! ");
+
+            notificationRepository.delete(notificationEntitiy);
+
+            return ResponseEntity.ok("Delete ! ");
+        }
+        catch(NotFoundException | AuthorizedException e){
+            throw e;
+        }
+        catch(Error e){
+            throw new SQLException("Notification SQL Error ! ");
+        }
+    }
+
+    private ObjectNode createNotificationNode(NotificationEntity notificationEntity){
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode notificationNode = objectMapper.createObjectNode();
+
+        // userId로 user data 가져와서 node 생성
+        ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(notificationEntity.getUserId());
+        ResponseUserDTO responseUserDTO = ResponseUserDTO.toResponseUserDTO(userEntity);
+
+        UserProfileEntity userProfileEntity = userProfileRepository.findUserProfileEntityByUserId(responseUserDTO.getUserId());
+        String profile;
+
+        if (userProfileEntity == null) {
+            profile = null;
+        } else {
+            profile = userProfileEntity.getPath();
+        }
+
+        ObjectNode userNode = objectMapper.createObjectNode();
+        userNode.put("userId", responseUserDTO.getUserId());
+        userNode.put("profile", profile);
+        userNode.put("nickname", responseUserDTO.getNickname());
+
+        // otherUserId로 user data 가져와서 node 생성
+        ResponseUserEntity otherUserEntity = responseUserRepository.findDefaultByUserId(notificationEntity.getOtherUserId());
+        ResponseUserDTO responseOtherUserDTO = ResponseUserDTO.toResponseUserDTO(otherUserEntity);
+
+        UserProfileEntity otherUserProfileEntity = userProfileRepository.findUserProfileEntityByUserId(responseOtherUserDTO.getUserId());
+        String otherProfile;
+
+        if (otherUserProfileEntity == null) {
+            otherProfile = null;
+        } else {
+            otherProfile = otherUserProfileEntity.getPath();
+        }
+
+        ObjectNode otherUserNode = objectMapper.createObjectNode();
+        otherUserNode.put("userId", responseOtherUserDTO.getUserId());
+        otherUserNode.put("profile", otherProfile);
+        otherUserNode.put("nickname", responseOtherUserDTO.getNickname());
+
+
+
+        notificationNode.put("notificationId", notificationEntity.getNotificationId());
+        notificationNode.set("user", userNode);
+        notificationNode.set("otherUser", otherUserNode);
+        notificationNode.put("targetId", notificationEntity.getTargetId());
+        notificationNode.put("targetType", notificationEntity.getTargetType());
+        notificationNode.put("title", notificationEntity.getTitle());
+        notificationNode.put("content", notificationEntity.getContent());
+        notificationNode.put("createdTime", String.valueOf(notificationEntity.getCreatedTime()));
+
+        return notificationNode;
+    }
+
+    private ObjectNode createResultNode(List<ObjectNode> responseList) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode codesArrayNode = objectMapper.createArrayNode();
+
+        for (ObjectNode node : responseList) {
+            codesArrayNode.add(node);
+        }
+
+        ObjectNode resultNode = objectMapper.createObjectNode();
+        resultNode.set("notifications", codesArrayNode);
+        resultNode.put("total", responseList.size());
+
+        return resultNode;
+    }
+
 }
