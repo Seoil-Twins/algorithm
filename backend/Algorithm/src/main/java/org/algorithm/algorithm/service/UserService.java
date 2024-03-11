@@ -9,10 +9,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.SendFailedException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.algorithm.algorithm.dto.BoardDTO;
-import org.algorithm.algorithm.dto.EmailVerifyDTO;
-import org.algorithm.algorithm.dto.ResponseUserDTO;
-import org.algorithm.algorithm.dto.UserDTO;
+import org.algorithm.algorithm.dto.*;
 import org.algorithm.algorithm.entity.*;
 import org.algorithm.algorithm.exception.*;
 import org.algorithm.algorithm.repository.*;
@@ -233,115 +230,96 @@ public class UserService {
     }
     public ObjectNode userMypageFeedback(UserDTO userDTO) {
         try {
-            String[] resultValue = userRepository.findFeedbackByUserId((int) userDTO.getUserId());
+            List<BoardEntity> resultValue = boardRepository.findFeedbackByUserId(userDTO.getUserId());
 
 
             ObjectMapper objectMapper = new ObjectMapper();
             ArrayNode linksArrayNode = objectMapper.createArrayNode();
 
 
-            for (String linkString : resultValue) {
-                String[] linkParts = linkString.split(",");
+            for (BoardEntity linkParts : resultValue) {
+                BoardDTO boardDTO = BoardDTO.toBoardDTO(linkParts);
                 String tempId = null;
-                if (linkParts.length == Const.BOARD.size()) {
-                    ObjectNode linkNode = objectMapper.createObjectNode();
-                    for (int i = 0; i < Const.BOARD.size(); i++) {
-                        String column = Const.BOARD.get(i);
-                        String value = linkParts[i];
-                        if (Objects.equals(column, "board_id")) {
-                            tempId = linkParts[i];
-                        }
-                        linkNode.put(column, value);
-                    }
-                    linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
-                    linksArrayNode.add(linkNode);
-                }
+                ObjectNode linkNode = createBoardNode(boardDTO, userDTO);
+//                linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
+                linksArrayNode.add(linkNode);
+                System.out.println(linkNode);
+
             }
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("userId", objectMapper.convertValue(userDTO.getUserId(), JsonNode.class));
             responseNode.set("results", linksArrayNode);
-            responseNode.set("totals", objectMapper.convertValue(resultValue.length, JsonNode.class));
+            responseNode.set("totals", objectMapper.convertValue(resultValue.size(), JsonNode.class));
             System.out.println(responseNode);
 
             return responseNode;
         }
         catch(Error e){
             throw new SQLException("GET MyPage Feedback Error ! ");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public ObjectNode userMypageFree(UserDTO userDTO) {
         try {
 
-            String[] resultValue = userRepository.findFreeByUserId((int) userDTO.getUserId());
+            List<BoardEntity> resultValue = boardRepository.findFreeByUserId(userDTO.getUserId());
 
 
             ObjectMapper objectMapper = new ObjectMapper();
             ArrayNode linksArrayNode = objectMapper.createArrayNode();
 
 
-            for (String linkString : resultValue) {
-                String[] linkParts = linkString.split(",");
+            for (BoardEntity linkParts : resultValue) {
+                BoardDTO boardDTO = BoardDTO.toBoardDTO(linkParts);
                 String tempId = null;
-                if (linkParts.length == Const.BOARD.size()) {
-                    ObjectNode linkNode = objectMapper.createObjectNode();
-                    for (int i = 0; i < Const.BOARD.size(); i++) {
-                        String column = Const.BOARD.get(i);
-                        String value = linkParts[i];
-                        if (Objects.equals(column, "solved")) continue;
-                        if (Objects.equals(column, "board_id")) {
-                            tempId = linkParts[i];
-                        }
-                        linkNode.put(column, value);
-                    }
-                    linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
-                    linksArrayNode.add(linkNode);
-                }
+                ObjectNode linkNode = createBoardNode(boardDTO, userDTO);
+//                linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
+                linksArrayNode.add(linkNode);
+                System.out.println(linkNode);
+
             }
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("userId", objectMapper.convertValue(userDTO.getUserId(), JsonNode.class));
             responseNode.set("results", linksArrayNode);
-            responseNode.set("totals", objectMapper.convertValue(resultValue.length, JsonNode.class));
+            responseNode.set("totals", objectMapper.convertValue(resultValue.size(), JsonNode.class));
             System.out.println(responseNode);
 
             return responseNode;
         }
         catch(Error e){
             throw new SQLException("GET MyPage FreeBoard Error ! ");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public ObjectNode userMypageAnswer(UserDTO userDTO) {
         try {
-            String[] resultValue = userRepository.findAnswerByUserId((int) userDTO.getUserId());
-
+            List<MyPageAnswerInterface> resultValue = boardRepository.findAnswerByUserId(userDTO.getUserId());
 
             ObjectMapper objectMapper = new ObjectMapper();
             ArrayNode linksArrayNode = objectMapper.createArrayNode();
 
 
-            for (String linkString : resultValue) {
-                String[] linkParts = linkString.split(",");
-                System.out.println(linkString);
-                String tempId = null;
-                if (linkParts.length == Const.MYPAGEANSWER.size()) {
-                    ObjectNode linkNode = objectMapper.createObjectNode();
-                    for (int i = 0; i < Const.MYPAGEANSWER.size(); i++) {
-                        String column = Const.MYPAGEANSWER.get(i);
-                        String value = linkParts[i];
-                        if (Objects.equals(column, "board_id")) {
-                            tempId = linkParts[i];
-                        }
-                        linkNode.put(column, value);
-                    }
-                    linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
-                    linksArrayNode.add(linkNode);
-                }
+            for (MyPageAnswerInterface linkParts : resultValue) {
+                ObjectNode linkNode = objectMapper.createObjectNode();
+                linkNode.put("boardId",linkParts.getBoard_id());
+                linkNode.put("boardType",linkParts.getBoard_type());
+                linkNode.put("title",linkParts.getTitle());
+                linkNode.put("content",linkParts.getContent());
+                linkNode.put("solved",linkParts.getSolved());
+                linkNode.put("views",linkParts.getViews());
+                linkNode.put("createdTime", String.valueOf(linkParts.getCreated_time()));
+                linksArrayNode.add(linkNode);
+                System.out.println(linkNode);
+
             }
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("userId", objectMapper.convertValue(userDTO.getUserId(), JsonNode.class));
             responseNode.set("results", linksArrayNode);
-            responseNode.set("totals", objectMapper.convertValue(resultValue.length, JsonNode.class));
+            responseNode.set("totals", objectMapper.convertValue(resultValue.size(), JsonNode.class));
             System.out.println(responseNode);
 
             return responseNode;
@@ -393,41 +371,35 @@ public class UserService {
 
     public ObjectNode userMypageFavorite(UserDTO userDTO) {
         try {
-            String[] resultValue = userRepository.findFavoriteBoardByUserId((int) userDTO.getUserId());
+            List<BoardEntity> resultValue = boardRepository.findFavoriteBoardByUserId(userDTO.getUserId());
 
 
             ObjectMapper objectMapper = new ObjectMapper();
             ArrayNode linksArrayNode = objectMapper.createArrayNode();
 
 
-            for (String linkString : resultValue) {
-                String[] linkParts = linkString.split(",");
-                System.out.println(linkString);
+
+            for (BoardEntity linkParts : resultValue) {
+                BoardDTO boardDTO = BoardDTO.toBoardDTO(linkParts);
                 String tempId = null;
-                if (linkParts.length == Const.MYPAGEFAVORITE.size()) {
-                    ObjectNode linkNode = objectMapper.createObjectNode();
-                    for (int i = 0; i < Const.MYPAGEFAVORITE.size(); i++) {
-                        String column = Const.MYPAGEFAVORITE.get(i);
-                        String value = linkParts[i];
-                        if (Objects.equals(column, "board_id")) {
-                            tempId = linkParts[i];
-                        }
-                        linkNode.put(column, value);
-                    }
-                    linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
-                    linksArrayNode.add(linkNode);
-                }
+                ObjectNode linkNode = createBoardNode(boardDTO, userDTO);
+//                linkNode.put("recommend", userRepository.findRecommendByBoardId(tempId));
+                linksArrayNode.add(linkNode);
+                System.out.println(linkNode);
+
             }
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.set("userId", objectMapper.convertValue(userDTO.getUserId(), JsonNode.class));
             responseNode.set("results", linksArrayNode);
-            responseNode.set("totals", objectMapper.convertValue(resultValue.length, JsonNode.class));
+            responseNode.set("totals", objectMapper.convertValue(resultValue.size(), JsonNode.class));
             System.out.println(responseNode);
 
             return responseNode;
         }
         catch(Error e ){
             throw new SQLException("GET MyPage Favorite Error !");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

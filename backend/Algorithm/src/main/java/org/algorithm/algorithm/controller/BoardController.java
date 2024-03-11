@@ -102,6 +102,12 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardByAlgorithmId(page, count, algorithmId, boardType, loginUser));
     }
 
+    @GetMapping("/board/board-type")
+    public ResponseEntity<?> getBoardType() {
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardType());
+    }
+
     @PostMapping("/board")
     public ResponseEntity<?> postBoard(@RequestBody BoardDTO boardDTO,
                                        HttpServletRequest request) {
@@ -121,6 +127,11 @@ public class BoardController {
                     return ResponseEntity.badRequest().body(
                             new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : require algorithm_id")
                     );
+            } else {
+                if(boardDTO.getAlgorithmId() != null)
+                    return ResponseEntity.badRequest().body(
+                            new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : not require algorithm_id")
+                    );
             }
 
             if(boardDTO.getBoardType() < 1 || boardDTO.getBoardType() > 4)
@@ -134,6 +145,30 @@ public class BoardController {
                 );
 
             boardService.postBoard(boardDTO, loginUser);
+
+            return ResponseEntity.ok("created");
+        } else {
+            // 세션에 loginUser가 없으면 로그인되지 않은 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
+        }
+
+    }
+
+    @PostMapping("/board/view/{board_id}")
+    public ResponseEntity<?> postView(@PathVariable("board_id") Long boardId,
+                                       HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false); // default true
+        UserDTO loginUser = null;
+        if(session != null){
+            // 상수로 뺼 예정
+            loginUser = (UserDTO)session.getAttribute(Const.LOGIN_USER_KEY);
+        }
+
+        if (loginUser != null) {
+
+
+            boardService.postView(boardId, loginUser);
 
             return ResponseEntity.ok("created");
         } else {
@@ -165,7 +200,7 @@ public class BoardController {
 
             boardService.postComment(commentDTO, boardId, loginUser);
 
-            return ResponseEntity.ok("created");
+            return ResponseEntity.status(HttpStatus.CREATED).body("CREATED");
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");

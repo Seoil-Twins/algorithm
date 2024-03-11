@@ -34,6 +34,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BoardService {
 
+    public final NotificationService notificationService;
+
     public final AlgorithmRepository algorithmRepository;
     public final AlgorithmKindRepository algorithmKindRepository;
     public final BoardRepository boardRepository;
@@ -160,7 +162,11 @@ public class BoardService {
 
            BoardEntity boardEntity = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
            BoardDTO boardDTO = BoardDTO.toBoardDTO(boardEntity);
-           ArrayNode commentList = insertCommentsNode(boardDTO);
+           ArrayNode commentList = null;
+           if(userDTO != null)
+            commentList = insertCommentsNode(boardDTO,userDTO);
+           else
+            commentList = insertCommentsNode(boardDTO);
 
            commentNode.set("comments", commentList);
            commentNode.put("total",commentList.size());
@@ -232,6 +238,37 @@ public class BoardService {
         }
     }
 
+    public void postView(Long boardId, UserDTO userDTO) {
+        try {
+            BoardEntity boardEntity = boardRepository.findBoardEntityByBoardIdOrderByCreatedTime(boardId);
+
+            if(boardEntity == null)
+            {
+                throw new NotFoundException("Board Not Found");
+            }
+
+            BoardViewEntity boardViewEntity = boardViewRepository.findByBoardIdAndUserId(boardId, userDTO.getUserId());
+            if(boardViewEntity != null)
+            {
+                throw new DuplicatedExcepiton("Already Exist view");
+            }
+
+            BoardViewEntity saveEntity = new BoardViewEntity();
+            saveEntity.setBoardId(boardId);
+            saveEntity.setUserId(userDTO.getUserId());
+
+            boardViewRepository.save(saveEntity);
+
+        }
+        catch(NotFoundException | DuplicatedExcepiton e){
+            throw e;
+        }
+        catch (Exception e){
+            throw new SQLException(" Board View All SQL Error ! ");
+        }
+    }
+
+
     public void postComment(CommentDTO commentDTO,Long boardId, UserDTO userDTO) {
         try {
 
@@ -272,6 +309,9 @@ public class BoardService {
             adoptEntity.setCommentId(commentId);
 
             adoptRepository.save(adoptEntity);
+
+
+            notificationService.postNotification(commentId, 3L,3L, userDTO);
 
         }
         catch(NotFoundException | AuthorizedException e){
@@ -424,6 +464,27 @@ public class BoardService {
         }
     }
 
+    public ObjectNode getBoardType() {
+        try {
+            ObjectMapper objectMappere = new ObjectMapper();
+            ObjectNode typeNode = objectMappere.createObjectNode();
+
+            typeNode.put("1",boardRepository.find1Type());
+            typeNode.put("2",boardRepository.find2Type());
+            typeNode.put("3",boardRepository.find3Type());
+            typeNode.put("4",boardRepository.find4Type());
+
+            return typeNode;
+
+        }
+        catch (NotFoundException | AuthorizedException e){
+            throw e;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new SQLException("Failed to delete board.");
+        }
+    }
+
     private ObjectNode createBoardNode(BoardDTO boardDTO, UserDTO userDTO) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode boardNode = objectMapper.createObjectNode();
@@ -485,10 +546,97 @@ public class BoardService {
             commentCount = "0";
 
 //        // boardId로 isRecommend 추출 코드 작성 요망
-        Boolean isRecommend = recommendBoardRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userDTO.getUserId()) != null;
+        RecommendBoardEntity rbe = recommendBoardRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userDTO.getUserId());
+        Long isRecommend = (rbe != null) ? rbe.getValue() : null;
 //
 //        // boardId로 isView 추출 코드 작성 요망
         Boolean isView = boardViewRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userDTO.getUserId()) != null;
+
+        boardNode.put("boardId", boardDTO.getBoardId());
+        boardNode.put("boardType", boardDTO.getBoardType());
+        boardNode.set("user", userNode);
+        boardNode.put("title", boardDTO.getTitle());
+        boardNode.put("content", boardDTO.getContent());
+        if(validSolved.contains(boardDTO.getBoardType()))
+            boardNode.put("solved", solved);
+        boardNode.put("views", views);
+        boardNode.put("recommendCount", recommendCount);
+        boardNode.set("tags", tagNode);
+        boardNode.put("commentCount", commentCount);
+        boardNode.put("isRecommend", isRecommend);
+        boardNode.put("isView", isView);
+        boardNode.put("createdTime", String.valueOf(boardDTO.getCreatedTime()));
+
+        return boardNode;
+    }
+
+    public ObjectNode createBoardNode(BoardDTO boardDTO, long userId) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode boardNode = objectMapper.createObjectNode();
+        Set<Long> validSolved = new HashSet<>(Arrays.asList(1L,3L,4L));
+        Set<Long> feedbackSolved = new HashSet<>(Arrays.asList(4L));
+
+        // userId로 user data 가져와서 node 생성
+        ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(boardDTO.getUserId());
+        ResponseUserDTO responseUserDTO = ResponseUserDTO.toResponseUserDTO(userEntity);
+
+        UserProfileEntity userProfileEntity = userProfileRepository.findUserProfileEntityByUserId(responseUserDTO.getUserId());
+        String profile;
+
+        if (userProfileEntity == null) {
+            profile = null;
+        } else {
+            profile = userProfileEntity.getPath();
+        }
+
+
+
+        ObjectNode userNode = objectMapper.createObjectNode();
+        userNode.put("userId", responseUserDTO.getUserId());
+        userNode.put("profile", profile);
+        userNode.put("nickname", responseUserDTO.getNickname());
+
+        // boardId로 recommendCount 추출
+        String recommendCount = recommendBoardRepository.findCountByBoardId(boardDTO.getBoardId());
+        if(recommendCount == null)
+            recommendCount = "0";
+
+        // boardId로 views 추출 코드
+        String views = boardViewRepository.countByBoardId(boardDTO.getBoardId());
+        if(views == null)
+            views = "0";
+
+        // boardId로 solved 추출 코드 작성 요망
+        Boolean solved;
+        if(feedbackSolved.contains(boardDTO.getBoardType())) {
+            solved = adoptFeedbackRepository.findByBoardId(boardDTO.getBoardId()) != null;
+        }
+        else
+            solved = adoptRepository.findByBoardId(boardDTO.getBoardId()) != null;
+
+        // boardId로 tags 추출 코드 작성 요망
+//        String[] tags = ["자유분방","천방지축"];
+        List<String> tagList = tagRepository.findValuesByBoardId(boardDTO.getBoardId());
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode tagNode = mapper.createArrayNode();
+
+        // tagList를 ArrayNode에 추가
+        for (String tag : tagList) {
+            tagNode.add(tag);
+        }
+
+        // boardId로 commentCount 추출 코드 작성 요망
+        String commentCount = boardRepository.findCommentCountByBoardId(boardDTO.getBoardId());
+        if (commentCount == null)
+            commentCount = "0";
+
+//        // boardId로 isRecommend 추출 코드 작성 요망
+        RecommendBoardEntity rbe = recommendBoardRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userId);
+        Long isRecommend = (rbe != null) ? rbe.getValue() : null;
+
+//
+//        // boardId로 isView 추출 코드 작성 요망
+        Boolean isView = boardViewRepository.findByBoardIdAndUserId(boardDTO.getBoardId(),userId) != null;
 
         boardNode.put("boardId", boardDTO.getBoardId());
         boardNode.put("boardType", boardDTO.getBoardType());
@@ -618,10 +766,55 @@ public class BoardService {
             commentNode.put("createdTime", String.valueOf(commentDTO.getCreatedTime()));
             commentsList.add(commentNode);
         }
-
         return commentsList;
-
     }
+    private ArrayNode insertCommentsNode(BoardDTO boardDTO, UserDTO userDTO){
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode commentsList = objectMapper.createArrayNode();
+
+        List<CommentEntity> commentEntities = commentRepository.findCommentEntitiesByBoardId(boardDTO.getBoardId());
+
+        for (CommentEntity commentEntity : commentEntities) {
+            CommentDTO commentDTO = CommentDTO.toCommentDTO(commentEntity);
+            ObjectNode commentNode = objectMapper.createObjectNode();
+
+            String recommend = recommendCommentRepository.countByCommentId(commentDTO.getCommentId());
+            if(recommend == null)
+                recommend = "0";
+            // boardId로 isRecommend 추출 코드 작성 요망
+            RecommendCommentEntity rbe = recommendCommentRepository.findByCommentIdAndUserId(commentEntity.getCommentId(),userDTO.getUserId());
+            Long isRecommend = (rbe != null) ? rbe.getValue() : null;
+
+            // userId로 user data 가져와서 node 생성
+            ResponseUserEntity userEntity = responseUserRepository.findDefaultByUserId(commentDTO.getUserId());
+            ResponseUserDTO responseUserDTO = ResponseUserDTO.toResponseUserDTO(userEntity);
+
+            UserProfileEntity userProfileEntity = userProfileRepository.findUserProfileEntityByUserId(responseUserDTO.getUserId());
+            String profile;
+
+            if (userProfileEntity == null) {
+                profile = null;
+            } else {
+                profile = userProfileEntity.getPath();
+            }
+
+            ObjectNode userNode = objectMapper.createObjectNode();
+            userNode.put("userId", responseUserDTO.getUserId());
+            userNode.put("profile", profile);
+            userNode.put("nickname", responseUserDTO.getNickname());
+
+            commentNode.put("commentId",commentDTO.getCommentId());
+            commentNode.set("user",userNode);
+            commentNode.put("content",commentDTO.getContent());
+            commentNode.put("recommendCount",recommend);
+            commentNode.put("isRecommend",isRecommend);
+            commentNode.put("createdTime", String.valueOf(commentDTO.getCreatedTime()));
+            commentsList.add(commentNode);
+        }
+        return commentsList;
+    }
+
+
     private ObjectNode createResultNode(List<ObjectNode> responseList) {
         ObjectMapper objectMapper = new ObjectMapper();
         ArrayNode codesArrayNode = objectMapper.createArrayNode();

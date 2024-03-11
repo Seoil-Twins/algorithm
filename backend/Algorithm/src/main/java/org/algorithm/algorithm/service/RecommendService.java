@@ -37,6 +37,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class RecommendService {
 
+    private final NotificationService notificationService;
+
     public final RankingRepository rankingRepository;
     public final ResponseUserRepository responseUserRepository;
     public final UserProfileRepository userProfileRepository;
@@ -61,6 +63,8 @@ public class RecommendService {
             recommendBoardEntity.setUserId(userDTO.getUserId());
             recommendBoardEntity.setValue(value ? 1 : -1);
             RecommendBoardEntity savedEntity = recommendBoardRepository.save(recommendBoardEntity);
+
+            notificationService.postNotification(boardId, 2L,1L, userDTO);
 
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode resultNode = objectMapper.createObjectNode();
@@ -89,6 +93,8 @@ public class RecommendService {
             recommendCommentEntity.setValue(value ? 1 : -1);
             RecommendCommentEntity savedEntity = recommendCommentRepository.save(recommendCommentEntity);
 
+            notificationService.postNotification(commentId, 2L,2L, userDTO);
+
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode resultNode = objectMapper.createObjectNode();
             resultNode.put("recommendCommentId",savedEntity.getRecommendCommentId());
@@ -116,6 +122,8 @@ public class RecommendService {
             recommendCommentCodeEntity.setValue(value ? 1 : -1);
             RecommendCommentCodeEntity savedEntity = recommendCommentCodeRepository.save(recommendCommentCodeEntity);
 
+
+
             ObjectMapper objectMapper = new ObjectMapper();
             ObjectNode resultNode = objectMapper.createObjectNode();
             resultNode.put("recommedCommentCodeId",savedEntity.getRecommendCommentCodeId());
@@ -128,6 +136,8 @@ public class RecommendService {
             throw e;
         }
     }
+
+
 
     public HttpStatus deleteBoard(Long boardId, UserDTO userDTO) {
         try {

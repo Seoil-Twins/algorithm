@@ -1,11 +1,17 @@
 package org.algorithm.algorithm.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.algorithm.algorithm.dto.UserDTO;
 import org.algorithm.algorithm.service.FileService;
+import org.algorithm.algorithm.service.NotificationService;
+import org.algorithm.algorithm.service.RankingService;
 import org.algorithm.algorithm.util.Const;
+import org.algorithm.algorithm.util.ErrorResponse;
+import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.repository.query.Param;
@@ -23,39 +29,16 @@ import java.nio.file.Paths;
 @RestController
 @ResponseBody
 @RequiredArgsConstructor
-public class FileController {
+public class NotificationController {
 
-    private final FileService fileService;
+    private final NotificationService notificationService;
 
-    @GetMapping("/display")
-    public ResponseEntity<Resource> display(@Param("filename") String filename) {
-        String path = "D:/Github/algorithm/backend/Algorithm/src/images/";
-        Resource resource = new FileSystemResource(path + filename);
-        if (!resource.exists())
-            return new ResponseEntity<Resource>(HttpStatus.NOT_FOUND);
+    @GetMapping("/notification/{user_id}")
+    public ResponseEntity<?> getNofitication(@PathVariable(value="user_id") Long userId,
+                                             @RequestParam(required = false, defaultValue = "1", value = "page") int page,
+                                             @RequestParam(required = false, defaultValue = "10", value = "count") int count,
+                                              HttpServletRequest request) throws BadRequestException {
 
-        HttpHeaders header = new HttpHeaders();
-        Path filePath = null;
-
-        try {
-            filePath = Paths.get(path + filename);
-            header.add("Content-Type", Files.probeContentType(filePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
-    }
-    @PatchMapping("/user/profile/{user_id}")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("image") MultipartFile file,
-                                                       @PathVariable("user_id") long userId) {
-        return ResponseEntity.ok(fileService.store(file,userId,"user/"+userId));
-    }
-
-    @PostMapping("/board/image/{board_id}")
-    public ResponseEntity<?> handleBoardImage(@RequestParam("image") MultipartFile file,
-                                              @PathVariable("board_id") long boardId,
-                                              HttpServletRequest request) {
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -64,16 +47,22 @@ public class FileController {
         }
 
         if (loginUser != null) {
-            return ResponseEntity.ok(fileService.storeBoardImage(file,boardId,"board/" + boardId,loginUser));
+
+            // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
+
+            return ResponseEntity.ok(notificationService.getNotification(userId,page, count));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
-    @PostMapping("/board/image/")
-    public ResponseEntity<?> handleBoardImageTemp(@RequestParam("image") MultipartFile file,
-                                              HttpServletRequest request) {
+    @PostMapping("/notification/{target_id}")
+    public ResponseEntity<?> postNotification(@PathVariable(value="target_id") Long targetId,
+                                              @RequestParam(value = "targetType", required = true) Long targetType,
+                                              @RequestParam(value = "notificationType", required = true) Long notificationType,
+                                              HttpServletRequest request) throws BadRequestException {
+
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -82,16 +71,20 @@ public class FileController {
         }
 
         if (loginUser != null) {
-            return ResponseEntity.ok(fileService.storeBoardImageTemp(file,"board/temp/" + loginUser.getUserId(), loginUser));
+
+            // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
+
+            return ResponseEntity.ok(notificationService.postNotification(targetId, targetType,notificationType, loginUser));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
 
-    @PatchMapping("/board/image/{board_id}")
-    public ResponseEntity<?> handlePatchBoardImage(@PathVariable("board_id") long boardId,
-                                              HttpServletRequest request) {
+    @DeleteMapping("/notification/{notification_id}")
+    public ResponseEntity<?> postNotification(@PathVariable(value="notification_id") Long notificationId,
+                                              HttpServletRequest request) throws BadRequestException {
+
         HttpSession session = request.getSession(false); // default true
         UserDTO loginUser = null;
         if(session != null){
@@ -100,20 +93,13 @@ public class FileController {
         }
 
         if (loginUser != null) {
-            return ResponseEntity.ok(fileService.patchImage(boardId,loginUser));
+
+            // 1 글 좋아요, 2 댓글 좋아요, 3 댓글 채택, 4 공지 사항 5 이벤트성 6 다른사람코드좋아요
+
+            return ResponseEntity.ok(notificationService.deleteNotification(notificationId, loginUser));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not Authenticated. Please Using After Login");
         }
     }
-
-
-    @DeleteMapping("/board/image/delete/{board_image_id}")
-    public ResponseEntity<HttpStatus> handleDeleteBoardImage(@PathVariable("board_image_id") long boardImageId) {
-        fileService.deleteBoardImage(boardImageId);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
 }
-
-

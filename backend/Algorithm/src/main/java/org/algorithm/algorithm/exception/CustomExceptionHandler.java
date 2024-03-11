@@ -23,6 +23,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorNode, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode errorNode = objectMapper.createObjectNode();
+        errorNode.put("errorCode", HttpStatus.BAD_REQUEST.value());
+        errorNode.put("message",ex.getMessage());
+
+        return new ResponseEntity<>(errorNode, HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(UpdateException.class)
     public ResponseEntity<Object> handleUpdateException(UpdateException ex, WebRequest request) {
