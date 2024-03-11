@@ -15,7 +15,7 @@ type RecommendPostProps = {
   apiUrl: string;
   userId?: string | number;
   requestId: string | number;
-  isRecommend?: boolean;
+  isRecommend?: boolean | null;
   recommendCount: number;
   padding?: number;
 };
@@ -66,14 +66,14 @@ const RecommendPost = ({
         }
 
         try {
-          if (changeIsRecommend) {
+          if (isRecommend !== null) {
+            await axiosInstance.delete(apiUrl);
+            toast.success("추천을 취소했습니다.");
+          } else {
             await axiosInstance.post(apiUrl, {
               value: changeIsRecommend,
             });
             toast.success("추천했습니다.");
-          } else {
-            await axiosInstance.delete(apiUrl);
-            toast.success("추천을 취소했습니다.");
           }
 
           setCount((prev) => (changeIsRecommend ? prev + 1 : prev - 1));

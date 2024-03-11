@@ -13,7 +13,7 @@ export type Board = {
   solved?: number | null;
   recommendCount: number;
   commentCount: number;
-  isRecommend?: boolean;
+  isRecommend?: boolean | null;
   isView: boolean;
   comments: Comment[];
   createdTime: string;
