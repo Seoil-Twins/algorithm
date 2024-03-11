@@ -115,14 +115,14 @@ const BoardDetail = async ({
         <EditorViewer className={styles.content} content={board.content} />
         <div className={styles.bottom}>
           <div className={styles.tagBox}>
-            {/* {board.tags?.map((tag, idx) => (
+            {board.tags?.map((tag, idx) => (
               <div key={idx} className={styles.tag}>
                 # {tag}
               </div>
-            ))} */}
+            ))}
           </div>
           <RecommendPost
-            apiUrl={`/board/favorite/${board.boardId}`}
+            apiUrl={`/recommend/board/${board.boardId}`}
             isRecommend={board.isRecommend}
             recommendCount={Number(board.recommendCount)}
             userId={user?.userId}

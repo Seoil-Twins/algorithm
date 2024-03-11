@@ -1,7 +1,9 @@
 import Image from "next/image";
 
-import { IMAGE_URL } from "@/api";
-import { getRankings } from "@/api/ranking";
+import { Ranking as RankingType } from "@/types/ranking";
+
+import { IMAGE_URL } from "@/app/actions/.";
+import { getRankings } from "../actions/ranking";
 
 import styles from "./ranking.module.scss";
 
@@ -34,7 +36,16 @@ const Ranking = async ({
   const count = Number(searchParams?.count) || 10;
   const keyword = searchParams?.keyword;
 
-  const rankings = await getRankings({ page, count, keyword });
+  const rankingsResponse = await getRankings({ page, count, keyword });
+  let rankings;
+  if (rankingsResponse.status !== 200) {
+    return (
+      <NotFound
+        title="랭킹을 표시할 수 없습니다."
+        description="매일 오전 12시 기준으로 랭킹에 업데이트 됩니다."
+      />
+    );
+  } else rankings = rankingsResponse.data;
 
   const includeCommaWithNumber = (num: number) => {
     return num.toLocaleString();
@@ -44,7 +55,7 @@ const Ranking = async ({
     return ((solved / tried) * 100).toFixed(2);
   };
 
-  const tableDatas: TableData[] = rankings.rankings.map((item) => {
+  const tableDatas: TableData[] = rankings.rankings.map((item: RankingType) => {
     return {
       datas: [
         <span key={item.rankingId}>{item.rank}</span>,

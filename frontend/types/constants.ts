@@ -1,9 +1,4 @@
-import {
-  KindOptions,
-  RateOptions,
-  SolvedOptions,
-  SortOptions,
-} from "./algorithm";
+import { RateOptions, SolvedOptions, SortOptions } from "./algorithm";
 
 export const BOARD_TYPE = {
   PUBLIC_QUESTION: 1,
@@ -29,11 +24,10 @@ export const UserKeys = {
 
 export const SOLVED_OPTIONS_ARRAY: SolvedOptions[] = ["a", "s", "ns"];
 export const SORT_OPTIONS_ARRAY: SortOptions[] = ["r", "or", "t"];
-export const KIND_OPTIONS_ARRAY: KindOptions[] = ["a", "c", "p", "j"];
 export const RATE_OPTIONS_ARRAY: RateOptions[] = ["h", "l"];
 
 export const checkMyType = (
-  compareArray: SolvedOptions[] | SortOptions[] | KindOptions[] | RateOptions[],
+  compareArray: SolvedOptions[] | SortOptions[] | RateOptions[],
   value: string,
 ) => {
   return compareArray.includes(value as never);

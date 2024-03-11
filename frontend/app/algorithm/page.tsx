@@ -4,13 +4,11 @@ import Image from "next/image";
 import {
   AlgorithmOptions,
   Algorithm as AlgorithmType,
-  KindOptions,
   RateOptions,
   SolvedOptions,
   SortOptions,
 } from "@/types/algorithm";
 import {
-  KIND_OPTIONS_ARRAY,
   RATE_OPTIONS_ARRAY,
   SOLVED_OPTIONS_ARRAY,
   SORT_OPTIONS_ARRAY,
@@ -34,7 +32,7 @@ const Algorithm = async ({
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
   const sortOptions: AlgorithmOptions = {
-    count: Number(searchParams?.count) || 20,
+    count: Number(searchParams?.count) || 10,
     page: Number(searchParams?.page) || 1,
     solved: checkMyType(
       SOLVED_OPTIONS_ARRAY,
@@ -45,15 +43,15 @@ const Algorithm = async ({
     sort: checkMyType(SORT_OPTIONS_ARRAY, searchParams?.sort as SortOptions)
       ? (searchParams?.sort as SortOptions)
       : "r",
-    kind: checkMyType(KIND_OPTIONS_ARRAY, searchParams?.kind as KindOptions)
-      ? (searchParams?.kind as KindOptions)
-      : "a",
     rate: checkMyType(RATE_OPTIONS_ARRAY, searchParams?.rate as RateOptions)
       ? (searchParams?.rate as RateOptions)
       : undefined,
-    level: isNaN(Number(searchParams?.level))
-      ? -1
-      : Number(searchParams?.level),
+    level:
+      isNaN(Number(searchParams?.level)) ||
+      Number(searchParams?.level) < -1 ||
+      Number(searchParams?.level) > 5
+        ? -1
+        : Number(searchParams?.level),
     tag: Number(searchParams?.tag) || undefined,
     keyword: (searchParams?.keyword as string) || undefined,
   };

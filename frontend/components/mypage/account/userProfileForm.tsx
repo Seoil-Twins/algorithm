@@ -181,7 +181,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         toast.error("나중에 다시 시도해주세요.");
       }
     } catch (error) {
-      console.log(error);
       toast.error("서버와의 통신 중 오류가 발생하였습니다.");
     }
   }, [isVerified, profileInfo]);

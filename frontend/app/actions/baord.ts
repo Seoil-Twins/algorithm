@@ -153,12 +153,14 @@ export const addBoard = async (
   }
 
   try {
-    const response = await axiosInstance.post("/board", {
-      algorithmId,
+    const data = {
+      algorithmId: algorithmId ? algorithmId : undefined,
       boardType,
       content,
       title,
-    });
+    };
+    console.log(data);
+    const response = await axiosInstance.post("/board", data);
 
     if (algorithmId) {
       revalidatePath("/forum/*", "layout");

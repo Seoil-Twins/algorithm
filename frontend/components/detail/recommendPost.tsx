@@ -8,12 +8,14 @@ import { useRouter } from "next/navigation";
 import styles from "./recommendPost.module.scss";
 
 import Modal from "../common/modal";
+import { axiosInstance } from "@/app/actions";
+import toast from "react-hot-toast";
 
 type RecommendPostProps = {
   apiUrl: string;
   userId?: string | number;
   requestId: string | number;
-  isRecommend?: boolean;
+  isRecommend?: boolean | null;
   recommendCount: number;
   padding?: number;
 };
@@ -42,7 +44,7 @@ const RecommendPost = ({
 
   const handleRecommend = useDebouncedCallback(
     useCallback(
-      (changeIsRecommend: boolean) => {
+      async (changeIsRecommend: boolean) => {
         const changeCount = changeIsRecommend ? count + 1 : count - 1;
         const isDisableWithUndefined =
           isRecommend === undefined &&
@@ -63,11 +65,24 @@ const RecommendPost = ({
           return;
         }
 
-        console.log(apiUrl, changeIsRecommend, userId, requestId);
+        try {
+          if (isRecommend !== null) {
+            await axiosInstance.delete(apiUrl);
+            toast.success("추천을 취소했습니다.");
+          } else {
+            await axiosInstance.post(apiUrl, {
+              value: changeIsRecommend,
+            });
+            toast.success("추천했습니다.");
+          }
 
-        setCount((prev) => (changeIsRecommend ? prev + 1 : prev - 1));
+          setCount((prev) => (changeIsRecommend ? prev + 1 : prev - 1));
+        } catch (error) {
+          console.log(error);
+          toast.error("추천에 실패했습니다.");
+        }
       },
-      [count, recommendCount, userId, isRecommend, apiUrl, requestId],
+      [count, recommendCount, userId, isRecommend, apiUrl],
     ),
     1000,
   );

@@ -170,9 +170,9 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
             <div className={styles.solved}>{renderCheckMark()}</div>
             <div className={styles.recommendBtnBox}>
               <RecommendPost
-                apiUrl={`/comment/favorite/${comment.commentId}`}
+                apiUrl={`/recommend/comment/${comment.commentId}`}
                 isRecommend={comment.isRecommend}
-                recommendCount={Number(comment.recommend)}
+                recommendCount={Number(comment.recommendCount)}
                 userId={user?.userId}
                 requestId={comment.commentId}
                 padding={10}
