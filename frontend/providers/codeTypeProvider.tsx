@@ -8,9 +8,7 @@ import {
   useEffect,
 } from "react";
 
-import { KindOptions } from "@/types/algorithm";
-
-export type CodeType = Exclude<KindOptions, "a">;
+export type CodeType = "c" | "p" | "j";
 export const CODE_TYPE_OPTIONS_ARRAY: CodeType[] = ["c", "p", "j"];
 
 export const getCodeValue = (code: CodeType) => {
