@@ -20,7 +20,7 @@ public class Adopt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adopt_id")
-    private long adoptId;
+    private Long adoptId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

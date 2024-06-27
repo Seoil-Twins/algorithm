@@ -18,7 +18,7 @@ public class EmailVerify {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "verify_id")
-    private long verifyId;
+    private Long verifyId;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;

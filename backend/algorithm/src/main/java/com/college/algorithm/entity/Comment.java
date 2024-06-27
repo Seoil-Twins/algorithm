@@ -20,7 +20,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private long commentId;
+    private Long commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -42,7 +42,7 @@ public class Comment {
     private String content;
 
     @Column(name = "recommend_count")
-    private int recommendCount;
+    private Integer recommendCount;
 
     @CreationTimestamp
     @Column(name = "created_time")

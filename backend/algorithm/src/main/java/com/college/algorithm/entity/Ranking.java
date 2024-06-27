@@ -20,7 +20,7 @@ public class Ranking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ranking_id")
-    private long rankingId;
+    private Long rankingId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -28,14 +28,14 @@ public class Ranking {
     private AppUser user;
 
     @Column(name = "solve_count")
-    private long solveCount;
+    private Long solveCount;
 
     @CreationTimestamp
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
     @Builder
-    public Ranking(AppUser user, long solveCount) {
+    public Ranking(AppUser user, Long solveCount) {
         this.user = user;
         this.solveCount = solveCount;
     }

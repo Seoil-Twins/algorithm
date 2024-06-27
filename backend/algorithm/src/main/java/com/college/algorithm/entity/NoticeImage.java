@@ -20,7 +20,7 @@ public class NoticeImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
-    private long imageId;
+    private Long imageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -34,14 +34,14 @@ public class NoticeImage {
     private String imageType;
 
     @Column(name = "image_size", nullable = false)
-    private long imageSize;
+    private Long imageSize;
 
     @CreationTimestamp
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
     @Builder
-    public NoticeImage(Notice notice, String imagePath, String imageType, long imageSize) {
+    public NoticeImage(Notice notice, String imagePath, String imageType, Long imageSize) {
         this.notice = notice;
         this.imagePath = imagePath;
         this.imageType = imageType;

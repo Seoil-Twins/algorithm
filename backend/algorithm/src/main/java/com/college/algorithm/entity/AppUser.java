@@ -18,7 +18,7 @@ public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private long userId;
+    private Long userId;
 
     @Column(name = "user_pw", nullable = false)
     private String userPw;
@@ -30,10 +30,10 @@ public class AppUser {
     private String nickname;
 
     @Column(name = "tried")
-    private long tried;
+    private Long tried;
 
     @Column(name = "solved")
-    private long solved;
+    private Long solved;
 
     @Column(name = "profile_path")
     private String profilePath;
@@ -42,29 +42,29 @@ public class AppUser {
     private String profileType;
 
     @Column(name = "profile_size")
-    private long profileSize;
+    private Long profileSize;
 
     @Column(name = "primary_nofi")
-    private boolean primaryNofi;
+    private Boolean primaryNofi;
 
     @Column(name = "comment_nofi")
-    private boolean commentNofi;
+    private Boolean commentNofi;
 
     @Column(name = "like_nofi")
-    private boolean likeNofi;
+    private Boolean likeNofi;
 
     @Column(name = "answer_nofi")
-    private boolean answerNofi;
+    private Boolean answerNofi;
 
     @Column(name = "event_nofi")
-    private boolean eventNofi;
+    private Boolean eventNofi;
 
     @CreationTimestamp
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private Boolean deleted;
 
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;

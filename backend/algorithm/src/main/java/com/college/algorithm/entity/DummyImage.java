@@ -17,7 +17,7 @@ public class DummyImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
-    private long imageId;
+    private Long imageId;
 
     @Column(name = "image_path", nullable = false)
     private String imagePath;
@@ -26,7 +26,7 @@ public class DummyImage {
     private String imageType;
 
     @Column(name = "image_size", nullable = false)
-    private long imageSize;
+    private Long imageSize;
 
     @CreationTimestamp
     @Column(name = "created_time")

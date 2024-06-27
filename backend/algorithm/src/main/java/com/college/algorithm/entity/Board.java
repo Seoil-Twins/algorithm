@@ -20,7 +20,7 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
-    private long boardId;
+    private Long boardId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -40,13 +40,13 @@ public class Board {
     private String content;
 
     @Column(name = "comment_count")
-    private long commentCount;
+    private Long commentCount;
 
     @Column(name = "recommend_count")
-    private int recommendCount;
+    private Integer recommendCount;
 
     @Column(name = "view_count")
-    private long viewCount;
+    private Long viewCount;
 
     @CreationTimestamp
     @Column(name = "created_time")
@@ -57,7 +57,7 @@ public class Board {
     private LocalDateTime updatedTime;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private Boolean deleted;
 
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;

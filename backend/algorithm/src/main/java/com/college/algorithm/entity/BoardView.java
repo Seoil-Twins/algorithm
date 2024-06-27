@@ -20,7 +20,7 @@ public class BoardView {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "view_id")
-    private long viewId;
+    private Long viewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

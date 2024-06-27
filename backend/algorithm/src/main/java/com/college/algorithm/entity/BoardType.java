@@ -15,7 +15,7 @@ public class BoardType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "type_id")
-    private char typeId;
+    private Character typeId;
 
     @Column(name = "type_name")
     private String typeName;

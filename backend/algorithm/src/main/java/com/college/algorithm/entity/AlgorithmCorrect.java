@@ -22,7 +22,7 @@ public class AlgorithmCorrect {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "correct_id")
-    private long correctId;
+    private Long correctId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -44,7 +44,7 @@ public class AlgorithmCorrect {
     private String code;
 
     @Column(name = "recommend_count")
-    private int recommendCount;
+    private Integer recommendCount;
 
     @CreationTimestamp
     @Column(name = "created_time")

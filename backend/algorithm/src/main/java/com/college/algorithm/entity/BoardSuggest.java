@@ -20,7 +20,7 @@ public class BoardSuggest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "suggest_id")
-    private long suggestId;
+    private Long suggestId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

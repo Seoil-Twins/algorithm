@@ -21,7 +21,7 @@ public class Explanation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "explanation_id")
-    private long explanationId;
+    private Long explanationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)

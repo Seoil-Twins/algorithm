@@ -20,7 +20,7 @@ public class Algorithm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "algorithm_id")
-    private long algorithmId;
+    private Long algorithmId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -45,7 +45,7 @@ public class Algorithm {
     private String content;
 
     @Column(name = "level", nullable = false)
-    private char level;
+    private Character level;
 
     @Column(name = "limit_time", nullable = false)
     private String limitTime;
@@ -54,7 +54,7 @@ public class Algorithm {
     private String limitMemory;
 
     @Column(name = "recommend_count")
-    private int recommendCount;
+    private Integer recommendCount;
 
     @CreationTimestamp
     @Column(name = "created_time")
@@ -65,7 +65,7 @@ public class Algorithm {
     private LocalDateTime updatedTime;
 
     @Builder
-    public Algorithm(AppUser user, AlgorithmKind kind, AlgorithmCompe compe, String title, String content, char level, String limitTime, String limitMemory) {
+    public Algorithm(AppUser user, AlgorithmKind kind, AlgorithmCompe compe, String title, String content, Character level, String limitTime, String limitMemory) {
         this.user = user;
         this.kind = kind;
         this.compe = compe;

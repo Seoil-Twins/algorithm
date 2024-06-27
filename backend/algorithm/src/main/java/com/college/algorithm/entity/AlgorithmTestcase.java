@@ -20,7 +20,7 @@ public class AlgorithmTestcase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "testcase_id")
-    private long testcaseId;
+    private Long testcaseId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)

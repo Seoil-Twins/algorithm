@@ -20,7 +20,7 @@ public class Try {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "try_id")
-    private long tryId;
+    private Long tryId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -38,7 +38,7 @@ public class Try {
     private AlgorithmCorrect correct;
 
     @Column(name = "solved")
-    private boolean solved;
+    private Boolean solved;
 
     @Column(name = "try_time", nullable = false)
     private String tryTime;
@@ -51,7 +51,7 @@ public class Try {
     private LocalDateTime createdTime;
 
     @Builder
-    public Try(AppUser user, Algorithm algorithm, AlgorithmCorrect correct, boolean solved, String tryTime, String tryMemory) {
+    public Try(AppUser user, Algorithm algorithm, AlgorithmCorrect correct, Boolean solved, String tryTime, String tryMemory) {
         this.user = user;
         this.algorithm = algorithm;
         this.correct = correct;

@@ -21,7 +21,7 @@ public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notice_id")
-    private long noticeId;
+    private Long noticeId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -44,7 +44,7 @@ public class Notice {
     private LocalDateTime updatedTime;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private Boolean deleted;
 
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;
