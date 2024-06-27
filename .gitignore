@@ -46,44 +46,50 @@ build/
 !**/gradle/
 
 ### STS ###
-/backend/Algorithm/.apt_generated
-/backend/Algorithm/.classpath
-/backend/Algorithm/.factorypath
-/backend/Algorithm/.project
-/backend/Algorithm/.settings
-/backend/Algorithm/.springBeans
-/backend/Algorithm/.sts4-cache
-/backend/Algorithm/bin/
-/backend/Algorithm/!**/src/main/**/bin/
-/backend/Algorithm/!**/src/test/**/bin/
+/backend/algorithm/.apt_generated
+/backend/algorithm/.classpath
+/backend/algorithm/.factorypath
+/backend/algorithm/.project
+/backend/algorithm/.settings
+/backend/algorithm/.springBeans
+/backend/algorithm/.sts4-cache
+/backend/algorithm/bin/
+/backend/algorithm/!**/src/main/**/bin/
+/backend/algorithm/!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-/backend/Algorithm/.idea
-/backend/Algorithm/*.iws
-/backend/Algorithm/*.iml
-/backend/Algorithm/*.ipr
-/backend/Algorithm/out/
-/backend/Algorithm/!**/src/main/**/out/
-/backend/Algorithm/!**/src/test/**/out/
+/backend/algorithm/.idea
+/backend/algorithm/*.iws
+/backend/algorithm/*.iml
+/backend/algorithm/*.ipr
+/backend/algorithm/out/
+/backend/algorithm/!**/src/main/**/out/
+/backend/algorithm/!**/src/test/**/out/
 
 ### NetBeans ###
-/backend/Algorithm//nbproject/private/
-/backend/Algorithm//nbbuild/
-/backend/Algorithm//dist/
-/backend/Algorithm//nbdist/
-/backend/Algorithm//.nb-gradle/
+/backend/algorithm//nbproject/private/
+/backend/algorithm//nbbuild/
+/backend/algorithm//dist/
+/backend/algorithm//nbdist/
+/backend/algorithm//.nb-gradle/
 
 ### VS Code ###
-/backend/Algorithm/.vscode/
+/backend/algorithm/.vscode/
 
 ### yml ###
-/backend/Algorithm/src/main/resources/application.yml
+/backend/algorithm/src/main/resources/application.yml
 
 ### properties ###
-/backend/Algorithm/src/main/resources/application.properties
+/backend/algorithm/src/main/resources/application.properties
 
 ### images ###
-/backend/Algorithm/src/images/**
+/backend/algorithm/src/images/**
 
 ### another ###
-/backend/Algorithm/program.exe
+/backend/algorithm/program.exe
+
+/backend/algorithm/gradlew
+/backend/algorithm/gradlew.bat
+/backend/algorithm/.gradle
+/backend/algorithm/gradle/*
+/backend/algorithm/build/*
