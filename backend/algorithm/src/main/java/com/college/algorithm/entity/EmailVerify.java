@@ -26,6 +26,9 @@ public class EmailVerify {
     @Column(name = "verify_code", nullable = false)
     private String verifyCode;
 
+    @Column(name = "verified")
+    private Boolean verified;
+
     @Column(name = "expiration_time", nullable = false)
     private LocalDateTime expirationTime;
 
