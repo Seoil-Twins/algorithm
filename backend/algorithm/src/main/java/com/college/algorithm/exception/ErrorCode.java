@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
+    BAD_REQUEST(HttpStatus.BAD_REQUEST,"인자 값이 잘못 되었습니다.",400),
 
     /* 401 UNAUTHORIZED : 잘못된 권한 */
     INVALID_COOKIE(HttpStatus.UNAUTHORIZED, "유효하지 않은 쿠키입니다.", 40110),
