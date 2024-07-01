@@ -45,6 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
                 * default -> 추가하지 않은 API는 누구나 사용 가능
                 * */
                 .includePathPattern("/user", PathMethod.GET)
+                .includePathPattern("/user/link", PathMethod.GET)
                 .includePathPattern("/user/link", PathMethod.POST);
     }
 

@@ -3,6 +3,7 @@ package com.college.algorithm.controller;
 import com.college.algorithm.dto.RequestLinkDto;
 import com.college.algorithm.dto.RequestLoginDto;
 import com.college.algorithm.dto.RequestSignupDto;
+import com.college.algorithm.dto.ResponseUserLinkDto;
 import com.college.algorithm.entity.AppUser;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
@@ -36,6 +37,15 @@ public class UserController {
             @PathVariable("userId") long userId
     ) {
         return ResponseEntity.ok().body(userService.getUser(userId));
+    }
+
+    @GetMapping(value = "/link")
+    public ResponseEntity<?> getLink(final HttpServletRequest request) {
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        ResponseUserLinkDto dto = userService.getLink(userId);
+        return ResponseEntity.ok().body(dto);
     }
 
     @PostMapping("/login")

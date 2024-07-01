@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,6 +43,18 @@ public class UserService {
         int favorite = algorithmRecommendRepository.countByUser(user);
 
         return UserMapper.INSTANCE.toResponseOtherUserDto(user, favorite);
+    }
+
+    public ResponseUserLinkDto getLink(String userId) {
+        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        List<UserLink> links = userLinkRepository.findAllByUser(user);
+        List<ResponseUserLinkDto.LinkDto> linkDtos = links.stream()
+                .map(UserMapper.INSTANCE::toResponseLinkDto)
+                .toList();
+
+        return new ResponseUserLinkDto(linkDtos);
     }
 
     public Long login(RequestLoginDto dto) {
