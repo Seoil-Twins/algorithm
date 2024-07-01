@@ -12,6 +12,7 @@ public enum ErrorCode {
 
     /* 401 UNAUTHORIZED : 잘못된 권한 */
     INVALID_COOKIE(HttpStatus.UNAUTHORIZED, "유효하지 않은 쿠키입니다.", 40110),
+    BLANK_COOKIE(HttpStatus.UNAUTHORIZED, "쿠키가 존재하지 않습니다.", 40120),
 
     /* 403 FORBIDDEN : 잘못된 접근 */
     NOT_VERIFIED_EMAIL(HttpStatus.FORBIDDEN, "인증이 되어 있지 않은 이메일입니다.", 40310),

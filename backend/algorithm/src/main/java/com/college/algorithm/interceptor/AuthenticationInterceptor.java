@@ -9,10 +9,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("-------------------------------------------in-------------------------------------------");
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+        if (session == null) { throw new CustomException(ErrorCode.BLANK_COOKIE); }
+        if (session.getAttribute("userId") == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
         return true;
     }

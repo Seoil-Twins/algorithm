@@ -1,16 +1,17 @@
 package com.college.algorithm.service;
 
-import com.college.algorithm.dto.RequestLoginDto;
-import com.college.algorithm.dto.RequestSignupDto;
-import com.college.algorithm.dto.ResponseOtherUserDto;
+import com.college.algorithm.dto.*;
 import com.college.algorithm.entity.AppUser;
 import com.college.algorithm.entity.EmailVerify;
+import com.college.algorithm.entity.UserLink;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.AlgorithmRecommendRepository;
 import com.college.algorithm.repository.EmailVerifyRepository;
+import com.college.algorithm.repository.UserLinkRepository;
 import com.college.algorithm.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final AlgorithmRecommendRepository algorithmRecommendRepository;
     private final EmailVerifyRepository emailVerifyRepository;
+    private final UserLinkRepository userLinkRepository;
+
     private final PasswordEncoder passwordEncoder;
+
+    public ResponseUserDto getMyInfo(String userId) {
+        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+        return UserMapper.INSTANCE.toResponseUserDto(user);
+    }
 
     public ResponseOtherUserDto getUser(long userId) {
         AppUser user = userRepository.findByUserId(userId)
@@ -61,5 +70,25 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void addLink(String userId, RequestLinkDto dto) {
+        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        UserLink link = userLinkRepository.findByUserAndLinkKind(user, dto.getLinkKind().getKindId());
+
+        if (link == null) {
+            link = UserLink.builder()
+                    .user(user)
+                    .linkKind(dto.getLinkKind().getKindId())
+                    .domain(dto.getDomain())
+                    .build();
+        } else {
+            link.setDomain(dto.getDomain());
+        }
+
+        userLinkRepository.save(link);
     }
 }

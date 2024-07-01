@@ -1,8 +1,11 @@
 package com.college.algorithm.controller;
 
+import com.college.algorithm.dto.RequestLinkDto;
 import com.college.algorithm.dto.RequestLoginDto;
 import com.college.algorithm.dto.RequestSignupDto;
 import com.college.algorithm.entity.AppUser;
+import com.college.algorithm.exception.CustomException;
+import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @ResponseBody
 public class UserController {
     private final UserService userService;
+
+    @GetMapping
+    public ResponseEntity<?> getMyInfo(final HttpServletRequest request) {
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        return ResponseEntity.ok().body(userService.getMyInfo(userId));
+    }
 
     @GetMapping(value = "/{userId}")
     public ResponseEntity<?> getUser(
@@ -40,6 +51,15 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> signup(@Valid @RequestBody RequestSignupDto dto) {
         userService.signup(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/link")
+    public ResponseEntity<?> addLink(@Valid @RequestBody RequestLinkDto dto, final HttpServletRequest request) {
+        final String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        userService.addLink(userId, dto);
         return ResponseEntity.noContent().build();
     }
 }
