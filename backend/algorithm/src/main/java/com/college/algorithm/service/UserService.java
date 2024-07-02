@@ -1,24 +1,22 @@
 package com.college.algorithm.service;
 
 import com.college.algorithm.dto.*;
-import com.college.algorithm.entity.AppUser;
-import com.college.algorithm.entity.EmailVerify;
-import com.college.algorithm.entity.UserLink;
+import com.college.algorithm.entity.*;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
+import com.college.algorithm.mapper.BoardMapper;
 import com.college.algorithm.mapper.UserMapper;
-import com.college.algorithm.repository.AlgorithmRecommendRepository;
-import com.college.algorithm.repository.EmailVerifyRepository;
-import com.college.algorithm.repository.UserLinkRepository;
-import com.college.algorithm.repository.UserRepository;
+import com.college.algorithm.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +25,8 @@ public class UserService {
     private final AlgorithmRecommendRepository algorithmRecommendRepository;
     private final EmailVerifyRepository emailVerifyRepository;
     private final UserLinkRepository userLinkRepository;
+    private final BoardTypeRepository boardTypeRepository;
+    private final BoardRepository boardRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -55,6 +55,47 @@ public class UserService {
                 .toList();
 
         return new ResponseUserLinkDto(linkDtos);
+    }
+
+    public ResponseMyAlgorithmDto getMyAlgorithmHistory(String userId) {
+        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        int favorite = algorithmRecommendRepository.countByUser(user);
+
+        return UserMapper.INSTANCE.toResponseMyAlgorithmDto(user, favorite);
+    }
+
+    public ResponseNotificationSettingsDto getNotificationSettings(String userId) {
+        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        return UserMapper.INSTANCE.toResponseNotificationSettingsDto(user);
+    }
+
+    public ResponseMyBoardHistoryDto getMyHistory(long userId, int page, int count, List<String> types) {
+        Pageable pageable = PageRequest.of(page - 1, count);
+
+        AppUser user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        List<BoardType> boardTypes = boardTypeRepository.findAllByTypeNameIn(types);
+        if (boardTypes == null || boardTypes.isEmpty()) { throw new CustomException(ErrorCode.NOT_FOUND_BOARD_TYPE); }
+
+        Page<Board> boardPage = boardRepository.findAllByBoardTypeInAndUserAndDeletedIsFalseOrderByCreatedTimeDesc(
+                boardTypes,
+                user,
+                pageable
+        );
+
+        List<Board> boards = boardPage.getContent();
+        List<BoardIntroDto> introDtos = boards.stream()
+                .map(BoardMapper.INSTANCE::toResponseBoardIntroDto)
+                .toList();
+
+        long total = boardPage.getTotalElements();
+
+        return new ResponseMyBoardHistoryDto(introDtos, total);
     }
 
     public Long login(RequestLoginDto dto) {

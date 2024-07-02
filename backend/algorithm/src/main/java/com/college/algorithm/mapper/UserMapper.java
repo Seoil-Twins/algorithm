@@ -1,8 +1,6 @@
 package com.college.algorithm.mapper;
 
-import com.college.algorithm.dto.ResponseOtherUserDto;
-import com.college.algorithm.dto.ResponseUserDto;
-import com.college.algorithm.dto.ResponseUserLinkDto;
+import com.college.algorithm.dto.*;
 import com.college.algorithm.entity.AppUser;
 import com.college.algorithm.entity.UserLink;
 import org.mapstruct.Mapper;
@@ -32,4 +30,16 @@ public interface UserMapper {
     @Mapping(source = "link.domain", target = "domain")
     @Mapping(source = "link.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class })
     ResponseUserLinkDto.LinkDto toResponseLinkDto(UserLink link);
+
+    @Mapping(source = "user.tried", target = "tried")
+    @Mapping(source = "user.solved", target = "solved")
+    @Mapping(source = "favorite", target = "favorite")
+    ResponseMyAlgorithmDto toResponseMyAlgorithmDto(AppUser user, int favorite);
+
+    @Mapping(source = "user.primaryNofi", target = "primaryNofi")
+    @Mapping(source = "user.commentNofi", target = "commentNofi")
+    @Mapping(source = "user.likeNofi", target = "likeNofi")
+    @Mapping(source = "user.answerNofi", target = "answerNofi")
+    @Mapping(source = "user.eventNofi", target = "eventNofi")
+    ResponseNotificationSettingsDto toResponseNotificationSettingsDto(AppUser user);
 }

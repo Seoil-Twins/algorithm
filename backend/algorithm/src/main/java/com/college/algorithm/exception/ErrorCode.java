@@ -19,6 +19,7 @@ public enum ErrorCode {
 
     /* 404 NOT FOUND : 리소스 없음 */
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다.", 40410),
+    NOT_FOUND_BOARD_TYPE(HttpStatus.NOT_FOUND, "게시판 유형이 존재하지 않습니다.", 40420),
 
     /* 409 CONFLICT : 리소스 충돌 */
     DUPLICATE_PARAMETER_NICKNAME(HttpStatus.CONFLICT, "닉네임이 이미 존재합니다", 40910),

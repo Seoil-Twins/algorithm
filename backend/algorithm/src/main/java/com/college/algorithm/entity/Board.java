@@ -62,6 +62,11 @@ public class Board {
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;
 
+    @Formula("(CASE WHEN board_type_id != '2' THEN " +
+            "  (SELECT CASE WHEN EXISTS (SELECT 1 FROM Adopt a WHERE a.board_id = board_id) THEN true ELSE false END) " +
+            "END)")
+    private Boolean solved;
+
     @Builder
     public Board(BoardType boardType, AppUser user, String title, String content) {
         this.boardType = boardType;

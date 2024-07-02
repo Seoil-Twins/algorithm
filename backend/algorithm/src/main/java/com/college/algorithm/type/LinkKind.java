@@ -1,4 +1,4 @@
-package com.college.algorithm.dto;
+package com.college.algorithm.type;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.stream.Stream;
 
 @Getter
-public enum EnumLinkKind {
+public enum LinkKind {
     GITHUB("1001"),
     GOOGLE("1002"),
     NAVER("1003"),
@@ -15,14 +15,14 @@ public enum EnumLinkKind {
 
     private String kindId;
 
-    EnumLinkKind(String kindId) {
+    LinkKind(String kindId) {
         this.kindId = kindId;
     }
 
     @JsonCreator
-    public static EnumLinkKind parsing(String value) {
-        return Stream.of(EnumLinkKind.values())
-                .filter(enumLinkKind -> enumLinkKind.kindId.equals(value))
+    public static LinkKind parsing(String value) {
+        return Stream.of(LinkKind.values())
+                .filter(linkKind -> linkKind.kindId.equals(value))
                 .findFirst()
                 .orElse(null);
     }
