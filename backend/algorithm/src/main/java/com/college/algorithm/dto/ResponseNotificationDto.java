@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class ResponseMyBoardHistoryDto {
-    private final List<BoardIntroDto> boards;
+public class ResponseNotificationDto {
+    private final List<NotificationDto> notifications;
     private final long total;
 }

@@ -27,6 +27,7 @@ public class UserService {
     private final UserLinkRepository userLinkRepository;
     private final BoardTypeRepository boardTypeRepository;
     private final BoardRepository boardRepository;
+    private final BoardRecommendRepository boardRecommendRepository;
     private final CommentRepository commentRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -74,7 +75,7 @@ public class UserService {
         return UserMapper.INSTANCE.toResponseNotificationSettingsDto(user);
     }
 
-    public ResponseMyBoardHistoryDto getMyHistory(long userId, int page, int count, List<String> types) {
+    public ResponseMyBoardDto getMyHistory(long userId, int page, int count, List<String> types) {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
@@ -105,7 +106,7 @@ public class UserService {
 
         long total = boardPage.getTotalElements();
 
-        return new ResponseMyBoardHistoryDto(introDtos, total);
+        return new ResponseMyBoardDto(introDtos, total);
     }
 
     public ResponseMyCommentDto getMyAdopt(long userId, int page, int count) {
@@ -134,6 +135,8 @@ public class UserService {
         AppUser user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
+        BoardType freeType = boardTypeRepository.findAllByTypeName(com.college.algorithm.type.BoardType.GENERAL_FREE.getTypeName());
+
         Page<Comment> commentPage = commentRepository.findAllByUserAndBoardDeletedIsFalseOrderByCreatedTimeDesc(
                 user,
                 pageable
@@ -141,11 +144,48 @@ public class UserService {
         List<Comment> comments = commentPage.getContent();
 
         List<ResponseMyCommentDto.CommentDto> commentDtos = comments.stream()
-                .map((comment) -> CommentMapper.INSTANCE.toResponseCommentDto(comment.getBoard(), comment))
+                .map((comment) -> {
+                    long boardType = comment.getBoard().getBoardType().getTypeId();
+
+                    if (boardType == freeType.getTypeId()) {
+                        return  CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(comment.getBoard(), comment);
+                    } else {
+                        return CommentMapper.INSTANCE.toResponseCommentDto(comment.getBoard(), comment);
+                    }
+                })
                 .toList();
         long total = commentPage.getTotalElements();
 
         return new ResponseMyCommentDto(commentDtos, total);
+    }
+
+    public ResponseMyBoardDto getMyRecommend(long userId, int page, int count) {
+        Pageable pageable = PageRequest.of(page - 1, count);
+
+        AppUser user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        BoardType freeType = boardTypeRepository.findAllByTypeName(com.college.algorithm.type.BoardType.GENERAL_FREE.getTypeName());
+
+        Page<BoardRecommend> recommendPage = boardRecommendRepository.findAllByUserAndBoardDeletedIsFalseOrderByCreatedTimeDesc(
+                user,
+                pageable
+        );
+        List<BoardRecommend> recommends = recommendPage.getContent();
+        List<BoardIntroDto> boardDtos = recommends.stream()
+                .map((recommend) -> {
+                    long boardType = recommend.getBoard().getBoardType().getTypeId();
+
+                    if (boardType == freeType.getTypeId()) {
+                        return  BoardMapper.INSTANCE.toResponseBoardIntroWithoutSolvedDto(recommend.getBoard());
+                    } else {
+                        return BoardMapper.INSTANCE.toResponseBoardIntroDto(recommend.getBoard());
+                    }
+                })
+                .toList();
+        long total = recommendPage.getTotalElements();
+
+        return new ResponseMyBoardDto(boardDtos, total);
     }
 
     public Long login(RequestLoginDto dto) {

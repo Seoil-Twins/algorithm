@@ -25,13 +25,13 @@ public class Notification {
     private String notificationType;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "from_id", referencedColumnName = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "from_id", referencedColumnName = "user_id", nullable = false)
     private AppUser fromUser;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "to_id", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "to_id", referencedColumnName = "user_id")
     private AppUser toUser;
 
     @ManyToOne(fetch = FetchType.EAGER)

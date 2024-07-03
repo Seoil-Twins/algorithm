@@ -1,9 +1,7 @@
 package com.college.algorithm.mapper;
 
 import com.college.algorithm.dto.BoardIntroDto;
-import com.college.algorithm.dto.ResponseMyCommentDto;
 import com.college.algorithm.entity.Board;
-import com.college.algorithm.entity.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
