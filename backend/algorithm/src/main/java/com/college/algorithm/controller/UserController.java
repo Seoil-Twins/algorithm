@@ -26,7 +26,7 @@ public class UserController {
         String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.ok().body(userService.getMyInfo(userId));
+        return ResponseEntity.ok().body(userService.getMyInfo(Long.parseLong(userId)));
     }
 
     @GetMapping(value = "/{userId}")
@@ -37,20 +37,20 @@ public class UserController {
     }
 
     @GetMapping(value = "/link")
-    public ResponseEntity<?> getLink(final HttpServletRequest request) {
+    public ResponseEntity<?> getLinks(final HttpServletRequest request) {
         String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseUserLinkDto dto = userService.getLink(userId);
+        ResponseUserLinkDto dto = userService.getLinks(Long.parseLong(userId));
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/try")
-    public ResponseEntity<?> getMyAlgorithmHistory(final HttpServletRequest request) {
+    public ResponseEntity<?> getMyAlgorithms(final HttpServletRequest request) {
         String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseMyAlgorithmDto dto = userService.getMyAlgorithmHistory(userId);
+        ResponseMyAlgorithmDto dto = userService.getMyAlgorithms(Long.parseLong(userId));
         return ResponseEntity.ok().body(dto);
     }
 
@@ -59,12 +59,12 @@ public class UserController {
         String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseNotificationSettingsDto dto = userService.getNotificationSettings(userId);
+        ResponseNotificationSettingsDto dto = userService.getNotificationSettings(Long.parseLong(userId));
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/question")
-    public ResponseEntity<?> getMyQuestion(
+    public ResponseEntity<?> getMyQuestions(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
@@ -73,12 +73,12 @@ public class UserController {
                 com.college.algorithm.type.BoardType.GENERAL_QUESTION.getTypeName(),
                 com.college.algorithm.type.BoardType.ALGORITHM_QUESTION.getTypeName()
         );
-        ResponseMyBoardDto dto = userService.getMyHistory(userId, page, count, boardTypes);
+        ResponseMyBoardDto dto = userService.getMyHistories(userId, page, count, boardTypes);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/feedback")
-    public ResponseEntity<?> getMyFeedback(
+    public ResponseEntity<?> getMyFeedbacks(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
@@ -86,12 +86,12 @@ public class UserController {
         List<String> boardTypes = List.of(
                 BoardType.ALGORITHM_FEEDBACK.getTypeName()
         );
-        ResponseMyBoardDto dto = userService.getMyHistory(userId, page, count, boardTypes);
+        ResponseMyBoardDto dto = userService.getMyHistories(userId, page, count, boardTypes);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/free")
-    public ResponseEntity<?> getMyFree(
+    public ResponseEntity<?> getMyFrees(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
@@ -99,37 +99,37 @@ public class UserController {
         List<String> boardTypes = List.of(
                 BoardType.GENERAL_FREE.getTypeName()
         );
-        ResponseMyBoardDto dto = userService.getMyHistory(userId, page, count, boardTypes);
+        ResponseMyBoardDto dto = userService.getMyHistories(userId, page, count, boardTypes);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/answer")
-    public ResponseEntity<?> getMyAdopt(
+    public ResponseEntity<?> getMyAdopts(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
     ) {
-        ResponseMyCommentDto dto = userService.getMyAdopt(userId, page, count);
+        ResponseMyCommentDto dto = userService.getMyAdopts(userId, page, count);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/comment")
-    public ResponseEntity<?> getMyComment(
+    public ResponseEntity<?> getMyComments(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
     ) {
-        ResponseMyCommentDto dto = userService.getMyComment(userId, page, count);
+        ResponseMyCommentDto dto = userService.getMyComments(userId, page, count);
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/{userId}/recommend")
-    public ResponseEntity<?> getMyRecommend(
+    public ResponseEntity<?> getMyRecommends(
             @PathVariable("userId") long userId,
             @RequestParam(value = "page", defaultValue = "1", required = false) int page,
             @RequestParam(value = "count", defaultValue = "5", required = false) int count
     ) {
-        ResponseMyBoardDto dto = userService.getMyRecommend(userId, page, count);
+        ResponseMyBoardDto dto = userService.getMyRecommends(userId, page, count);
         return ResponseEntity.ok().body(dto);
     }
 
@@ -154,7 +154,7 @@ public class UserController {
         final String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.addLink(userId, dto);
+        userService.addLink(Long.parseLong(userId), dto);
         return ResponseEntity.noContent().build();
     }
 }

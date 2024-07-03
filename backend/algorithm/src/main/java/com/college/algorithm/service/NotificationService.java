@@ -28,6 +28,10 @@ public class NotificationService {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Page<Notification> notificationPage = notificationRepository.findAllByNotificationTypeInOrToUserAndBoardDeletedIsFalseAndFromUserDeletedIsFalseOrderByCreatedTimeDesc(

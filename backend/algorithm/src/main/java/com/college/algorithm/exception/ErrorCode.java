@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     /* 403 FORBIDDEN : 잘못된 접근 */
     NOT_VERIFIED_EMAIL(HttpStatus.FORBIDDEN, "인증이 되어 있지 않은 이메일입니다.", 40310),
+    DELETED_USER(HttpStatus.FORBIDDEN, "삭제된 사용자입니다.", 40320),
 
     /* 404 NOT FOUND : 리소스 없음 */
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다.", 40410),

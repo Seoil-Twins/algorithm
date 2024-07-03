@@ -32,14 +32,23 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseUserDto getMyInfo(String userId) {
-        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+    public ResponseUserDto getMyInfo(long userId) {
+        AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
         return UserMapper.INSTANCE.toResponseUserDto(user);
     }
 
     public ResponseOtherUserDto getUser(long userId) {
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         int favorite = algorithmRecommendRepository.countByUser(user);
@@ -47,8 +56,12 @@ public class UserService {
         return UserMapper.INSTANCE.toResponseOtherUserDto(user, favorite);
     }
 
-    public ResponseUserLinkDto getLink(String userId) {
-        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+    public ResponseUserLinkDto getLinks(long userId) {
+        AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         List<UserLink> links = userLinkRepository.findAllByUser(user);
@@ -59,8 +72,12 @@ public class UserService {
         return new ResponseUserLinkDto(linkDtos);
     }
 
-    public ResponseMyAlgorithmDto getMyAlgorithmHistory(String userId) {
-        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+    public ResponseMyAlgorithmDto getMyAlgorithms(long userId) {
+        AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         int favorite = algorithmRecommendRepository.countByUser(user);
@@ -68,17 +85,25 @@ public class UserService {
         return UserMapper.INSTANCE.toResponseMyAlgorithmDto(user, favorite);
     }
 
-    public ResponseNotificationSettingsDto getNotificationSettings(String userId) {
-        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+    public ResponseNotificationSettingsDto getNotificationSettings(long userId) {
+        AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         return UserMapper.INSTANCE.toResponseNotificationSettingsDto(user);
     }
 
-    public ResponseMyBoardDto getMyHistory(long userId, int page, int count, List<String> types) {
+    public ResponseMyBoardDto getMyHistories(long userId, int page, int count, List<String> types) {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         List<BoardType> boardTypes = boardTypeRepository.findAllByTypeNameIn(types);
@@ -109,10 +134,14 @@ public class UserService {
         return new ResponseMyBoardDto(introDtos, total);
     }
 
-    public ResponseMyCommentDto getMyAdopt(long userId, int page, int count) {
+    public ResponseMyCommentDto getMyAdopts(long userId, int page, int count) {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         Page<Board> boardPage = boardRepository.findAllByUserAndAdoptIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
@@ -129,10 +158,14 @@ public class UserService {
         return new ResponseMyCommentDto(commentDtos, total);
     }
 
-    public ResponseMyCommentDto getMyComment(long userId, int page, int count) {
+    public ResponseMyCommentDto getMyComments(long userId, int page, int count) {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         BoardType freeType = boardTypeRepository.findAllByTypeName(com.college.algorithm.type.BoardType.GENERAL_FREE.getTypeName());
@@ -159,10 +192,14 @@ public class UserService {
         return new ResponseMyCommentDto(commentDtos, total);
     }
 
-    public ResponseMyBoardDto getMyRecommend(long userId, int page, int count) {
+    public ResponseMyBoardDto getMyRecommends(long userId, int page, int count) {
         Pageable pageable = PageRequest.of(page - 1, count);
 
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         BoardType freeType = boardTypeRepository.findAllByTypeName(com.college.algorithm.type.BoardType.GENERAL_FREE.getTypeName());
@@ -218,8 +255,8 @@ public class UserService {
     }
 
     @Transactional
-    public void addLink(String userId, RequestLinkDto dto) {
-        AppUser user = userRepository.findByUserId(Long.parseLong(userId))
+    public void addLink(long userId, RequestLinkDto dto) {
+        AppUser user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         UserLink link = userLinkRepository.findByUserAndLinkKind(user, dto.getLinkKind().getKindId());
