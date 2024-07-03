@@ -28,6 +28,6 @@ public class AlgorithmDto {
     private String limitTime;
     private String limitMemory;
     private Integer recommendCount;
-    private LocalDateTime createdTime;
-    private LocalDateTime updatedTime;
+    private String createdTime;
+    private String updatedTime;
 }

@@ -1,5 +1,6 @@
 package com.college.algorithm.mapper;
 
+import com.college.algorithm.dto.ResponseAlgorithmUserDto;
 import com.college.algorithm.dto.ResponseOtherUserDto;
 import com.college.algorithm.entity.AppUser;
 import org.mapstruct.Mapper;
@@ -17,4 +18,9 @@ public interface UserMapper {
     @Mapping(source = "user.solved", target = "solved")
     @Mapping(source = "favorite", target = "favorite")
     ResponseOtherUserDto toResponseOtherUserDto(AppUser user, int favorite);
+
+    @Mapping(source = "user.userId", target = "userId")
+    @Mapping(source = "user.profilePath", target = "profile")
+    @Mapping(source = "user.nickname", target = "nickname")
+    ResponseAlgorithmUserDto toResponseAlgorithmUserDto(AppUser user);
 }

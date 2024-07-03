@@ -1,7 +1,8 @@
 package com.college.algorithm.controller;
 
-import com.college.algorithm.dto.AlgorithmSearchRequestDto;
+import com.college.algorithm.dto.*;
 import com.college.algorithm.exception.BadRequestException;
+import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.AlgorithmService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,13 +10,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -37,18 +36,14 @@ public class AlgorithmController {
                                              HttpServletRequest request) {
         Set<String> validLevel = new HashSet<>(Arrays.asList("-1","0","1","2","3","4","5"));
         if (!validLevel.contains(level)) {
-//            return ResponseEntity.badRequest().body(
-////                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : level ( Level range -1 ~ 5 : default 0 )")
-//            );
-            throw new BadRequestException(ErrorCode.BAD_REQUEST);
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
-
         Set<String> validSort = new HashSet<>(Arrays.asList("r","or","t","R","OR","T"));
         if (!validSort.contains(sort)) {
 //            return ResponseEntity.badRequest().body(
 //                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : sort ( sort only 'r', 'or', 't' : default 'r' )")
 //            );
-            throw new BadRequestException(ErrorCode.BAD_REQUEST);
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
         Set<String> validSolved = new HashSet<>(Arrays.asList("a","s","ns","A","S","NS"));
@@ -57,7 +52,7 @@ public class AlgorithmController {
 //                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : solved ( solved only 'a', 's', 'ns' : default 'a' )")
 //            );
 
-            throw new BadRequestException(ErrorCode.BAD_REQUEST);
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
         Set<String> validRate = new HashSet<>(Arrays.asList("h","l","H","L"));
@@ -66,7 +61,7 @@ public class AlgorithmController {
 //                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : rate ( rate only 'h', 'l' )")
 //            );
 
-            throw new BadRequestException(ErrorCode.BAD_REQUEST);
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         } else if (rate != null){
             rate = rate.toLowerCase();
         }
@@ -77,7 +72,7 @@ public class AlgorithmController {
 //                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : tag ( tag range 1001 ~ 1014 )" + " input : ")
 //            );
 
-            throw new BadRequestException(ErrorCode.BAD_REQUEST);
+            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
 
@@ -90,12 +85,93 @@ public class AlgorithmController {
         }
 
         if (loginUser != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, loginUser));
         } else {
             // 세션에 loginUser가 없으면 로그인되지 않은 상태
             return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO));
-
         }
-
     }
+
+    @GetMapping("/algorithm/recommend")
+    public ResponseEntity<?> getSuggestAlgorithm() {
+        AlgorithmSuggestResponseDto response = algorithmService.getSuggestAlgorithms();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @GetMapping("/algorithm/{algorithm_id}")
+    public ResponseEntity<?> getAlgorithmDetail(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                HttpServletRequest request) {
+        Long loginUserId = (Long) request.getAttribute("유저유저키키");
+        AlgorithmDetailDto response = algorithmService.getAlgorithmDetail(algorithm_id,1L);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/algorithm/{algorithm_id}/explanation")
+    public ResponseEntity<?> getExplanation(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                            HttpServletRequest request) {
+        Long loginUserId = (Long) request.getAttribute("유저유저키키");
+        ExplanationResponseDto response = algorithmService.getExplanation(algorithm_id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/algorithm/kind")
+    public ResponseEntity<?> getKinds() {
+        AlgorithmKindResponseDto response = algorithmService.getKinds();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/algorithm/{algorithm_id}/correct")
+    public ResponseEntity<?> getAlgorithmCorrect(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
+                                                 @RequestParam(required = false, defaultValue = "10", value = "count") int count,
+                                                 @PathVariable(value = "algorithm_id") Long algorithm_id) {
+        ResponseCorrectDto response = algorithmService.getCorrects(algorithm_id,page,count);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/algorithm/{algorithm_id}/correct/{correct_id}/comment")
+    public ResponseEntity<?> getAlgorithmCorrectComment(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
+                                                 @RequestParam(required = false, defaultValue = "10", value = "count") int count,
+                                                 @PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                    @PathVariable(value = "correct_id") Long correct_id) {
+        ResponseCorrectCommentDto response = algorithmService.getCorrectComments(correct_id,page,count);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/comment")
+    public ResponseEntity<?> postAlgorithmCorrectComment(@RequestBody(required = false) RequestCorrectComment requestCorrectComment,
+                                                        @PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                        @PathVariable(value = "correct_id") Long correct_id,
+                                                        HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(algorithmService.postCorrectComment(correct_id,requestCorrectComment,loginUserId)).build();
+    }
+
+    @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/recommend")
+    public ResponseEntity<?> postAlgorithmCorrectRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                         @PathVariable(value = "correct_id") Long correct_id,
+                                                         HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(algorithmService.postCorrectRecommend(correct_id,loginUserId)).build();
+    }
+
+    @DeleteMapping("/algorithm/{algorithm_id}/correct/{correct_id}/recommend")
+    public ResponseEntity<?> deleteAlgorithmCorrectRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                           @PathVariable(value = "correct_id") Long correct_id,
+                                                           HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(algorithmService.deleteCorrectRecommend(correct_id,loginUserId)).build();
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.college.algorithm.repository;
 
 import com.college.algorithm.entity.Algorithm;
+import com.college.algorithm.entity.AlgorithmKind;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,9 +9,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface AlgorithmRepository extends JpaRepository<Algorithm, Long>, JpaSpecificationExecutor<Algorithm> {
 
     Page<Algorithm> findAll(Pageable pageable);
+
+    Algorithm findAlgorithmByAlgorithmId(Long algorithmId);
 
     @Query(value = "SELECT COUNT(*)" +
             " FROM try " +
