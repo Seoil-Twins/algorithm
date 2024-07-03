@@ -5,6 +5,7 @@ import com.college.algorithm.entity.*;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.mapper.BoardMapper;
+import com.college.algorithm.mapper.CommentMapper;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
 import jakarta.transaction.Transactional;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +27,7 @@ public class UserService {
     private final UserLinkRepository userLinkRepository;
     private final BoardTypeRepository boardTypeRepository;
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -89,13 +90,62 @@ public class UserService {
         );
 
         List<Board> boards = boardPage.getContent();
-        List<BoardIntroDto> introDtos = boards.stream()
-                .map(BoardMapper.INSTANCE::toResponseBoardIntroDto)
-                .toList();
+        List<BoardIntroDto> introDtos = null;
+        boolean isFreeBoard = boardTypes.stream().allMatch((type) -> type.getTypeName().equals(com.college.algorithm.type.BoardType.GENERAL_FREE.getTypeName()));
+
+        if (isFreeBoard) {
+            introDtos = boards.stream()
+                    .map(BoardMapper.INSTANCE::toResponseBoardIntroWithoutSolvedDto)
+                    .toList();
+        } else {
+            introDtos = boards.stream()
+                    .map(BoardMapper.INSTANCE::toResponseBoardIntroDto)
+                    .toList();
+        }
 
         long total = boardPage.getTotalElements();
 
         return new ResponseMyBoardHistoryDto(introDtos, total);
+    }
+
+    public ResponseMyCommentDto getMyAdopt(long userId, int page, int count) {
+        Pageable pageable = PageRequest.of(page - 1, count);
+
+        AppUser user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Page<Board> boardPage = boardRepository.findAllByUserAndAdoptIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
+                user,
+                pageable
+        );
+        List<Board> boards = boardPage.getContent();
+
+        List<ResponseMyCommentDto.CommentDto> commentDtos = boards.stream()
+                .map((board) -> CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(board, board.getAdopt()))
+                .toList();
+        long total = boardPage.getTotalElements();
+
+        return new ResponseMyCommentDto(commentDtos, total);
+    }
+
+    public ResponseMyCommentDto getMyComment(long userId, int page, int count) {
+        Pageable pageable = PageRequest.of(page - 1, count);
+
+        AppUser user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Page<Comment> commentPage = commentRepository.findAllByUserAndBoardDeletedIsFalseOrderByCreatedTimeDesc(
+                user,
+                pageable
+        );
+        List<Comment> comments = commentPage.getContent();
+
+        List<ResponseMyCommentDto.CommentDto> commentDtos = comments.stream()
+                .map((comment) -> CommentMapper.INSTANCE.toResponseCommentDto(comment.getBoard(), comment))
+                .toList();
+        long total = commentPage.getTotalElements();
+
+        return new ResponseMyCommentDto(commentDtos, total);
     }
 
     public Long login(RequestLoginDto dto) {

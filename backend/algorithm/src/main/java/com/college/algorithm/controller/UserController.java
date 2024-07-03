@@ -106,6 +106,26 @@ public class UserController {
         return ResponseEntity.ok().body(dto);
     }
 
+    @GetMapping("/{userId}/answer")
+    public ResponseEntity<?> getMyAdopt(
+            @PathVariable("userId") long userId,
+            @RequestParam(value = "page", defaultValue = "1", required = false) int page,
+            @RequestParam(value = "count", defaultValue = "5", required = false) int count
+    ) {
+        ResponseMyCommentDto dto = userService.getMyAdopt(userId, page, count);
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @GetMapping("/{userId}/comment")
+    public ResponseEntity<?> getMyComment(
+            @PathVariable("userId") long userId,
+            @RequestParam(value = "page", defaultValue = "1", required = false) int page,
+            @RequestParam(value = "count", defaultValue = "5", required = false) int count
+    ) {
+        ResponseMyCommentDto dto = userService.getMyComment(userId, page, count);
+        return ResponseEntity.ok().body(dto);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody RequestLoginDto dto, final HttpServletRequest request) {
         final Long userId = userService.login(dto);

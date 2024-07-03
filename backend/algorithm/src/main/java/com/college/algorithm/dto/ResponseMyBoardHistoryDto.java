@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ResponseMyBoardHistoryDto {
-    private final List<BoardIntroDto> results;
+    private final List<BoardIntroDto> boards;
     private final long total;
 }

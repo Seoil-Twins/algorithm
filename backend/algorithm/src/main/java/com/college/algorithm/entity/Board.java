@@ -22,7 +22,7 @@ public class Board {
     @Column(name = "board_id")
     private Long boardId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "board_type_id", referencedColumnName = "type_id")
     private BoardType boardType;
@@ -31,6 +31,11 @@ public class Board {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "uploader_id", referencedColumnName = "user_id")
     private AppUser user;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "adopt_id", referencedColumnName = "comment_id")
+    private Comment adopt;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -62,10 +67,12 @@ public class Board {
     @Column(name = "deleted_time")
     private LocalDateTime deletedTime;
 
-    @Formula("(CASE WHEN board_type_id != '2' THEN " +
-            "  (SELECT CASE WHEN EXISTS (SELECT 1 FROM Adopt a WHERE a.board_id = board_id) THEN true ELSE false END) " +
-            "END)")
-    private Boolean solved;
+    @Transient
+    private Boolean isSolved;
+
+    public Boolean getIsSolved() {
+        return adopt != null;
+    }
 
     @Builder
     public Board(BoardType boardType, AppUser user, String title, String content) {
