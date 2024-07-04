@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -143,9 +144,27 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(final HttpServletRequest request) {
+        request.getSession().invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     public ResponseEntity<?> signup(@Valid @RequestBody RequestSignupDto dto) {
         userService.signup(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/verify/send")
+    public ResponseEntity<?> sendEmail(@Valid @RequestBody RequestSendEmailDto dto) {
+        userService.sendEmail(dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/verify/compare")
+    public ResponseEntity<?> compareVerifyCode(@Valid @RequestBody RequestCompareVerifycodeDto dto) {
+        userService.compareVerifyCode(dto);
         return ResponseEntity.noContent().build();
     }
 
@@ -155,6 +174,44 @@ public class UserController {
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
         userService.addLink(Long.parseLong(userId), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<?> updateNickname(@Valid @RequestBody RequestNicknameDto dto, final  HttpServletRequest request) {
+        final String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        userService.updateNickname(Long.parseLong(userId), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateProfile(@Valid @ModelAttribute RequestProfileDto dto, final  HttpServletRequest request) {
+        final String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        userService.updateProfile(Long.parseLong(userId), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/notification")
+    public ResponseEntity<?> updateNotification(@Valid @RequestBody RequestNotificationDto dto, final HttpServletRequest request) {
+        final String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        userService.updateNotification(Long.parseLong(userId), dto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteUser(final HttpServletRequest request) {
+        final String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        userService.deleteUser(Long.parseLong(userId));
+        request.getSession().invalidate();
+
         return ResponseEntity.noContent().build();
     }
 }

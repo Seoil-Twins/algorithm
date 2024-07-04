@@ -48,7 +48,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .includePathPattern("/user/link", PathMethod.GET)
                 .includePathPattern("/user/link", PathMethod.POST)
                 .includePathPattern("/user/try", PathMethod.GET)
-                .includePathPattern("/user/notification", PathMethod.GET);
+                .includePathPattern("/user/notification", PathMethod.GET)
+                .includePathPattern("/user/nickname", PathMethod.PATCH)
+                .includePathPattern("/user/profile", PathMethod.PATCH)
+                .includePathPattern("/user/notification", PathMethod.PUT)
+                .includePathPattern("/user", PathMethod.DELETE);
     }
 
     // Proxy 패턴을 사용하여 Path 및 Method를 체크하는 역할의 대리자(PathMatcher)를 생성
@@ -69,6 +73,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .includePathPattern("/**", PathMethod.DELETE)
                 .excludePathPattern("/user", PathMethod.POST)
                 .excludePathPattern("/user/login", PathMethod.POST)
-                .excludePathPattern("/user/verify/*", PathMethod.POST);
+                .excludePathPattern("/user/verify/*", PathMethod.POST)
+                .excludePathPattern("/user", PathMethod.DELETE);
     }
 }

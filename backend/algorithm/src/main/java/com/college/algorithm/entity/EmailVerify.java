@@ -42,4 +42,9 @@ public class EmailVerify {
         this.verifyCode = verifyCode;
         this.expirationTime = expirationTime;
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.verified = false;
+    }
 }

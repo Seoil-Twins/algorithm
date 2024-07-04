@@ -93,3 +93,4 @@ build/
 /backend/algorithm/.gradle
 /backend/algorithm/gradle/*
 /backend/algorithm/build/*
+/backend/algorithm/upload/*
