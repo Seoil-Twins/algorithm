@@ -19,15 +19,9 @@ import java.time.LocalDateTime;
 @Builder
 public class AlgorithmDto {
     private Long algorithmId;
-    private AppUser user;
-    private AlgorithmKind kind;
-    private AlgorithmCompe compe;
     private String title;
-    private String content;
     private Character level;
-    private String limitTime;
-    private String limitMemory;
-    private Integer recommendCount;
-    private String createdTime;
-    private String updatedTime;
+    private String kind;
+    private Float correctRate;
+    private Boolean solved;
 }

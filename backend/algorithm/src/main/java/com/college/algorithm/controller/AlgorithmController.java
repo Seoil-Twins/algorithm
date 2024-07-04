@@ -40,27 +40,16 @@ public class AlgorithmController {
         }
         Set<String> validSort = new HashSet<>(Arrays.asList("r","or","t","R","OR","T"));
         if (!validSort.contains(sort)) {
-//            return ResponseEntity.badRequest().body(
-//                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : sort ( sort only 'r', 'or', 't' : default 'r' )")
-//            );
             throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
         Set<String> validSolved = new HashSet<>(Arrays.asList("a","s","ns","A","S","NS"));
         if (!validSolved.contains(solved)) {
-//            return ResponseEntity.badRequest().body(
-//                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : solved ( solved only 'a', 's', 'ns' : default 'a' )")
-//            );
-
             throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
         Set<String> validRate = new HashSet<>(Arrays.asList("h","l","H","L"));
         if (!validRate.contains(rate) && rate != null) {
-//            return ResponseEntity.badRequest().body(
-//                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : rate ( rate only 'h', 'l' )")
-//            );
-
             throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         } else if (rate != null){
             rate = rate.toLowerCase();
@@ -68,28 +57,26 @@ public class AlgorithmController {
 
         Set<String> validTag = new HashSet<>(Arrays.asList("1001","1002","1003","1004","1005","1006","1007","1008","1009","1010","1011","1012","1013","1014"));
         if (!validTag.contains(tag) && tag != null) {
-//            return ResponseEntity.badRequest().body(
-//                    new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request : tag ( tag range 1001 ~ 1014 )" + " input : ")
-//            );
 
             throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
 
-        HttpSession session = request.getSession(false); // default true
         AlgorithmSearchRequestDto algorithmRequestDTO = new AlgorithmSearchRequestDto(page,count,solved.toLowerCase(),sort.toLowerCase(),level,rate,tag,keyword);
-        Long loginUser = null; // String이 아니라 UserDTO로 받아야하고, 밑에서 세션으로 가져와야만합니다.
+
+        HttpSession session = request.getSession(false); // default true
+        Long loginUserId = null;
         if(session != null){
             // 상수로 뺼 예정
-            loginUser = (Long)session.getAttribute("로그인 암호 키 무언가");
+            loginUserId = (Long)session.getAttribute("로그인 암호 키 무언가");
+            if(loginUserId == null)
+                throw new CustomException(ErrorCode.INVALID_COOKIE);
+        } else{
+            // 무언가 오류처리
         }
 
-        if (loginUser != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, loginUser));
-        } else {
-            // 세션에 loginUser가 없으면 로그인되지 않은 상태
-            return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO));
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, loginUserId));
+
     }
 
     @GetMapping("/algorithm/recommend")

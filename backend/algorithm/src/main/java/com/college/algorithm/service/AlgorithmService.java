@@ -45,10 +45,8 @@ public class AlgorithmService {
     private final ExplanationRepository explanationRepository;
     private final CommentRepository commentRepository;
 
-
-    public ObjectNode getAll(AlgorithmSearchRequestDto algorithmRequestDTO) {
+    public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
         try {
-            System.out.println(algorithmRequestDTO);
             Pageable pageable = null;
 
             if ("r".equals(algorithmRequestDTO.getSort())) { // "r"이면 내림차순
@@ -64,23 +62,19 @@ public class AlgorithmService {
                             algorithmRequestDTO.getKeyword()),
                     pageable
             );
-            long total = algorithmEntities.getTotalElements();
+            Long total = algorithmEntities.getTotalElements();
 
 
             ObjectMapper objectMapper = new ObjectMapper();
 
             List<Algorithm> resultValue = algorithmEntities.getContent();
-            ArrayNode response = objectMapper.createArrayNode();
 
-            List<LocalDateTime> times = new ArrayList<>();
+            ResponseAlgorithmDto response;
+            List<AlgorithmDto> dtos = new ArrayList<>();
 
-
-
-            for (Algorithm algorithmEntity : resultValue) {
-                AlgorithmDto algorithmDTO = AlgorithmMapper.INSTANCE.toAlgorithmDto(algorithmEntity);
-
+            for (Algorithm algorithm : resultValue) {
                 // algorithmId로 testcase 찾아와서 node 생성
-                List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmDTO.getAlgorithmId());
+                List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithm.getAlgorithmId());
                 ArrayNode testcaseArrayNode = objectMapper.createArrayNode();
                 if (testcaseEntities == null)
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Data");
@@ -96,165 +90,46 @@ public class AlgorithmService {
                     testcaseArrayNode.add(testcaseNode);
                 }
 
-                float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
-                float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
+                float tried = algorithmRepository.findTriedByAlgorithmId(algorithm.getAlgorithmId());
+                float correct = algorithmRepository.findCorrectByAlgorithmId(algorithm.getAlgorithmId());
                 float correctRate = 0.0f;
-                if(tried > 0)
+                if(tried > 0){
                     correctRate = correct / tried;
-
-                ObjectNode dtoNode = objectMapper.createObjectNode();
-
-                dtoNode.put("algorithmId",algorithmDTO.getAlgorithmId());
-                dtoNode.put("title",algorithmDTO.getTitle());
-                dtoNode.put("level",algorithmDTO.getLevel().toString());
-                dtoNode.put("kind",algorithmDTO.getKind().getKindName());
-//                dtoNode.put("limitTime",algorithmDTO.getLimitTime());
-//                dtoNode.put("limitMem",algorithmDTO.getLimitMemory());
-//                dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
-//                dtoNode.put("content",algorithmDTO.getContent());
-//                dtoNode.put("testcase",testcaseArrayNode);
-                dtoNode.put("correctRate",Math.round(correctRate*100));
-                dtoNode.put("solved", (JsonNode) null);
-                response.add(dtoNode);
-            }
-
-            List<JsonNode> list = new ArrayList<>();
-            ArrayNode sortedResponse = objectMapper.createArrayNode();
-
-            if(Objects.equals(algorithmRequestDTO.getRate(), "h")) {
-                response.forEach(list::add);
-
-                // correctRate를 기준으로 내림차순 정렬
-                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()).reversed());
-
-                // 정렬된 데이터를 새로운 ArrayNode에 추가
-                list.forEach(sortedResponse::add);
-            } else if(Objects.equals(algorithmRequestDTO.getRate(), "l")) {
-                response.forEach(list::add);
-
-                // correctRate를 기준으로 오름차순 정렬
-                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()));
-
-                // 정렬된 데이터를 새로운 ArrayNode에 추가
-                list.forEach(sortedResponse::add);
-            } else {
-                response.forEach(sortedResponse::add);
-            }
-
-            ObjectNode responseJSON = objectMapper.createObjectNode();
-            responseJSON.set("algorithms", sortedResponse);
-            responseJSON.put("total",total);
-
-            System.out.println(times);
-
-            return responseJSON;
-        }
-        catch (Error e){
-            throw new BadRequestException(ErrorCode.SQL_EXCEPTION); // 잠깐만 이거임, SQLException 넣어야함.
-        }
-    }
-    public ObjectNode getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
-        try {
-            System.out.println(algorithmRequestDTO);
-            Pageable pageable = null;
-
-            if ("r".equals(algorithmRequestDTO.getSort())) { // "r"이면 내림차순
-                pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount(), Sort.by("createdTime").descending());
-            } else { // "or"이면 오름차순
-                pageable = PageRequest.of(algorithmRequestDTO.getPage()-1, algorithmRequestDTO.getCount(), Sort.by("createdTime").ascending());
-            }
-
-            Page<Algorithm> algorithmEntities = algorithmRepository.findAll(
-                    AlgorithmSpecification.withDynamicQuery(
-                            algorithmRequestDTO.getLevel(),
-                            algorithmRequestDTO.getTag(),
-                            algorithmRequestDTO.getKeyword()),
-                    pageable
-            );
-            long total = algorithmEntities.getTotalElements();
-
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            List<Algorithm> resultValue = algorithmEntities.getContent();
-            ArrayNode response = objectMapper.createArrayNode();
-
-            List<LocalDateTime> times = new ArrayList<>();
-
-            // boolean solved = loginUserId와 algorithmId로 검사하기.
-
-            for (Algorithm algorithmEntity : resultValue) {
-                AlgorithmDto algorithmDTO = AlgorithmMapper.INSTANCE.toAlgorithmDto(algorithmEntity);
-
-                // algorithmId로 testcase 찾아와서 node 생성
-                List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmDTO.getAlgorithmId());
-                ArrayNode testcaseArrayNode = objectMapper.createArrayNode();
-                if (testcaseEntities == null)
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Data");
-                for (AlgorithmTestcase testcaseEntitiy : testcaseEntities) {
-                    AlgorithmTestcaseDto testcaseDTO = AlgorithmMapper.INSTANCE.toAlgorithmTestcaseDto(testcaseEntitiy);
-
-
-                    ObjectNode testcaseNode = objectMapper.createObjectNode();
-                    testcaseNode.put("testcaseId", testcaseDTO.getTestcaseId());
-                    testcaseNode.put("algorithmId", testcaseDTO.getAlgorithm().getAlgorithmId());
-                    testcaseNode.put("input", testcaseDTO.getInput());
-                    testcaseNode.put("output", testcaseDTO.getOutput());
-                    testcaseArrayNode.add(testcaseNode);
+                    correctRate = Math.round(correctRate*100);
                 }
 
-                float tried = algorithmRepository.findTriedByAlgorithmId(algorithmDTO.getAlgorithmId());
-                float correct = algorithmRepository.findCorrectByAlgorithmId(algorithmDTO.getAlgorithmId());
-                float correctRate = 0.0f;
-                if(tried > 0)
-                    correctRate = correct / tried;
+                Boolean solved = null;
+                if(loginUserId != null){
+                    solved = correctRepository.countByAlgorithm_AlgorithmIdAndUser_UserId(algorithm.getAlgorithmId(),loginUserId)>=1;
+                }
 
-                ObjectNode dtoNode = objectMapper.createObjectNode();
-
-                dtoNode.put("algorithmId",algorithmDTO.getAlgorithmId());
-                dtoNode.put("title",algorithmDTO.getTitle());
-                dtoNode.put("level",algorithmDTO.getLevel().toString());
-                dtoNode.put("kind",algorithmDTO.getKind().getKindName());
-//                dtoNode.put("limitTime",algorithmDTO.getLimitTime());
-//                dtoNode.put("limitMem",algorithmDTO.getLimitMemory());
-//                dtoNode.put("createdTime", String.valueOf(algorithmDTO.getCreatedTime()));
-//                dtoNode.put("content",algorithmDTO.getContent());
-//                dtoNode.put("testcase",testcaseArrayNode);
-                dtoNode.put("correctRate",Math.round(correctRate*100));
-                dtoNode.put("solved", (JsonNode) null);
-                response.add(dtoNode);
+                dtos.add(AlgorithmMapper.INSTANCE.toAlgorithmDto(algorithm,correctRate,solved));
             }
 
-            List<JsonNode> list = new ArrayList<>();
-            ArrayNode sortedResponse = objectMapper.createArrayNode();
+            List<AlgorithmDto> list = new ArrayList<>();
+            List<AlgorithmDto> sortedResponse = new ArrayList<>();
 
             if(Objects.equals(algorithmRequestDTO.getRate(), "h")) {
-                response.forEach(list::add);
+                dtos.forEach(list::add);
 
                 // correctRate를 기준으로 내림차순 정렬
-                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()).reversed());
+                list.sort(Comparator.comparing(AlgorithmDto::getCorrectRate).reversed());
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
                 list.forEach(sortedResponse::add);
             } else if(Objects.equals(algorithmRequestDTO.getRate(), "l")) {
-                response.forEach(list::add);
+                dtos.forEach(list::add);
 
                 // correctRate를 기준으로 오름차순 정렬
-                list.sort(Comparator.comparing((JsonNode node) -> node.get("correctRate").asInt()));
+                list.sort(Comparator.comparing(AlgorithmDto::getCorrectRate));
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
                 list.forEach(sortedResponse::add);
             } else {
-                response.forEach(sortedResponse::add);
+                sortedResponse.addAll(dtos);
             }
 
-            ObjectNode responseJSON = objectMapper.createObjectNode();
-            responseJSON.set("algorithms", sortedResponse);
-            responseJSON.put("total",total);
-
-            System.out.println(times);
-
-            return responseJSON;
+            return new ResponseAlgorithmDto(sortedResponse,total);
         }
         catch (Error e){
             throw new CustomException(ErrorCode.SQL_EXCEPTION); // 잠깐만 이거임, SQLException 넣어야함.
@@ -400,7 +275,7 @@ public class AlgorithmService {
             throw new CustomException(ErrorCode.NOT_FOUND_CORRECT);
 
         if(correctRecommendRepository.findByCorrect_CorrectIdAndUser_UserId(correctId, loginUserId) != null)
-            throw new CustomException(ErrorCode.DUPLICATE_CORRECT_RECOMMEND);
+            throw new CustomException(ErrorCode.DUPLICATE_RECOMMEND);
 
 
         AlgorithmCorrectRecommend recommend = new AlgorithmCorrectRecommend(user, correct);
@@ -424,7 +299,7 @@ public class AlgorithmService {
         AlgorithmCorrectRecommend recommend = correctRecommendRepository.findByCorrect_CorrectIdAndUser_UserId(correctId, user.getUserId());
 
         if(recommend == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_CORRECT_RECOMMEND);
+            throw new CustomException(ErrorCode.NOT_FOUND_RECOMMEND);
 
         if(!recommend.getUser().getUserId().equals(loginUserId))
             throw new CustomException(ErrorCode.NOT_MATCHED_USER);

@@ -14,18 +14,12 @@ public interface AlgorithmMapper {
     AlgorithmMapper INSTANCE = Mappers.getMapper(AlgorithmMapper.class);
 
     @Mapping(source = "algorithm.algorithmId", target = "algorithmId")
-    @Mapping(source = "algorithm.user", target = "user")
-    @Mapping(source = "algorithm.kind", target = "kind")
-    @Mapping(source = "algorithm.compe", target = "compe")
+    @Mapping(source = "algorithm.kind.kindName", target = "kind")
     @Mapping(source = "algorithm.title", target = "title")
-    @Mapping(source = "algorithm.content", target = "content")
     @Mapping(source = "algorithm.level", target = "level")
-    @Mapping(source = "algorithm.limitTime", target = "limitTime")
-    @Mapping(source = "algorithm.limitMemory", target = "limitMemory")
-    @Mapping(source = "algorithm.recommendCount", target = "recommendCount")
-    @Mapping(source = "algorithm.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class})
-    @Mapping(source = "algorithm.updatedTime", target = "updatedTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class})
-    AlgorithmDto toAlgorithmDto(Algorithm algorithm);
+    @Mapping(source = "correctRate", target = "correctRate")
+    @Mapping(source = "solved", target = "solved")
+    AlgorithmDto toAlgorithmDto(Algorithm algorithm, Float correctRate, Boolean solved);
 
     @Mapping(source = "algorithmTestcase.testcaseId", target = "testcaseId")
     @Mapping(source = "algorithmTestcase.algorithm", target = "algorithm")
