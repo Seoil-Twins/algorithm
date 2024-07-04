@@ -328,6 +328,10 @@ public class UserService {
     @Transactional
     public void addLink(long userId, RequestLinkDto dto) {
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         UserLink link = userLinkRepository.findByUserAndLinkKind(user, dto.getLinkKind().getKindId());
@@ -347,6 +351,10 @@ public class UserService {
 
     public void updateNickname(long userId, RequestNicknameDto dto) {
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         boolean hasNicknameUser = userRepository.existsByNickname(dto.getNickname());
@@ -359,6 +367,10 @@ public class UserService {
 
     public void updateProfile(long userId, RequestProfileDto dto) {
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         String prevProfilePath = user.getProfilePath();
@@ -378,6 +390,10 @@ public class UserService {
 
     public void updateNotification(long userId, RequestNotificationDto dto) {
         AppUser user = userRepository.findByUserId(userId)
+                .map(item -> {
+                    if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
+                    return item;
+                })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         user.setPrimaryNofi(dto.getPrimaryNofi() != null ? dto.getPrimaryNofi() : user.getPrimaryNofi());
