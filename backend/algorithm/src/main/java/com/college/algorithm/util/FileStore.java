@@ -1,6 +1,6 @@
 package com.college.algorithm.util;
 
-import com.college.algorithm.dto.UploadFile;
+import com.college.algorithm.dto.UploadFileDto;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class FileStore {
     @Value("${upload.dir}")
     private String directoryPath;
 
-    public UploadFile storeFile(String storeDefaultPath, MultipartFile file) {
+    public UploadFileDto storeFile(String storeDefaultPath, MultipartFile file) {
         if (file.isEmpty()) {
             log.warn("이미지가 비어 있습니다.\n파일 이름 : " + file.getOriginalFilename());
             throw new CustomException(ErrorCode.BROKEN_IMAGE);
@@ -44,7 +44,7 @@ public class FileStore {
             throw new CustomException(ErrorCode.ERROR_IMAGE_UPLOAD);
         }
 
-        return UploadFile.builder()
+        return UploadFileDto.builder()
                 .originalFilename(originalFilename)
                 .storeFilename(storeFilename)
                 .storePath(storeFilePath)

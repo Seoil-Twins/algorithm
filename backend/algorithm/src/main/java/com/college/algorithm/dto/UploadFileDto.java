@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UploadFile {
+public class UploadFileDto {
     private String originalFilename;
     private String storeFilename;
     private String storePath;
@@ -17,7 +17,7 @@ public class UploadFile {
     private long size;
 
     @Builder
-    public UploadFile(String originalFilename, String storeFilename, String storePath, String extension, String type, long size) {
+    public UploadFileDto(String originalFilename, String storeFilename, String storePath, String extension, String type, long size) {
         this.originalFilename = originalFilename;
         this.storeFilename = storeFilename;
         this.storePath = storePath;

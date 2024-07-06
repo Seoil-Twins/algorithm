@@ -11,7 +11,6 @@ import com.college.algorithm.repository.*;
 import com.college.algorithm.util.FileStore;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -375,7 +374,7 @@ public class UserService {
 
         String prevProfilePath = user.getProfilePath();
 
-        UploadFile uploadedFile = fileStore.storeFile("profile/", dto.getProfile());
+        UploadFileDto uploadedFile = fileStore.storeFile("profile/", dto.getProfile());
 
         user.setProfilePath(uploadedFile.getStorePath());
         user.setProfileType(uploadedFile.getType());
