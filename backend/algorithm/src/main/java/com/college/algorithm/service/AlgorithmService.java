@@ -45,6 +45,12 @@ public class AlgorithmService {
     private final ExplanationRepository explanationRepository;
     private final CommentRepository commentRepository;
 
+    private final DummyImageRepository dummyImageRepository;
+    private final BoardTypeRepository boardTypeRepository;
+    private final BoardRepository boardRepository;
+    private final BoardImageRepository boardImageRepository;
+    private final TagRepository tagRepository;
+
     public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
         try {
             Pageable pageable = null;
@@ -285,6 +291,51 @@ public class AlgorithmService {
         correctRepository.save(correct);
 
         return HttpStatus.CREATED;
+    }
+
+    public HttpStatus postAlgorithmBoard(RequestAlgorithmPostDto boardPostDto,Long algorithmId, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
+        if(algorithm == null)
+            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+
+
+        List<Long> dummyImageIds = boardPostDto.getImageIds();
+        List<DummyImage> dummyImages = new ArrayList<>();
+        for(Long imageId : dummyImageIds){
+            DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
+            if(image != null)
+                dummyImages.add(image);
+            else
+                throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+        }
+
+        Board board = new Board();
+        board.setTitle(boardPostDto.getTitle());
+        board.setContent(boardPostDto.getContent());
+        board.setBoardType(boardTypeRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
+        board.setAlgorithmId(algorithmId);
+        Board savedBoard = boardRepository.save(board);
+
+        for(DummyImage image : dummyImages){
+            BoardImage boardImage = new BoardImage(savedBoard, image.getImagePath(), image.getImageType(), image.getImageSize());
+            boardImageRepository.save(boardImage);
+            dummyImageRepository.delete(image);
+        }
+
+        List<Tag> tags = new ArrayList<>();
+        List<String> tagNames = boardPostDto.getTags();
+        for (String tagName : tagNames) {
+            Tag tag = new Tag(savedBoard, tagName);
+            tags.add(tag);
+        }
+
+        tagRepository.saveAll(tags);
+
+        return HttpStatus.OK;
     }
 
     public HttpStatus deleteCorrectRecommend(Long correctId, Long loginUserId){

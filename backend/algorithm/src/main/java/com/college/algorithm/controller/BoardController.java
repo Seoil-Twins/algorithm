@@ -6,9 +6,12 @@ import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.BoardService;
 import com.college.algorithm.type.BoardType;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 @ResponseBody
 @RequestMapping("/board")
 @RequiredArgsConstructor
+@Validated
 public class BoardController {
 
     private final BoardService boardService;
@@ -75,6 +79,28 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardComments(page,count,boardId));
     }
 
+    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> postBoardImage(@Valid @ModelAttribute RequestBoardImageDto dto,
+                                            HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.ok().body(boardService.postBoardImage(dto,loginUserId));
+    }
+    @PostMapping("/")
+    public ResponseEntity<?> postBoard(@Valid @RequestBody(required = false) RequestBoardPostDto dto,
+                                        HttpServletRequest request){
+
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.postBoard(dto,loginUserId));
+    }
+
     @PostMapping("/{board_id}/recommend")
     public ResponseEntity<?> postBoardRecommend(@PathVariable(value = "board_id") Long board_id,
                                                            HttpServletRequest request) {
@@ -96,6 +122,18 @@ public class BoardController {
             throw new CustomException(ErrorCode.INVALID_COOKIE);
 
         return ResponseEntity.status(boardService.postBoardComment(board_id,requestBoardComment,loginUserId)).build();
+    }
+
+    @PostMapping("/{board_id}/comment/{comment_id}/adopt")
+    public ResponseEntity<?> postAdopt(@PathVariable(value = "board_id") Long board_id,
+                                       @PathVariable(value = "comment_id") Long comment_id,
+                                              HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(boardService.postBoardAdopt(board_id,comment_id,loginUserId)).build();
     }
 
     @PatchMapping("/{board_id}")

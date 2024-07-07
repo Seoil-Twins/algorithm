@@ -7,9 +7,11 @@ import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.AlgorithmService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -20,6 +22,7 @@ import java.util.Set;
 @RestController
 @ResponseBody
 @RequiredArgsConstructor
+@Validated
 public class AlgorithmController {
 
     private final AlgorithmService algorithmService;
@@ -147,6 +150,19 @@ public class AlgorithmController {
             throw new CustomException(ErrorCode.INVALID_COOKIE);
 
         return ResponseEntity.status(algorithmService.postCorrectRecommend(correct_id,loginUserId)).build();
+    }
+
+    @PostMapping("/algorithm/{algorithm_id}/board")
+    public ResponseEntity<?> postAlgorithmBoard(@Valid @RequestBody(required = false) RequestAlgorithmPostDto dto,
+                                       @PathVariable(value = "algorithm_id") Long algorithm_id,
+                                       HttpServletRequest request){
+
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.postAlgorithmBoard(dto,algorithm_id, loginUserId));
     }
 
     @DeleteMapping("/algorithm/{algorithm_id}/correct/{correct_id}/recommend")

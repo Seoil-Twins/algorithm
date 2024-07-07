@@ -4,21 +4,16 @@ import com.college.algorithm.dto.*;
 import com.college.algorithm.entity.*;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
-import com.college.algorithm.mapper.AlgorithmMapper;
 import com.college.algorithm.mapper.BoardMapper;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.college.algorithm.util.FileStore;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.CurrentTimestamp;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +33,10 @@ public class BoardService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
+
+    private final FileStore fileStore;
+    private final DummyImageRepository dummyImageRepository;
+    private final BoardImageRepository boardImageRepository;
 
     public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId){
         Pageable pageable = PageRequest.of(page-1, count);
@@ -59,7 +58,7 @@ public class BoardService {
                 break;
             case "a":
                 searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 질문");
-                searchType2 = kindRepository.findBoardTypeByTypeName("알고리즘 자유");
+                searchType2 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
                 boards = boardRepository.findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),searchType2.getTypeId(),keyword);
                 break;
             case "aq":
@@ -67,7 +66,7 @@ public class BoardService {
                 boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
                 break;
             case "af":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 자유");
+                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
                 boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
                 break;
         }
@@ -177,6 +176,66 @@ public class BoardService {
 
         return new ResponseBoardCommentDto(dtos,total);
     }
+
+    public ResponseBoardImageDto postBoardImage(RequestBoardImageDto dto, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+
+        UploadFileDto uploadedFile = fileStore.storeFile("dummyImages/", dto.getImage());
+
+        DummyImage dummyImage = new DummyImage();
+
+        dummyImage.setImagePath(uploadedFile.getStorePath());
+        dummyImage.setImageType(uploadedFile.getType());
+        dummyImage.setImageSize(uploadedFile.getSize());
+
+        DummyImage savedImage = dummyImageRepository.save(dummyImage);
+
+        return new ResponseBoardImageDto(savedImage.getImageId(),savedImage.getImagePath());
+    }
+
+    public HttpStatus postBoard(RequestBoardPostDto boardPostDto, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+
+        List<Long> dummyImageIds = boardPostDto.getImageIds();
+        List<DummyImage> dummyImages = new ArrayList<>();
+        for(Long imageId : dummyImageIds){
+            DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
+            if(image != null)
+                dummyImages.add(image);
+            else
+                throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+        }
+
+        Board board = new Board();
+        board.setTitle(boardPostDto.getTitle());
+        board.setContent(boardPostDto.getContent());
+        board.setBoardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
+        Board savedBoard = boardRepository.save(board);
+
+        for(DummyImage image : dummyImages){
+            BoardImage boardImage = new BoardImage(savedBoard, image.getImagePath(), image.getImageType(), image.getImageSize());
+            boardImageRepository.save(boardImage);
+            dummyImageRepository.delete(image);
+        }
+
+        List<Tag> tags = new ArrayList<>();
+        List<String> tagNames = boardPostDto.getTags();
+        for (String tagName : tagNames) {
+            Tag tag = new Tag(savedBoard, tagName);
+            tags.add(tag);
+        }
+
+        tagRepository.saveAll(tags);
+
+        return HttpStatus.OK;
+    }
+
     public HttpStatus postBoardRecommend(Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -217,6 +276,36 @@ public class BoardService {
 
         return HttpStatus.CREATED;
     }
+
+    public HttpStatus postBoardAdopt(Long boardId, Long commentId, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Board board = boardRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+        Comment comment = commentRepository.findCommentByCommentId(commentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COMMENT));
+
+        if(comment.getBoard() == null)
+            throw new CustomException(ErrorCode.NOT_MATCHED_BOARD);
+
+        if(board.getDeleted())
+            throw new CustomException(ErrorCode.DELETED_BOARD);
+
+        if(board.getAdoptId() != null)
+            throw new CustomException(ErrorCode.DUPLICATE_ADOPT);
+
+        if(!comment.getBoard().getBoardId().equals(board.getBoardId()))
+            throw new CustomException(ErrorCode.NOT_MATCHED_BOARD);
+
+        board.setAdoptId(commentId);
+        boardRepository.save(board);
+
+
+        return HttpStatus.CREATED;
+    }
     public HttpStatus patchBoard(RequestBoardUpdateDto boardUpdateDto,Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -240,11 +329,22 @@ public class BoardService {
                 throw new CustomException(ErrorCode.BAD_REQUEST_BOARD_TYPE);
         }
 
-        List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
-        tagRepository.deleteAll(tags);
 
-        if(boardUpdateDto.getTags()!=null) {
-            for (String content : boardUpdateDto.getTags()) {
+        List<Tag> existingTags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
+
+        List<String> newTags = boardUpdateDto.getTags();
+
+        for (Tag tag : existingTags) {
+            if (!newTags.contains(tag.getContent())) {
+                tagRepository.delete(tag);
+            } else {
+                newTags.remove(tag.getContent());
+            }
+        }
+
+        // 새로운 태그 추가
+        if (newTags != null) {
+            for (String content : newTags) {
                 Tag tag = new Tag(board, content);
                 tagRepository.save(tag);
             }
@@ -253,6 +353,7 @@ public class BoardService {
         board.setTitle(boardUpdateDto.getTitle());
         board.setContent(boardUpdateDto.getContent());
         board.setBoardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardUpdateDto.getBoardType(),10)));
+        board.setUpdatedTime(LocalDateTime.now());
 
         boardRepository.save(board);
 
