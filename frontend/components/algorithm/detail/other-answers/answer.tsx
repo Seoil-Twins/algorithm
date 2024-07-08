@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { IMAGE_URL } from "@/api";
-import { ResponseAnswerItem } from "@/types/code";
+import { ResponseAnswerItem } from "@/types2/code";
 
 import styles from "./answer.module.scss";
 import { notosansBold } from "@/styles/_font";

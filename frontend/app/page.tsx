@@ -9,8 +9,8 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 import AlgorithmCard from "@/components/home/algorithmCard";
 import PostCard from "@/components/home/postCard";
 
-import { Algorithm } from "@/types/algorithm";
-import { Board } from "@/types/board";
+import { Algorithm } from "@/types2/algorithm";
+import { Board } from "@/types2/board";
 
 import { getRecommendAlgorithms } from "./actions/algorithm";
 import { getRecommendPosts } from "./actions/baord";

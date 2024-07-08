@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
 
-import { Board, BoardResponse, PageOptions } from "@/types/board";
-import { BoardType } from "@/types/boardType";
-import { AlgorithmPageOptions } from "@/types/algorithm";
+import { Board, BoardResponse, PageOptions } from "@/types2/board";
+import { BoardType } from "@/types2/boardType";
+import { AlgorithmPageOptions } from "@/types2/algorithm";
 
 export const getBoardTypes = async () => {
   const response: BoardType[] = [
@@ -33,9 +33,8 @@ export const getBoardTypes = async () => {
 
 export const getRecommendPosts = async (): Promise<ActionResponse> => {
   try {
-    const response = await axiosInstance.get<BoardResponse>(
-      "/board/recommended",
-    );
+    const response =
+      await axiosInstance.get<BoardResponse>("/board/recommended");
     return {
       status: response.status,
       data: response.data,

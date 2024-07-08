@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { redirect } from "next/navigation";
 
-import { User } from "@/types/user";
+import { User } from "@/types2/user";
 
 import { getUser, getUserSNSInfo } from "@/app/actions/user";
 

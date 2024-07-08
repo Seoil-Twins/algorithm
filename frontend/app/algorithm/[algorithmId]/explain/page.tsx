@@ -5,7 +5,7 @@ import { getAlgorithm, getExplain } from "@/app/actions/algorithm";
 
 import EditorViewer from "@/components/common/editorViewer";
 import NotFound from "@/components/common/notFound";
-import Explanation from "@/types/explanation";
+import Explanation from "@/types2/explanation";
 
 type ExplainProps = {
   algorithmId: number;

@@ -1,4 +1,4 @@
-import { CommentResponse, PageOptions } from "@/types/comment";
+import { CommentResponse, PageOptions } from "@/types2/comment";
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
 
 export const getComments = async (

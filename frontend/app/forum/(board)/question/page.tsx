@@ -1,4 +1,4 @@
-import { BOARD_TYPE } from "@/types/constants";
+import { BOARD_TYPE } from "@/types2/constants";
 
 import { getBoards } from "@/app/actions/baord";
 

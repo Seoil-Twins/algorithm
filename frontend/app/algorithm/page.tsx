@@ -7,13 +7,13 @@ import {
   RateOptions,
   SolvedOptions,
   SortOptions,
-} from "@/types/algorithm";
+} from "@/types2/algorithm";
 import {
   RATE_OPTIONS_ARRAY,
   SOLVED_OPTIONS_ARRAY,
   SORT_OPTIONS_ARRAY,
   checkMyType,
-} from "@/types/constants";
+} from "@/types2/constants";
 
 import { getAlgorithmKinds, getAlgorithms } from "../actions/algorithm";
 

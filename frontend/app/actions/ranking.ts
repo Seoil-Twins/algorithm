@@ -2,7 +2,7 @@
 
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
 
-import { PageOptions } from "@/types/ranking";
+import { PageOptions } from "@/types2/ranking";
 
 export const getRankings = async (
   options: PageOptions,

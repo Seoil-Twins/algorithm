@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { Ranking as RankingType } from "@/types/ranking";
+import { Ranking as RankingType } from "@/types2/ranking";
 
 import { IMAGE_URL } from "@/app/actions/.";
 import { getRankings } from "../actions/ranking";

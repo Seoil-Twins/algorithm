@@ -1,4 +1,4 @@
-import Alram from "@/types/alram";
+import Alram from "@/types2/alram";
 
 export const fetchAlrams = async () => {
   const alrams: Alram[] = [

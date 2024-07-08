@@ -1,6 +1,6 @@
 import Content from "../content";
 
-import { BOARD_TYPE } from "@/types/constants";
+import { BOARD_TYPE } from "@/types2/constants";
 
 type FeedbackParams = { algorithmId: number };
 

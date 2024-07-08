@@ -7,7 +7,7 @@ import Link from "next/link";
 import { notosansBold } from "@/styles/_font";
 import styles from "./navbar.module.scss";
 
-import { Algorithm } from "@/types/algorithm";
+import { Algorithm } from "@/types2/algorithm";
 
 import Share from "./share";
 import Dropdown from "@/components/common/dropdown";
@@ -21,7 +21,7 @@ import {
 } from "@/providers/codeTypeProvider";
 import { useAuth } from "@/providers/authProvider";
 
-import { checkMyType } from "@/types/constants";
+import { checkMyType } from "@/types2/constants";
 
 type AlgorithmNavbarProps = {
   algorithm: Algorithm;

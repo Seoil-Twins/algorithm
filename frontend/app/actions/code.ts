@@ -2,7 +2,7 @@
 
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
 
-import { AnswerResponse, PageOptions, RequestCode } from "@/types/code";
+import { AnswerResponse, PageOptions, RequestCode } from "@/types2/code";
 
 export const getAnswer = async (
   algorithmId: number | string,

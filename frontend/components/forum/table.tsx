@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { IMAGE_URL } from "@/api";
 import { getBoardTypes } from "@/app/actions/baord";
-import { BoardResponse } from "@/types/board";
+import { BoardResponse } from "@/types2/board";
 
 import { notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";

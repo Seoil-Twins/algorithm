@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import { Comment as CommentType } from "@/types/comment";
+import { Comment as CommentType } from "@/types2/comment";
 
 import { IMAGE_URL } from "@/app/actions";
 import {

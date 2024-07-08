@@ -6,8 +6,8 @@ import { useSWRConfig } from "swr";
 import toast from "react-hot-toast";
 import { useFormState } from "react-dom";
 
-import { User } from "@/types/user";
-import { UserKeys } from "@/types/constants";
+import { User } from "@/types2/user";
+import { UserKeys } from "@/types2/constants";
 
 import { IMAGE_URL } from "@/app/actions";
 import {

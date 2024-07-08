@@ -17,7 +17,7 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import { useAuth } from "@/providers/authProvider";
 
-import AlramType from "@/types/alram";
+import AlramType from "@/types2/alram";
 
 import { fetchAlrams } from "@/api/alram";
 import { IMAGE_URL } from "@/api";

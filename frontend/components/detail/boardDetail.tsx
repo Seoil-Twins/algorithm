@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { User } from "@/types/user";
-import { CommentResponse } from "@/types/comment";
+import { User } from "@/types2/user";
+import { CommentResponse } from "@/types2/comment";
 
 import { getComments } from "@/app/actions/comment";
 import { IMAGE_URL } from "@/app/actions";
@@ -19,7 +19,7 @@ import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
-import { BOARD_TYPE } from "@/types/constants";
+import { BOARD_TYPE } from "@/types2/constants";
 import FeedbackSolve from "./feedbackSolve";
 
 type BoardDetailProps = {

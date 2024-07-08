@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { RequestBoard } from "@/types/board";
+import { RequestBoard } from "@/types2/board";
 
 import styles from "./boardForm.module.scss";
 import { notosansMedium } from "@/styles/_font";

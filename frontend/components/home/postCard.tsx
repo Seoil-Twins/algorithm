@@ -7,7 +7,7 @@ import { notosansMedium } from "@/styles/_font";
 
 import TagSlider from "./tagSlider";
 
-import { Board } from "@/types/board";
+import { Board } from "@/types2/board";
 
 type PostCardProps = {
   post: Board;

@@ -4,7 +4,7 @@ import { ReactNode, createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
-import { User } from "@/types/user";
+import { User } from "@/types2/user";
 
 type AuthProviderContext = {
   user: User | undefined | null;

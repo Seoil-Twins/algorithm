@@ -17,7 +17,7 @@ import { useAuth } from "@/providers/authProvider";
 
 import { MenuItems } from "./navigation";
 
-import AlramType from "@/types/alram";
+import AlramType from "@/types2/alram";
 
 import { fetchAlrams } from "@/api/alram";
 

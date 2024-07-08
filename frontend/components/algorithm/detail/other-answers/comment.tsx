@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import { SummaryComment } from "@/types/code";
+import { SummaryComment } from "@/types2/code";
 
 import { IMAGE_URL } from "@/app/actions";
 import { deleteComment, patchComment } from "@/app/actions/comment";

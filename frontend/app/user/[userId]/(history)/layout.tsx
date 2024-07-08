@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
-import { User } from "@/types/user";
+import { User } from "@/types2/user";
 
 import { IMAGE_URL } from "@/api";
 

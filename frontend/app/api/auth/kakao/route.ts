@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { axiosInstance } from "@/api";
 
-import { User } from "@/types/user";
+import { User } from "@/types2/user";
 
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;

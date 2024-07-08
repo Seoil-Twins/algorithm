@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR, { useSWRConfig } from "swr";
 
-import { ResponseNotification } from "@/types/user";
+import { ResponseNotification } from "@/types2/user";
 
 import { useAuth } from "@/providers/authProvider";
 
@@ -13,7 +13,7 @@ import styles from "./notification.module.scss";
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
-import { UserKeys } from "@/types/constants";
+import { UserKeys } from "@/types2/constants";
 import { getNotifications, updateNotifications } from "@/app/actions/user";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";

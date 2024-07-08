@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import { User } from "@/types/user";
-import { UserKeys } from "@/types/constants";
+import { User } from "@/types2/user";
+import { UserKeys } from "@/types2/constants";
 import { getUser, logout } from "@/app/actions/user";
 
 export const useUser = () => {

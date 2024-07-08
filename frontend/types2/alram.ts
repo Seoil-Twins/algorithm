@@ -1,4 +1,4 @@
-import Board from "./board";
+import { Board } from "./board";
 import { User } from "./user";
 
 export default interface Alram {
