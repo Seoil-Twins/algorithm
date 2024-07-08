@@ -9,6 +9,7 @@ import com.college.algorithm.mapper.AlgorithmMapper;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
 import com.college.algorithm.util.AlgorithmSpecification;
+import com.college.algorithm.util.CodeRunner;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +52,9 @@ public class AlgorithmService {
     private final BoardRepository boardRepository;
     private final BoardImageRepository boardImageRepository;
     private final TagRepository tagRepository;
+
+    private final CodeTypeRepository codeTypeRepository;
+    private final AlgorithmCorrectRepository algorithmCorrectRepository;
 
     public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
         try {
@@ -255,6 +260,63 @@ public class AlgorithmService {
         }
 
         return new ResponseCorrectCommentDto(dtos,total);
+    }
+    public ResponsePostCodeDto postCode(RequestCodeDto codeDto, Long algorithmId, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
+        if(algorithmEntity == null)
+            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+
+        CodeRunner codeRunner = new CodeRunner(testcaseRepository);
+        ResponseCodeDto codeResponseDTO = null;
+
+        double startTime = System.currentTimeMillis();
+        try {
+            switch (codeDto.getType()){
+                case "3001" : codeResponseDTO = codeRunner.runCpp(codeDto,algorithmId); break;
+                case "3002" : codeResponseDTO = codeRunner.runPython(codeDto,algorithmId); break;
+                case "3003" : codeResponseDTO = codeRunner.runJava(codeDto,algorithmId); break;
+            }
+        }
+         catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        double endTime = System.currentTimeMillis();
+
+        double excuteTime = codeResponseDTO.getExcuteTime();
+        Boolean codeResultSolved = codeResponseDTO.getSolved();
+        System.out.println(codeResultSolved);
+
+
+        Boolean solved = codeResultSolved && (Double.parseDouble(algorithmEntity.getLimitTime()) > excuteTime);
+
+        System.out.println(Double.parseDouble(algorithmEntity.getLimitTime()));
+        System.out.println(excuteTime);
+        System.out.println(solved);
+
+        AlgorithmCorrect postCode = new AlgorithmCorrect();
+        postCode.setUser(user);
+        postCode.setAlgorithm(algorithmEntity);
+        postCode.setCodeType(codeTypeRepository.findCodeTypeByTypeId(codeDto.getType()));
+        postCode.setCode(codeDto.getCode());
+
+        if(solved){
+            AlgorithmCorrect savedEntity = algorithmCorrectRepository.save(postCode);
+        }
+
+        ResponsePostCodeDto response = new ResponsePostCodeDto();
+        response.setIsSuccess(solved);
+        response.setUseTime(String.valueOf(codeResponseDTO.getExcuteTime()));
+        response.setUseMemory("test128");
+
+
+        // codeResponseDTO
+        return response;
     }
     public HttpStatus postCorrectComment(Long correctId, RequestCorrectComment requestCorrectComment, Long loginUserId){
 

@@ -127,6 +127,18 @@ public class AlgorithmController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/algorithm/{algorithm_id}")
+    public ResponseEntity<?> postCode(@RequestBody RequestCodeDto dto,
+                                      @PathVariable(value = "algorithm_id") Long algorithm_id,
+                                      HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.ok().body(algorithmService.postCode(dto,algorithm_id,loginUserId));
+    }
+
     @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/comment")
     public ResponseEntity<?> postAlgorithmCorrectComment(@RequestBody(required = false) RequestCorrectComment requestCorrectComment,
                                                         @PathVariable(value = "algorithm_id") Long algorithm_id,

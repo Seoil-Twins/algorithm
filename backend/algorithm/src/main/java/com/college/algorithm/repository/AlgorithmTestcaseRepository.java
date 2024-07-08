@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AlgorithmTestcaseRepository extends JpaRepository<AlgorithmTestcase, Long> {
     List<AlgorithmTestcase> findTestcaseEntitiesByAlgorithmAlgorithmId(long algorithmId);
+    List<AlgorithmTestcase> findAlgorithmTestcasesByAlgorithm_AlgorithmId(Long algorithmId);
 }
