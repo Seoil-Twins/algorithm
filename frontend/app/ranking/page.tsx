@@ -61,11 +61,7 @@ const Ranking = async ({
         <span key={item.rankingId}>{item.rank}</span>,
         <div key={item.rankingId} className={styles.nickname}>
           <Image
-            src={
-              item.user.profile
-                ? `${IMAGE_URL}/${item.user.profile}`
-                : "/svgs/user_profile_default.svg"
-            }
+            src={`${IMAGE_URL}/${item.user.profile}`}
             alt="프로필 사진"
             width={38}
             height={38}

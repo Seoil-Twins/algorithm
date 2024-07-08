@@ -74,11 +74,7 @@ const BoardDetail = async ({
             className={styles.flex}
           >
             <Image
-              src={
-                board.user.profile
-                  ? `${IMAGE_URL}/${board.user.profile}`
-                  : "/svgs/user_profile_default.svg"
-              }
+              src={`${IMAGE_URL}/${board.user.profile}`}
               alt="프로필 사진"
               width={38}
               height={38}

@@ -321,11 +321,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
         <div className={styles.profile}>
           <label htmlFor="profile">
             <Image
-              src={
-                profileImg
-                  ? `${IMAGE_URL}/${profileImg}`
-                  : "/svgs/user_profile_default.svg"
-              }
+              src={`${IMAGE_URL}/${profileImg}`}
               alt="프로필 사진"
               width={96}
               height={96}

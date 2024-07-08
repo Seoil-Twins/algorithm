@@ -81,11 +81,7 @@ const Comment = ({ comment }: CommentProps) => {
     <div className={styles.comment}>
       <Link href={`/user/${comment.user.userId}/question`}>
         <Image
-          src={
-            comment.user.profile
-              ? `${IMAGE_URL}/${comment.user.profile}`
-              : "/svgs/user_profile_default.svg"
-          }
+          src={`${IMAGE_URL}/${comment.user.profile}`}
           alt="유저 아이콘"
           width={32}
           height={32}

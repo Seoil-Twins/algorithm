@@ -77,11 +77,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       <Content title="">
         <div className={styles.profile}>
           <Image
-            src={
-              user.profile
-                ? `${IMAGE_URL}/${user.profile}`
-                : "/svgs/user_profile_default.svg"
-            }
+            src={`${IMAGE_URL}/${user.profile}`}
             alt="프로필 사진"
             width={38}
             height={38}

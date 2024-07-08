@@ -5,18 +5,39 @@ import useSWR from "swr";
 
 import { User } from "@/types2/user";
 import { UserKeys } from "@/types2/constants";
-import { getUser, logout } from "@/app/actions/user";
+import { CustomException, FRONTEND_API_URL } from "@/app/api";
+import { checkAuth } from "@/utils/authorization";
+import { useRouter } from "next/navigation";
 
 export const useUser = () => {
+  const router = useRouter();
+
   const { data, isLoading, isValidating } = useSWR(
     UserKeys.getUser,
     async () => {
-      const userResponse = await getUser();
+      const response = await fetch(FRONTEND_API_URL + "/user", {
+        method: "GET",
+        credentials: "include",
+      });
 
-      if (userResponse.status !== 200) {
-        return null;
+      if (response.ok) {
+        const user: User = await response.json();
+        return user;
+      } else {
+        const error: CustomException =
+          (await response.json()) as CustomException;
+        const isNotAuth: boolean = checkAuth(error.errorCode);
+
+        if (isNotAuth) {
+          await fetch(FRONTEND_API_URL + "/user/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+
+          removeUser();
+          router.refresh();
+        }
       }
-      return userResponse.data as User;
     },
     {
       revalidateOnFocus: false,
@@ -30,9 +51,8 @@ export const useUser = () => {
     setUser(user);
   };
 
-  const removeUser = async () => {
+  const removeUser = () => {
     setUser(null);
-    await logout();
   };
 
   useEffect(() => {

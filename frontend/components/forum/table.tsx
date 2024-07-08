@@ -33,11 +33,7 @@ const Table = async ({ item }: TableProps) => {
         <Link href={`/forum/${content.boardId}`} key={content.boardId}>
           <div className={styles.item}>
             <Image
-              src={
-                content.user.profile
-                  ? `${IMAGE_URL}/${content.user.profile}`
-                  : "/svgs/user_profile_default.svg"
-              }
+              src={`${IMAGE_URL}/${content.user.profile}`}
               alt="프로필 사진"
               width={46}
               height={46}

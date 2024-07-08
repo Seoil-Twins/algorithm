@@ -173,11 +173,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   onClick={openProfileModal}
                 >
                   <Image
-                    src={
-                      user.profile
-                        ? `${IMAGE_URL}/${user.profile}`
-                        : "/svgs/user_profile_default.svg"
-                    }
+                    src={`${IMAGE_URL}/${user.profile}`}
                     alt="프로필 사진"
                     width={38}
                     height={38}
@@ -208,11 +204,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             </div>
             <div className={styles.imgBox}>
               <Image
-                src={
-                  user.profile
-                    ? `${IMAGE_URL}/${user.profile}`
-                    : "/svgs/user_profile_default.svg"
-                }
+                src={`${IMAGE_URL}/${user.profile}`}
                 alt="프로필 사진"
                 width={80}
                 height={80}

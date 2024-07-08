@@ -33,11 +33,7 @@ const Answer = ({ answer }: AnswerProps) => {
             className={styles.flex}
           >
             <Image
-              src={
-                answer.user.profile
-                  ? `${IMAGE_URL}/${answer.user.profile}`
-                  : "/svgs/user_profile_default.svg"
-              }
+              src={`${IMAGE_URL}/${answer.user.profile}`}
               alt="유저 아이콘"
               width={38}
               height={38}

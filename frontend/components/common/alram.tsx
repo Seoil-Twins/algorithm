@@ -28,11 +28,7 @@ const Alram = forwardRef<HTMLDivElement, AlramProps>(
                     <div className={styles.item}>
                       <div>
                         <Image
-                          src={
-                            alram.otherUser.profile
-                              ? `${IMAGE_URL}/${alram.otherUser.profile}`
-                              : "/svgs/user_profile_default.svg"
-                          }
+                          src={`${IMAGE_URL}/${alram.otherUser.profile}`}
                           alt="프로필 사진"
                           width={28}
                           height={28}
