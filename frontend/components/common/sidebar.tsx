@@ -15,11 +15,11 @@ import styles from "./sidebar.module.scss";
 
 import { useAuth } from "@/providers/authProvider";
 
+import { FRONTEND_API_URL } from "@/app/api";
+
 import { MenuItems } from "./navigation";
 
-import AlramType from "@/types2/alram";
-
-import { fetchAlrams } from "@/api/alram";
+import { Notification, NotificationItem } from "@/app/api/model/user";
 
 import ThemeImage from "./themeImage";
 import ThemeSwitch from "./themeSwitch";
@@ -42,7 +42,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isVisibleAlramModal, setIsVisibleAlramModal] =
     useState<boolean>(false);
-  const [alrams, setAlrams] = useState<AlramType[]>([]);
+  const [alrams, setAlrams] = useState<NotificationItem[]>([]);
 
   const customMenuItems: MenuItems[] = useMemo(() => {
     return user
@@ -84,13 +84,22 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
     setIsVisibleAlramModal((prev) => !prev);
   }, [onAlramClick]);
 
-  const callFetchAlrams = useCallback(async () => {
-    const newAlrams = await fetchAlrams();
-    setAlrams(newAlrams);
+  const getNotifications = useCallback(async () => {
+    const response = await fetch(
+      FRONTEND_API_URL + `/notification?page=1&count=10`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    if (response.ok) {
+      const newAlrams = await response.json();
+      setAlrams(newAlrams.notifications);
+    }
   }, []);
 
   const handleLogout = useCallback(async () => {
-    // cookie 삭제 api 호출
     logout();
   }, [logout]);
 
@@ -101,9 +110,9 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
 
   useEffect(() => {
     if (isVisibleAlramModal) {
-      callFetchAlrams();
+      getNotifications();
     }
-  }, [isVisibleAlramModal, callFetchAlrams]);
+  }, [isVisibleAlramModal, getNotifications]);
 
   return (
     <div className={styles.centerBox}>

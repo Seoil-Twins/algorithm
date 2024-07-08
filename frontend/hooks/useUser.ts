@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import { User } from "@/types2/user";
-import { UserKeys } from "@/types2/constants";
+import { User } from "@/app/api/model/user";
+import { SWRKeys } from "@/types2/constants";
 import { CustomException, FRONTEND_API_URL } from "@/app/api";
 import { checkAuth } from "@/utils/authorization";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ export const useUser = () => {
   const router = useRouter();
 
   const { data, isLoading, isValidating } = useSWR(
-    UserKeys.getUser,
+    SWRKeys.getUser,
     async () => {
       const response = await fetch(FRONTEND_API_URL + "/user", {
         method: "GET",

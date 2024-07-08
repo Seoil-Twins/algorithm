@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { useFormState } from "react-dom";
 
 import { User } from "@/types2/user";
-import { UserKeys } from "@/types2/constants";
+import { SWRKeys } from "@/types2/constants";
 
 import { IMAGE_URL } from "@/app/actions";
 import {
@@ -109,7 +109,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       });
 
       if (response.status === 200) {
-        mutate(UserKeys.getUser);
+        mutate(SWRKeys.getUser);
         setProfileImg(response.data.profile);
       } else {
         toast.error("서버와의 통신 중 오류가 발생하였습니다.");
@@ -267,7 +267,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
           },
         } as UserProfile;
       });
-      mutate(UserKeys.getUser);
+      mutate(SWRKeys.getUser);
     } else {
       toast.error((state.data as string) || "서버 에러가 발생하였습니다.");
     }

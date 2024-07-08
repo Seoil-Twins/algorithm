@@ -4,8 +4,9 @@ import { ReactNode, createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
-import { User } from "@/types2/user";
 import { FRONTEND_API_URL } from "@/app/api";
+
+import { User } from "@/app/api/model/user";
 
 type AuthProviderContext = {
   user: User | undefined | null;
