@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀립니다.", 40010),
-    VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "이미 인증된 이메일입니다.", 40020),
     EXPIRED_TIME_EMAIL(HttpStatus.BAD_REQUEST, "인증 시간이 만료된 이메일입니다.", 40030),
     NOT_MATCH_VERIFY_CODE(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다.", 40040),
     BROKEN_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 깨져있거나 존재하지 않습니다.", 40050),

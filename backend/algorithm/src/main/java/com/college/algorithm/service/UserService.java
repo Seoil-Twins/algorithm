@@ -289,7 +289,9 @@ public class UserService {
 
         if (emailVerify.isPresent()) {
             entity = emailVerify.get();
-            if (entity.getVerified()) { throw new CustomException(ErrorCode.VERIFIED_EMAIL); }
+            if (entity.getVerified()) {
+                entity.setVerified(false);
+            }
 
             entity.setVerifyCode(verifyCode);
             entity.setExpirationTime(expiryTime);
