@@ -11,8 +11,6 @@ export const POST = async (req: Request, _res: Response) => {
       headers: req.headers,
     });
 
-    console.log(response);
-
     if (response.ok) {
       cookies().delete(
         (process.env.NEXT_PUBLIC_SESSION_KEY as string) || "JSESSIONID",

@@ -45,13 +45,12 @@ const Login = () => {
           body: JSON.stringify({
             email,
             password,
-            redirectUrl: redirectUrl.current,
           }),
         });
 
         if (response.ok) {
           login();
-          router.replace("/");
+          router.replace(redirectUrl.current ? redirectUrl.current : "/");
         } else if (!response.ok) {
           const body = (await response.json()) as CustomException;
           toast.error(body.message);
