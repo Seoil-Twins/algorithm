@@ -1,12 +1,13 @@
 import {
-  BACKEND_API_URL,
+  API_INSTANCE,
   CustomException,
   createNextApiError,
+  handleUnAuthorization,
 } from "@/app/api";
 import { validationEmail } from "@/utils/validation";
 import { NextResponse } from "next/server";
 
-const url = BACKEND_API_URL + "/user/verify/send";
+const API_URL = "/user/verify/send";
 
 export const POST = async (req: Request) => {
   const body = await req.json();
@@ -29,28 +30,13 @@ export const POST = async (req: Request) => {
   }
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: body["email"],
-      }),
+    await API_INSTANCE.POST(API_URL, req.headers, {
+      email: body["email"],
     });
 
-    if (response.ok) {
-      return new Response(null, { status: 204 });
-    } else {
-      const error = (await response.json()) as CustomException;
-      if (!error.message) {
-        error.message = "알 수 없는 오류가 발생하였습니다.";
-      }
-
-      return NextResponse.json(error, { status: error.status });
-    }
+    return new Response(null, { status: 204 });
   } catch (error: any) {
-    const response: CustomException = createNextApiError(error.message);
-    return NextResponse.json(response, { status: response.status });
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.json(error, { status: error.status, headers });
   }
 };

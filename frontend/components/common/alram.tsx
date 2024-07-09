@@ -4,11 +4,10 @@ import Link from "next/link";
 
 import { NotificationItem, RequireUser } from "@/app/api/model/user";
 
-import { IMAGE_URL } from "@/api";
-
 import { notosansMedium } from "@/styles/_font";
 import styles from "./alram.module.scss";
 import { NotificationType } from "@/types/notiication.d";
+import { IMAGE_URL } from "@/api";
 
 type AlramProps = {
   isVisible: boolean;

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { IMAGE_URL } from "@/api";
+import { IMAGE_URL } from "@/api/index2";
 import { ResponseAnswerItem } from "@/types2/code";
 
 import styles from "./answer.module.scss";

@@ -17,14 +17,14 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { IMAGE_URL } from "@/api";
 import { NotificationItem } from "@/app/api/model/user";
-import { FRONTEND_API_URL } from "@/app/api";
 
 import { MenuItems } from "./navigation";
 import ThemeSwitch from "./themeSwitch";
 import ThemeImage from "./themeImage";
 import Alram from "./alram";
+import { UserAPI } from "@/api/user";
+import { IMAGE_URL } from "@/api";
 
 type NavbarProps = {
   menuItems: MenuItems[];
@@ -98,13 +98,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   }, [logout]);
 
   const getNotifications = useCallback(async () => {
-    const response = await fetch(
-      FRONTEND_API_URL + `/notification?page=1&count=10`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
+    const response = await UserAPI.getNotifications();
 
     if (response.ok) {
       const newAlrams = await response.json();

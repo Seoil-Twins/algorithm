@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { IMAGE_URL } from "@/api";
+import { IMAGE_URL } from "@/api/index2";
 import { getBoardTypes } from "@/app/actions/baord";
 import { BoardResponse } from "@/types2/board";
 

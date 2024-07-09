@@ -5,9 +5,10 @@ import useSWR from "swr";
 
 import { User } from "@/app/api/model/user";
 import { SWRKeys } from "@/types2/constants";
-import { CustomException, FRONTEND_API_URL } from "@/app/api";
+import { CustomException } from "@/app/api";
 import { checkAuth } from "@/utils/authorization";
 import { useRouter } from "next/navigation";
+import { UserAPI } from "@/api/user";
 
 export const useUser = () => {
   const router = useRouter();
@@ -15,10 +16,7 @@ export const useUser = () => {
   const { data, isLoading, isValidating } = useSWR(
     SWRKeys.getUser,
     async () => {
-      const response = await fetch(FRONTEND_API_URL + "/user", {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await UserAPI.getUser();
 
       if (response.ok) {
         const user: User = await response.json();
@@ -29,11 +27,7 @@ export const useUser = () => {
         const isNotAuth: boolean = checkAuth(error.errorCode);
 
         if (isNotAuth) {
-          await fetch(FRONTEND_API_URL + "/user/logout", {
-            method: "POST",
-            credentials: "include",
-          });
-
+          await UserAPI.logout();
           removeUser();
           router.refresh();
         }

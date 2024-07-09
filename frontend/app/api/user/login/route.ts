@@ -3,9 +3,14 @@ import { NextResponse } from "next/server";
 
 import { validationEmail, validationPassword } from "@/utils/validation";
 
-import { BACKEND_API_URL, CustomException, createNextApiError } from "../..";
+import {
+  API_INSTANCE,
+  CustomException,
+  createNextApiError,
+  handleUnAuthorization,
+} from "../..";
 
-const url = BACKEND_API_URL + "/user/login";
+const API_URL = "/user/login";
 
 export const POST = async (req: Request) => {
   const body = await req.json();
@@ -44,37 +49,26 @@ export const POST = async (req: Request) => {
   }
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: body["email"],
-        userPw: body["password"],
-      }),
+    const response = await API_INSTANCE.POST(API_URL, req.headers, {
+      email: body["email"],
+      userPw: body["password"],
     });
 
-    if (response.ok) {
-      const cookie = response.headers.get("set-cookie");
-      if (!cookie) {
-        const response: CustomException = createNextApiError(null);
-        return NextResponse.json(response, { status: response.status });
-      }
-
-      revalidatePath("/", "layout");
-      return new Response(null, {
-        status: 204,
-        headers: {
-          "Set-Cookie": cookie,
-        },
-      });
-    } else {
-      const error = (await response.json()) as CustomException;
-      return NextResponse.json(error, { status: error.status });
+    const cookie = response.headers.get("set-cookie");
+    if (!cookie) {
+      const response: CustomException = createNextApiError(null);
+      return NextResponse.json(response, { status: response.status });
     }
+
+    revalidatePath("/", "layout");
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Set-Cookie": cookie,
+      },
+    });
   } catch (error: any) {
-    const response: CustomException = createNextApiError(error.message);
-    return NextResponse.json(response, { status: response.status });
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.json(error, { status: error.status, headers });
   }
 };

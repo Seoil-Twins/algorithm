@@ -4,9 +4,9 @@ import { ReactNode, createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
-import { FRONTEND_API_URL } from "@/app/api";
 
 import { User } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
 type AuthProviderContext = {
   user: User | undefined | null;
@@ -29,10 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, isLoading, isValidating, addUser, removeUser } = useUser();
 
   const login = async () => {
-    const response = await fetch(FRONTEND_API_URL + "/user", {
-      method: "GET",
-      credentials: "include",
-    });
+    const response = await UserAPI.getUser();
 
     if (response.ok) {
       const user: User = await response.json();
@@ -41,11 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await fetch(FRONTEND_API_URL + "/user/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-
+    await UserAPI.logout();
     removeUser();
     router.refresh();
   };

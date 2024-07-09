@@ -15,15 +15,14 @@ import styles from "./sidebar.module.scss";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { FRONTEND_API_URL } from "@/app/api";
-
 import { MenuItems } from "./navigation";
 
-import { Notification, NotificationItem } from "@/app/api/model/user";
+import { NotificationItem } from "@/app/api/model/user";
 
 import ThemeImage from "./themeImage";
 import ThemeSwitch from "./themeSwitch";
 import Alram from "./alram";
+import { UserAPI } from "@/api/user";
 
 type SidebarProps = {
   menuItems: MenuItems[];
@@ -85,13 +84,7 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   }, [onAlramClick]);
 
   const getNotifications = useCallback(async () => {
-    const response = await fetch(
-      FRONTEND_API_URL + `/notification?page=1&count=10`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
+    const response = await UserAPI.getNotifications();
 
     if (response.ok) {
       const newAlrams = await response.json();

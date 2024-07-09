@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDebouncedCallback } from "use-debounce";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
-
-import {
-  compareVerifyCode,
-  sendVerifyCode as sendVerifyCodeAPI,
-  signup,
-} from "@/app/actions/user";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./signup.module.scss";
@@ -20,12 +13,13 @@ import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
 import SubmitButton from "@/components/common/submitButton";
-import { CustomException, FRONTEND_API_URL } from "@/app/api";
+import { CustomException } from "@/app/api";
 import {
   validationEmail,
   validationNickname,
   validationPassword,
 } from "@/utils/validation";
+import { UserAPI } from "@/api/user";
 
 interface SignupProperty {
   nickname: string;
@@ -94,14 +88,10 @@ const Signup = () => {
         return;
       }
 
-      // 이메일 전송 API 구현
       try {
         setIsSending(true);
-        const response = await fetch(FRONTEND_API_URL + "/user/verify/send", {
-          method: "POST",
-          body: JSON.stringify({
-            email: signupInfo.email.value,
-          }),
+        const response = await UserAPI.sendVerfiyCode({
+          email: signupInfo.email.value,
         });
 
         if (response.ok) {
@@ -141,19 +131,22 @@ const Signup = () => {
       if (signupInfo.verifyCode.disabled || isVerified) return;
 
       try {
-        const response = await fetch(
-          FRONTEND_API_URL + "/user/verify/compare",
-          {
-            method: "POST",
-            body: JSON.stringify({
-              email: signupInfo.email.value,
-              verifyCode: signupInfo.verifyCode.value,
-            }),
-          },
-        );
+        const response = await UserAPI.compareVerifyCode({
+          email: signupInfo.email.value,
+          verifyCode: signupInfo.verifyCode.value,
+        });
 
         if (response.ok) {
           setIsVerified(true);
+          const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
+
+          setSignupInfo({
+            ...prev,
+            verifyCode: {
+              ...verifyCodeField,
+              disabled: true,
+            },
+          });
         } else {
           const error: CustomException =
             (await response.json()) as CustomException;
@@ -202,13 +195,10 @@ const Signup = () => {
           return;
         }
 
-        const response = await fetch(FRONTEND_API_URL + "/user", {
-          method: "POST",
-          body: JSON.stringify({
-            email: signupInfo.email.value,
-            userPw: signupInfo.password.value,
-            nickname: signupInfo.nickname.value,
-          }),
+        const response = await UserAPI.signup({
+          email: signupInfo.email.value,
+          userPw: signupInfo.password.value,
+          nickname: signupInfo.nickname.value,
         });
 
         if (response.ok) {
@@ -255,7 +245,7 @@ const Signup = () => {
             name="nickname"
             type="text"
             title="닉네임"
-            placeholder="닉네임 입력 (2 ~ 16자)"
+            placeholder="닉네임 입력 (2 ~ 10자)"
             value={signupInfo.nickname.value}
             onChange={(changedValue: string) =>
               handleSignupInfo(changedValue, "nickname")
@@ -330,6 +320,7 @@ const Signup = () => {
           </label>
         </div>
         <SubmitButton
+          isPending={isFinish}
           btnTitle="회원가입"
           pendingTitle="회원가입 중"
           className={`${styles.button} ${notosansBold.className}`}

@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { User } from "@/types2/user";
 
-import { IMAGE_URL } from "@/api";
+import { IMAGE_URL } from "@/api/index2";
 
 import styles from "./user.module.scss";
 import { notosansBold } from "@/styles/_font";

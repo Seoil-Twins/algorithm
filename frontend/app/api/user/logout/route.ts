@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
-import { BACKEND_API_URL, CustomException, createNextApiError } from "../..";
+import {
+  API_INSTANCE,
+  CustomException,
+  createNextApiError,
+  handleUnAuthorization,
+} from "../..";
 import { cookies } from "next/headers";
 
-const url = BACKEND_API_URL + "/user/logout";
+const API_URL = "/user/logout";
 
 export const POST = async (req: Request, _res: Response) => {
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: req.headers,
+    cookies().delete(
+      (process.env.NEXT_PUBLIC_SESSION_KEY as string) || "JSESSIONID",
+    );
+
+    await API_INSTANCE.POST(API_URL, req.headers);
+
+    return new Response(null, {
+      status: 204,
     });
-
-    if (response.ok) {
-      cookies().delete(
-        (process.env.NEXT_PUBLIC_SESSION_KEY as string) || "JSESSIONID",
-      );
-
-      return new Response(null, {
-        status: 204,
-      });
-    }
   } catch (error: any) {
-    const response: CustomException = createNextApiError(error.message);
-    return NextResponse.json(response, { status: response.status });
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.json(error, { status: error.status, headers });
   }
 };

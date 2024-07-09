@@ -45,4 +45,8 @@
     font-size: 18px;
     cursor: pointer;
   }
+
+  .button:disabled {
+    background-color: $darkPrimaryColor;
+  }
 }

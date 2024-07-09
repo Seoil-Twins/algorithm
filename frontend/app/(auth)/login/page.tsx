@@ -12,13 +12,15 @@ import Input from "@/components/common/input";
 import { useAuth } from "@/providers/authProvider";
 
 import SubmitButton from "@/components/common/submitButton";
-import { CustomException, FRONTEND_API_URL } from "@/app/api";
+import { CustomException } from "@/app/api";
+import { UserAPI } from "@/api/user";
 
 const Login = () => {
   const router = useRouter();
   const searchParam = useSearchParams();
   const { login, logout } = useAuth();
 
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -38,14 +40,12 @@ const Login = () => {
   const handleLogin = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      setIsPending(true);
 
       try {
-        const response = await fetch(FRONTEND_API_URL + "/user/login", {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            password,
-          }),
+        const response = await UserAPI.login({
+          email,
+          password,
         });
 
         if (response.ok) {
@@ -57,6 +57,8 @@ const Login = () => {
         }
       } catch (error: any) {
         toast.error(error.message);
+      } finally {
+        setIsPending(false);
       }
     },
     [router, email, password, login],
@@ -103,6 +105,7 @@ const Login = () => {
           />
         </div>
         <SubmitButton
+          isPending={isPending}
           btnTitle="로그인"
           pendingTitle="로그인 중"
           className={`${styles.button} ${notosansBold.className}`}
