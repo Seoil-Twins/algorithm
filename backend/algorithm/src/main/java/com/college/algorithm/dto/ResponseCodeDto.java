@@ -12,6 +12,5 @@ import lombok.Setter;
 public class ResponseCodeDto {
     private Boolean solved;
     private double excuteTime;
-    private ObjectNode results;
 
 }

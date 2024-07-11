@@ -55,6 +55,7 @@ public class AlgorithmService {
 
     private final CodeTypeRepository codeTypeRepository;
     private final AlgorithmCorrectRepository algorithmCorrectRepository;
+    private final TryRepository tryRepository;
 
     public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
         try {
@@ -273,7 +274,6 @@ public class AlgorithmService {
         CodeRunner codeRunner = new CodeRunner(testcaseRepository);
         ResponseCodeDto codeResponseDTO = null;
 
-        double startTime = System.currentTimeMillis();
         try {
             switch (codeDto.getType()){
                 case "3001" : codeResponseDTO = codeRunner.runCpp(codeDto,algorithmId); break;
@@ -286,18 +286,8 @@ public class AlgorithmService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        double endTime = System.currentTimeMillis();
 
-        double excuteTime = codeResponseDTO.getExcuteTime();
-        Boolean codeResultSolved = codeResponseDTO.getSolved();
-        System.out.println(codeResultSolved);
-
-
-        Boolean solved = codeResultSolved && (Double.parseDouble(algorithmEntity.getLimitTime()) > excuteTime);
-
-        System.out.println(Double.parseDouble(algorithmEntity.getLimitTime()));
-        System.out.println(excuteTime);
-        System.out.println(solved);
+        Boolean solved = codeResponseDTO.getSolved() && (Double.parseDouble(algorithmEntity.getLimitTime()) > codeResponseDTO.getExcuteTime());
 
         AlgorithmCorrect postCode = new AlgorithmCorrect();
         postCode.setUser(user);
@@ -307,7 +297,10 @@ public class AlgorithmService {
 
         if(solved){
             AlgorithmCorrect savedEntity = algorithmCorrectRepository.save(postCode);
+            Try codeTry = new Try(user,algorithmEntity,savedEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
+            tryRepository.save(codeTry);
         }
+
 
         ResponsePostCodeDto response = new ResponsePostCodeDto();
         response.setIsSuccess(solved);
