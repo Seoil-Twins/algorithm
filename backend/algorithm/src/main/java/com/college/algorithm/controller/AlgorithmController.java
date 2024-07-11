@@ -164,6 +164,17 @@ public class AlgorithmController {
         return ResponseEntity.status(algorithmService.postCorrectRecommend(correct_id,loginUserId)).build();
     }
 
+    @PostMapping("/algorithm/{algorithm_id}/recommend")
+    public ResponseEntity<?> postAlgorithmRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                           HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(algorithmService.postAlgorithmRecommend(algorithm_id,loginUserId)).build();
+    }
+
     @PostMapping("/algorithm/{algorithm_id}/board")
     public ResponseEntity<?> postAlgorithmBoard(@Valid @RequestBody(required = false) RequestAlgorithmPostDto dto,
                                        @PathVariable(value = "algorithm_id") Long algorithm_id,
@@ -187,6 +198,17 @@ public class AlgorithmController {
             throw new CustomException(ErrorCode.INVALID_COOKIE);
 
         return ResponseEntity.status(algorithmService.deleteCorrectRecommend(correct_id,loginUserId)).build();
+    }
+
+    @DeleteMapping("/algorithm/{algorithm_id}/recommend")
+    public ResponseEntity<?> deleteAlgorithmRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
+                                                             HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(algorithmService.deleteAlgorithmRecommend(algorithm_id,loginUserId)).build();
     }
 
 }

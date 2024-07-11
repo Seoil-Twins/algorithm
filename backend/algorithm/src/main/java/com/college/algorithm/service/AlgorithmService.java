@@ -56,6 +56,7 @@ public class AlgorithmService {
     private final CodeTypeRepository codeTypeRepository;
     private final AlgorithmCorrectRepository algorithmCorrectRepository;
     private final TryRepository tryRepository;
+    private final AlgorithmRecommendRepository algorithmRecommendRepository;
 
     public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
         try {
@@ -348,6 +349,28 @@ public class AlgorithmService {
         return HttpStatus.CREATED;
     }
 
+
+    public HttpStatus postAlgorithmRecommend(Long algorithmId, Long loginUserId){
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
+        if(algorithm == null)
+            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+
+        if(algorithmRecommendRepository.countByAlgorithm_AlgorithmIdAndUserUserId(algorithmId, loginUserId) >= 1)
+            throw new CustomException(ErrorCode.DUPLICATE_RECOMMEND);
+
+
+        AlgorithmRecommend recommend = new AlgorithmRecommend(user, algorithm);
+
+        algorithmRecommendRepository.save(recommend);
+        algorithm.setRecommendCount(algorithmRecommendRepository.countByAlgorithm_AlgorithmId(algorithmId));
+        algorithmRepository.save(algorithm);
+
+        return HttpStatus.CREATED;
+    }
+
     public HttpStatus postAlgorithmBoard(RequestAlgorithmPostDto boardPostDto,Long algorithmId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -413,6 +436,31 @@ public class AlgorithmService {
         correctRecommendRepository.delete(recommend);
         correct.setRecommendCount(correctRecommendRepository.countByCorrect_CorrectId(correctId));
         correctRepository.save(correct);
+
+        return HttpStatus.OK;
+    }
+
+
+    public HttpStatus deleteAlgorithmRecommend(Long algorithmId, Long loginUserId){
+
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
+        if(algorithm == null)
+            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+
+        AlgorithmRecommend recommend = algorithmRecommendRepository.findByAlgorithm_AlgorithmIdAndUser_UserId(algorithmId, user.getUserId());
+
+        if(recommend == null)
+            throw new CustomException(ErrorCode.NOT_FOUND_RECOMMEND);
+
+        if(!recommend.getUser().getUserId().equals(loginUserId))
+            throw new CustomException(ErrorCode.NOT_MATCHED_USER);
+
+        algorithmRecommendRepository.delete(recommend);
+        algorithm.setRecommendCount(algorithmRecommendRepository.countByAlgorithm_AlgorithmId(algorithmId));
+        algorithmRepository.save(algorithm);
 
         return HttpStatus.OK;
     }
