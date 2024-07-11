@@ -136,6 +136,17 @@ public class BoardController {
         return ResponseEntity.status(boardService.postBoardAdopt(board_id,comment_id,loginUserId)).build();
     }
 
+    @PostMapping("/{board_id}/view")
+    public ResponseEntity<?> postView(@PathVariable(value = "board_id") Long board_id,
+                                       HttpServletRequest request) {
+//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
+        Long loginUserId = 1L;
+        if(loginUserId == null)
+            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
+        return ResponseEntity.status(boardService.postBoardView(board_id,loginUserId)).build();
+    }
+
     @PatchMapping("/{board_id}")
     public ResponseEntity<?> patchBoard(@RequestBody(required = false) RequestBoardUpdateDto boardUpdateDto,
                                         @PathVariable(value = "board_id") Long boardId,

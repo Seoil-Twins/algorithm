@@ -42,7 +42,7 @@ public class CodeRunner {
 
                 Process compileProcess = Runtime.getRuntime().exec("g++ -o program -x c++ -");
                 if(!compileProcess.isAlive()){
-                    throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
                 }
                 compileProcess.getOutputStream().write(requestCodeDto.getCode().getBytes());
                 compileProcess.getOutputStream().close();
@@ -50,7 +50,7 @@ public class CodeRunner {
                 // 컴파일 결과 확인
                 int compileResult = compileProcess.waitFor();
                 if (compileResult != 0) {
-                    throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
                 }
 
                 // 생성된 실행 파일 실행하여 결과값 확인
@@ -89,7 +89,7 @@ public class CodeRunner {
                 return new ResponseCodeDto(flag, excuteTime);
 
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
         }
     }
 
@@ -127,7 +127,7 @@ public class CodeRunner {
                 }
 
                 if(results.size() <= 0){
-                    throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
                 }
 
                 // 결과값 비교
@@ -139,7 +139,7 @@ public class CodeRunner {
             }
                 return new ResponseCodeDto(flag, excuteTime);
         }catch(Exception e) {
-            throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
         }
     }
 
@@ -211,7 +211,7 @@ public class CodeRunner {
             return new ResponseCodeDto(flag, excuteTime);
 
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
         }
     }
 

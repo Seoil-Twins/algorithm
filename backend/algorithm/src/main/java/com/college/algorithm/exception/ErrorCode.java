@@ -43,7 +43,8 @@ public enum ErrorCode {
 
     /* 500 SERVER : 서버측 에러 */
     SQL_EXCEPTION(HttpStatus.CONFLICT, "SQL 실행 중 오류가 발생했습니다.", 50010),
-    ERROR_IMAGE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장에 실패하였습니다.", 50030),
+    ERROR_IMAGE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장에 실패하였습니다.", 50020),
+    ERROR_CODE_RUNNER(HttpStatus.INTERNAL_SERVER_ERROR, "코드 외부 실행 중 오류가 발생했습니다.", 50030),
     ;
 
     private final HttpStatus httpStatus;

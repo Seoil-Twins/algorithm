@@ -306,6 +306,30 @@ public class BoardService {
 
         return HttpStatus.CREATED;
     }
+
+
+    public HttpStatus postBoardView(Long boardId, Long loginUserId){
+        AppUser user = userRepository.findByUserId(loginUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        Board board = boardRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+        BoardView boardView = boardViewRepository.findByBoard_BoardIdAndUserUserId(boardId, loginUserId);
+
+        if(boardView == null)
+        {
+            BoardView view = new BoardView();
+            view.setBoard(board);
+            view.setUser(user);
+            boardViewRepository.save(view);
+
+            board.setViewCount((long) boardViewRepository.countByBoard_BoardId(boardId));
+            boardRepository.save(board);
+        }
+
+        return HttpStatus.CREATED;
+    }
     public HttpStatus patchBoard(RequestBoardUpdateDto boardUpdateDto,Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
