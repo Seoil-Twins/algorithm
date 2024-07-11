@@ -76,7 +76,7 @@ public class BoardService {
         for(Board board : boards){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-            Boolean isSolved = false;// 뭐지? adopt 테이블이 삭제되면서 알 수가 없ㄴㄴ데?
+            Boolean isSolved = loginUserId != null ? board.getAdoptId() != null : null;
 
             Boolean isRecommend = null;
             if(loginUserId != null)
@@ -115,7 +115,7 @@ public class BoardService {
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-        Boolean isSolved = false;// 뭐지? adopt 테이블이 삭제되면서 알 수가 없ㄴㄴ데?
+        Boolean isSolved = loginUserId != null ? board.getAdoptId() != null : null;
 
         Boolean isView = null;
         if(loginUserId != null)
