@@ -4,7 +4,7 @@ import com.college.algorithm.dto.*;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.BoardService;
-import com.college.algorithm.type.BoardType;
+import com.college.algorithm.type.BoardTypeWithSearchParam;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class BoardController {
                                                                                                                af : 알고리즘 피드백*/
                                        @RequestParam(required = false, value = "keyword") String keyword,
                                        HttpServletRequest request){
-        boolean paramFlag = Arrays.stream(BoardType.values())
+        boolean paramFlag = Arrays.stream(BoardTypeWithSearchParam.values())
                 .anyMatch(type -> boardType.equals(type.getSearchParam()));
         if(!paramFlag)
             throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);

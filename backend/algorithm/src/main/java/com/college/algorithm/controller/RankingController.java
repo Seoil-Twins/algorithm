@@ -1,16 +1,10 @@
 package com.college.algorithm.controller;
 
-import com.college.algorithm.exception.CustomException;
-import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.RankingService;
-import com.college.algorithm.type.BoardType;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor

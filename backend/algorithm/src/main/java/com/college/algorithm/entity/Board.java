@@ -37,14 +37,13 @@ public class Board {
     @JoinColumn(name = "adopt_id", referencedColumnName = "comment_id")
     private Comment adopt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "algorithm_id", referencedColumnName = "algorithm_id")
+    private Algorithm algorithm;
+
     @Column(name = "title", nullable = false)
     private String title;
-
-    @Column(name = "adopt_id", nullable = false)
-    private Long adoptId;
-
-    @Column(name = "algorithm_id", nullable = false)
-    private Long algorithmId;
 
     @Lob
     @Column(name = "content", nullable = false)

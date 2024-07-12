@@ -1,7 +1,6 @@
 package com.college.algorithm.controller;
 
 import com.college.algorithm.dto.*;
-import com.college.algorithm.exception.BadRequestException;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.AlgorithmService;
@@ -16,8 +15,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @RestController
 @ResponseBody

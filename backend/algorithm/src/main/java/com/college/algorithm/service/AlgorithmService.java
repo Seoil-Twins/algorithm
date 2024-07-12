@@ -86,8 +86,8 @@ public class AlgorithmService {
                 ArrayNode testcaseArrayNode = objectMapper.createArrayNode();
                 if (testcaseEntities == null)
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Data");
-                for (AlgorithmTestcase testcaseEntitiy : testcaseEntities) {
-                    AlgorithmTestcaseDto testcaseDTO = AlgorithmMapper.INSTANCE.toAlgorithmTestcaseDto(testcaseEntitiy);
+                for (AlgorithmTestcase testcaseEntity : testcaseEntities) {
+                    AlgorithmTestcaseDto testcaseDTO = AlgorithmMapper.INSTANCE.toAlgorithmTestcaseDto(testcaseEntity);
 
 
                     ObjectNode testcaseNode = objectMapper.createObjectNode();
@@ -118,21 +118,21 @@ public class AlgorithmService {
             List<AlgorithmDto> sortedResponse = new ArrayList<>();
 
             if(Objects.equals(algorithmRequestDTO.getRate(), "h")) {
-                dtos.forEach(list::add);
+                list.addAll(dtos);
 
                 // correctRate를 기준으로 내림차순 정렬
                 list.sort(Comparator.comparing(AlgorithmDto::getCorrectRate).reversed());
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
-                list.forEach(sortedResponse::add);
+                sortedResponse.addAll(list);
             } else if(Objects.equals(algorithmRequestDTO.getRate(), "l")) {
-                dtos.forEach(list::add);
+                list.addAll(dtos);
 
                 // correctRate를 기준으로 오름차순 정렬
                 list.sort(Comparator.comparing(AlgorithmDto::getCorrectRate));
 
                 // 정렬된 데이터를 새로운 ArrayNode에 추가
-                list.forEach(sortedResponse::add);
+                sortedResponse.addAll(list);
             } else {
                 sortedResponse.addAll(dtos);
             }
@@ -186,9 +186,7 @@ public class AlgorithmService {
         if(loginUserId != null)
              isRecommend = recommendRepository.countByAlgorithm_AlgorithmIdAndUserUserId(algorithmId, loginUserId) >= 1;
 
-        AlgorithmDetailDto response = AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithmEntity,isRecommend,testcases);
-
-        return response;
+        return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithmEntity,isRecommend,testcases);
     }
     public ExplanationResponseDto getExplanation(Long algorithmId){
 
@@ -200,9 +198,7 @@ public class AlgorithmService {
         if(explanation == null)
             throw new CustomException(ErrorCode.NOT_FOUND_EXPLANATION);
 
-        ExplanationResponseDto response = AlgorithmMapper.INSTANCE.toExplanationResponseDto(algorithmEntity,explanation);
-
-        return response;
+        return AlgorithmMapper.INSTANCE.toExplanationResponseDto(algorithmEntity,explanation);
     }
     public ResponseAlgorithmKindDto getKinds(){
 
@@ -271,16 +267,19 @@ public class AlgorithmService {
         ResponseCodeDto codeResponseDTO = null;
 
         try {
-            switch (codeDto.getType()){
-                case "3001" : codeResponseDTO = codeRunner.runCpp(codeDto,algorithmId); break;
-                case "3002" : codeResponseDTO = codeRunner.runPython(codeDto,algorithmId); break;
-                case "3003" : codeResponseDTO = codeRunner.runJava(codeDto,algorithmId); break;
-            }
+            codeResponseDTO = switch (codeDto.getType()) {
+                case "3001" -> codeRunner.runCpp(codeDto, algorithmId);
+                case "3002" -> codeRunner.runPython(codeDto, algorithmId);
+                case "3003" -> codeRunner.runJava(codeDto, algorithmId);
+                default -> codeResponseDTO;
+            };
         }
-         catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        catch (IOException | InterruptedException e) {
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
+        }
+
+        if (codeResponseDTO == null) {
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
         }
 
         Boolean solved = codeResponseDTO.getSolved() && (Double.parseDouble(algorithmEntity.getLimitTime()) > codeResponseDTO.getExcuteTime());
@@ -393,7 +392,7 @@ public class AlgorithmService {
         board.setTitle(boardPostDto.getTitle());
         board.setContent(boardPostDto.getContent());
         board.setBoardType(boardTypeRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
-        board.setAlgorithmId(algorithmId);
+        board.setAlgorithm(algorithm);
         Board savedBoard = boardRepository.save(board);
 
         for(DummyImage image : dummyImages){

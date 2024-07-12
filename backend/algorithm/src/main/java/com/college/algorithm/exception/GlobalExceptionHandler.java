@@ -1,8 +1,6 @@
 package com.college.algorithm.exception;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -19,11 +17,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = { CustomException.class })
     protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
         log.warn("handleCustomException throw CustomException : {}", e.getErrorCode());
-        return ErrorResponse.toResponseEntity(e.getErrorCode());
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         return ErrorResponse.toResponseEntity(e.getErrorCode());
     }
 

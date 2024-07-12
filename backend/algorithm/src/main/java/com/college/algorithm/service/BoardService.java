@@ -76,7 +76,7 @@ public class BoardService {
         for(Board board : boards){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-            Boolean isSolved = loginUserId != null ? board.getAdoptId() != null : null;
+            Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
 
             Boolean isRecommend = null;
             if(loginUserId != null)
@@ -115,7 +115,7 @@ public class BoardService {
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-        Boolean isSolved = loginUserId != null ? board.getAdoptId() != null : null;
+        Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
 
         Boolean isView = null;
         if(loginUserId != null)
@@ -160,7 +160,7 @@ public class BoardService {
     }
     public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId){
 
-        if(boardRepository.findByBoardId(boardId) == null)
+        if(boardRepository.findByBoardId(boardId).isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_BOARD);
 
         Pageable pageable = PageRequest.of(page-1, count);
@@ -294,13 +294,13 @@ public class BoardService {
         if(board.getDeleted())
             throw new CustomException(ErrorCode.DELETED_BOARD);
 
-        if(board.getAdoptId() != null)
+        if(board.getAdopt().getCommentId() != null)
             throw new CustomException(ErrorCode.DUPLICATE_ADOPT);
 
         if(!comment.getBoard().getBoardId().equals(board.getBoardId()))
             throw new CustomException(ErrorCode.NOT_MATCHED_BOARD);
 
-        board.setAdoptId(commentId);
+        board.setAdopt(comment);
         boardRepository.save(board);
 
 
