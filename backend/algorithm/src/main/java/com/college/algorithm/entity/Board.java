@@ -35,6 +35,12 @@ public class Board {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "adopt_id", nullable = false)
+    private Long adoptId;
+
+    @Column(name = "algorithm_id", nullable = false)
+    private Long algorithmId;
+
     @Lob
     @Column(name = "content", nullable = false)
     private String content;

@@ -32,11 +32,6 @@ public class Try {
     @JoinColumn(name = "algorithm_id", referencedColumnName = "algorithm_id")
     private Algorithm algorithm;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "correct_id", referencedColumnName = "correct_id")
-    private AlgorithmCorrect correct;
-
     @Column(name = "solved")
     private Boolean solved;
 
@@ -51,10 +46,9 @@ public class Try {
     private LocalDateTime createdTime;
 
     @Builder
-    public Try(AppUser user, Algorithm algorithm, AlgorithmCorrect correct, Boolean solved, String tryTime, String tryMemory) {
+    public Try(AppUser user, Algorithm algorithm, Boolean solved, String tryTime, String tryMemory) {
         this.user = user;
         this.algorithm = algorithm;
-        this.correct = correct;
         this.solved = solved;
         this.tryTime = tryTime;
         this.tryMemory = tryMemory;

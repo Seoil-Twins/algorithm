@@ -58,11 +58,11 @@ public class Algorithm {
 
     @CreationTimestamp
     @Column(name = "created_time")
-    private LocalDateTime createdTime;
+    private String createdTime;
 
     @UpdateTimestamp
     @Column(name = "updated_time")
-    private LocalDateTime updatedTime;
+    private String updatedTime;
 
     @Builder
     public Algorithm(AppUser user, AlgorithmKind kind, AlgorithmCompe compe, String title, String content, Character level, String limitTime, String limitMemory) {
