@@ -1,22 +1,21 @@
 import React from "react";
-import { useFormStatus } from "react-dom";
 
 type SubmitButtonProps = {
+  isPending: boolean;
   btnTitle: string;
   pendingTitle: string;
   className: string;
 };
 
 const SubmitButton = ({
+  isPending,
   btnTitle,
   pendingTitle,
   className,
 }: SubmitButtonProps) => {
-  const { pending } = useFormStatus();
-
   return (
-    <button type="submit" className={className}>
-      {pending ? pendingTitle : btnTitle}
+    <button type="submit" className={className} disabled={isPending}>
+      {isPending ? pendingTitle : btnTitle}
     </button>
   );
 };

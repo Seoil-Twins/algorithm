@@ -17,7 +17,7 @@ export const AUTH_PATHS = [
   "/forum/new",
 ];
 
-export const UserKeys = {
+export const SWRKeys = {
   getUser: "/user/me",
   getNotification: "/user/notification",
 };

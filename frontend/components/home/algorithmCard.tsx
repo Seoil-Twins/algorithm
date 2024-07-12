@@ -5,7 +5,7 @@ import Link from "next/link";
 import styles from "./algorithmCard.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { Algorithm } from "@/types/algorithm";
+import { Algorithm } from "@/types2/algorithm";
 
 import TagSlider from "./tagSlider";
 

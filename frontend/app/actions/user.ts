@@ -7,7 +7,7 @@ import cookie from "cookie";
 import { redirect } from "next/navigation";
 
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
-import { PageOptions, RequestNotification, User } from "@/types/user";
+import { PageOptions, RequestNotification, User } from "@/types2/user";
 import {
   validationEmail,
   validationNickname,

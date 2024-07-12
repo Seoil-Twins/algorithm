@@ -4,13 +4,15 @@ import { ReactNode, createContext, useContext } from "react";
 import { useRouter } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
-import { User } from "@/types/user";
+
+import { User } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
 type AuthProviderContext = {
   user: User | undefined | null;
   isLoading: boolean;
   isValidating: boolean;
-  login: (user: User) => Promise<void>;
+  login: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -26,13 +28,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const { user, isLoading, isValidating, addUser, removeUser } = useUser();
 
-  const login = async (user: User) => {
-    addUser(user);
+  const login = async () => {
+    const response = await UserAPI.getUser();
+
+    if (response.ok) {
+      const user: User = await response.json();
+      addUser(user);
+    }
   };
 
   const logout = async () => {
-    // remove Cookie
-    await removeUser();
+    await UserAPI.logout();
+    removeUser();
     router.refresh();
   };
 

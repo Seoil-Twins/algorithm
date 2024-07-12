@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR, { useSWRConfig } from "swr";
 
-import { ResponseNotification } from "@/types/user";
+import { ResponseNotification } from "@/types2/user";
 
 import { useAuth } from "@/providers/authProvider";
 
@@ -13,10 +13,9 @@ import styles from "./notification.module.scss";
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
-import { UserKeys } from "@/types/constants";
+import { SWRKeys } from "@/types2/constants";
 import { getNotifications, updateNotifications } from "@/app/actions/user";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 
 type NotificationSettings = {
   title: string;
@@ -71,7 +70,7 @@ const Notification = () => {
   const { user } = useAuth();
   const { mutate } = useSWRConfig();
   const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
-    UserKeys.getNotification,
+    SWRKeys.getNotification,
     getNotifications,
   );
 
@@ -100,7 +99,7 @@ const Notification = () => {
           notificationSettings,
         );
         if (response.status === 200) {
-          mutate(UserKeys.getNotification);
+          mutate(SWRKeys.getNotification);
           toast.success("알림 설정을 변경하였습니다.");
         } else {
           setNotifications(prevNotifications.current!);

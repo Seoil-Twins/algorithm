@@ -3,8 +3,8 @@
 import React from "react";
 import Image from "next/image";
 
-import { AlgorithmPageOptions } from "@/types/algorithm";
-import { Board, BoardResponse } from "@/types/board";
+import { AlgorithmPageOptions } from "@/types2/algorithm";
+import { Board, BoardResponse } from "@/types2/board";
 
 import Table, { TableData } from "@/components/algorithm/table";
 

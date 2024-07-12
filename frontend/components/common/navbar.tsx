@@ -17,15 +17,14 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 
 import { useAuth } from "@/providers/authProvider";
 
-import AlramType from "@/types/alram";
-
-import { fetchAlrams } from "@/api/alram";
-import { IMAGE_URL } from "@/api";
+import { NotificationItem } from "@/app/api/model/user";
 
 import { MenuItems } from "./navigation";
 import ThemeSwitch from "./themeSwitch";
 import ThemeImage from "./themeImage";
 import Alram from "./alram";
+import { UserAPI } from "@/api/user";
+import { IMAGE_URL } from "@/api";
 
 type NavbarProps = {
   menuItems: MenuItems[];
@@ -47,7 +46,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     useState<boolean>(false);
   const [isVisibleProfileModal, setIsVisibleProfileModal] =
     useState<boolean>(false);
-  const [alrams, setAlrams] = useState<AlramType[]>([]);
+  const [alrams, setAlrams] = useState<NotificationItem[]>([]);
 
   const onAlramClick = useCallback((event: MouseEvent) => {
     const insideAlram = alramModalRef.current?.contains(event.target as Node);
@@ -98,16 +97,20 @@ const Navbar = ({ menuItems }: NavbarProps) => {
     logout();
   }, [logout]);
 
-  const callFetchAlrams = useCallback(async () => {
-    const newAlrams = await fetchAlrams();
-    setAlrams(newAlrams);
+  const getNotifications = useCallback(async () => {
+    const response = await UserAPI.getNotifications();
+
+    if (response.ok) {
+      const newAlrams = await response.json();
+      setAlrams(newAlrams.notifications);
+    }
   }, []);
 
   useEffect(() => {
     if (isVisibleAlramModal) {
-      callFetchAlrams();
+      getNotifications();
     }
-  }, [isVisibleAlramModal, callFetchAlrams]);
+  }, [isVisibleAlramModal, getNotifications]);
 
   useEffect(() => {
     return () => {
@@ -173,11 +176,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
                   onClick={openProfileModal}
                 >
                   <Image
-                    src={
-                      user.profile
-                        ? `${IMAGE_URL}/${user.profile}`
-                        : "/svgs/user_profile_default.svg"
-                    }
+                    src={`${IMAGE_URL}/${user.profile}`}
                     alt="프로필 사진"
                     width={38}
                     height={38}
@@ -208,11 +207,7 @@ const Navbar = ({ menuItems }: NavbarProps) => {
             </div>
             <div className={styles.imgBox}>
               <Image
-                src={
-                  user.profile
-                    ? `${IMAGE_URL}/${user.profile}`
-                    : "/svgs/user_profile_default.svg"
-                }
+                src={`${IMAGE_URL}/${user.profile}`}
                 alt="프로필 사진"
                 width={80}
                 height={80}
@@ -224,13 +219,17 @@ const Navbar = ({ menuItems }: NavbarProps) => {
               </div>
               <div className={styles.algorithmBox}>
                 <div className={styles.algorithmItem}>
-                  맞춘 문제 <span className={styles.correct}>123</span>
+                  맞춘 문제{" "}
+                  <span className={styles.correct}>{user.solved}</span>
                 </div>
                 <div className={styles.algorithmItem}>
-                  틀린 문제 <span className={styles.wrong}>123</span>
+                  틀린 문제{" "}
+                  <span className={styles.wrong}>
+                    {user.tried - user.solved}
+                  </span>
                 </div>
                 <div className={styles.algorithmItem}>
-                  시도한 문제 <span className={styles.try}>123</span>
+                  시도한 문제 <span className={styles.try}>{user.tried}</span>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-import { AUTH_PATHS, NO_AUTH_PATHS } from "./types/constants";
+import { AUTH_PATHS, NO_AUTH_PATHS } from "./types2/constants";
 
 export default async function middrleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;

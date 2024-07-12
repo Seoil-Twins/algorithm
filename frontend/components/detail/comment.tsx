@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import { Comment as CommentType } from "@/types/comment";
+import { Comment as CommentType } from "@/types2/comment";
 
 import { IMAGE_URL } from "@/app/actions";
 import {
@@ -124,11 +124,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
           <div className={styles.user}>
             <Link href={`/user/${comment.user.userId}/question`}>
               <Image
-                src={
-                  comment.user.profile
-                    ? `${IMAGE_URL}/${comment.user.profile}`
-                    : "/svgs/user_profile_default.svg"
-                }
+                src={`${IMAGE_URL}/${comment.user.profile}`}
                 alt="프로필 사진"
                 width={38}
                 height={38}

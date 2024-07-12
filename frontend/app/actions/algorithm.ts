@@ -5,9 +5,9 @@ import {
   AlgorithmKind,
   AlgorithmOptions,
   AlgorithmResponse,
-} from "@/types/algorithm";
+} from "@/types2/algorithm";
 import { ActionError, ActionResponse, axiosInstance, errorHandler } from ".";
-import Explanation from "@/types/explanation";
+import Explanation from "@/types2/explanation";
 
 export const getRecommendAlgorithms = async (): Promise<
   ActionResponse | ActionError

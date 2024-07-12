@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
 
-import { RequestBoard } from "@/types/board";
-import { BOARD_TYPE } from "@/types/constants";
+import { RequestBoard } from "@/types2/board";
+import { BOARD_TYPE } from "@/types2/constants";
 
 import { addBoard } from "@/app/actions/baord";
 

@@ -21,6 +21,15 @@ const nextConfig = {
       },
     ],
   },
+  // proxy 설정
+  async rewrites() {
+    return [
+      {
+        source: "/api/display",
+        destination: "http://localhost:8080/display",
+      },
+    ];
+  },
   // 엄격 모드로 인해 useEffect가 2번 실행 (1번만 실행하게 할라면 밑에 주석을 푸셈)
   reactStrictMode: false,
 };

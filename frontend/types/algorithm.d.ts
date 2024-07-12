@@ -1,43 +1,39 @@
-import { BOARD_TYPE_VALUE } from "@/components/common/boardForm";
-import { Testcase } from "./testcase";
-import { RequiredUser } from "./user";
+import { ALGORITHM_BOARD_TYPE, PageOptions } from ".";
+import { BOARD_TYPE } from "./board";
 
-export type Algorithm = {
-  algorithmId: number;
-  user: RequiredUser;
-  title: string;
-  level: string;
-  algorithmKind: number;
-  algorithmCompe: number;
-  limitTime: string;
-  limitMem: string;
-  createdTime: string;
-  content: string;
-  thumbnail?: string;
-  kinds: string[];
-  testcase: Testcase[];
-  isFavorite?: boolean;
-  solved?: boolean;
-  correctRate: number;
-};
+export const SolvedOptions = {
+  ALL: "a",
+  SOLVED: "s",
+  NOT_SOLVED: "ns",
+} as const;
+export type SOLVED_OPTIONS = (typeof SolvedOptions)[keyof typeof SolvedOptions];
 
-export type AlgorithmResponse = {
-  algorithms: Algorithm[];
-  total: number;
-};
+export const SortOptions = {
+  RECNET: "r",
+  OLDER: "or",
+  TRIED: "t",
+} as const;
+export type SORT_OPTIONS = (typeof SortOptions)[keyof typeof SortOptions];
 
-export type SolvedOptions = "a" | "s" | "ns";
-export type SortOptions = "r" | "or" | "t";
-export type RateOptions = "h" | "l";
+export const RateOptions = {
+  HIGH: "h",
+  LOW: "l",
+} as const;
+export type RATE_OPTIONS = (typeof RateOptions)[keyof typeof RateOptions];
 
 export type AlgorithmOptions = {
   count: number;
   page: number;
-  solved: SolvedOptions;
-  sort: SortOptions;
+  solved: SOLVED_OPTIONS;
+  sort: SORT_OPTIONS;
   level: number;
-  rate?: RateOptions;
+  rate?: RATE_OPTIONS;
   tag?: number;
+  keyword?: string;
+};
+
+export type AlgorithmPageOptions = PageOptions & {
+  kind: ALGORITHM_BOARD_TYPE;
   keyword?: string;
 };
 
@@ -46,17 +42,10 @@ export type AlgorithmKind = {
   kindName: string;
 };
 
-export type AlgorithmPageOptions = {
-  count: number;
-  page: number;
-  kind: 3 | 4 | 6;
-  keyword?: string;
-};
-
-export type AlgorithmPostData = {
+export type RequestAlgorithm = {
   title: string;
   content: string;
-  boardType: BOARD_TYPE_VALUE;
-  algorithmId: number;
+  boardType: ALGORITHM_BOARD_TYPE;
   tags?: string[];
+  imageIds: number[];
 };

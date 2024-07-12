@@ -12,8 +12,8 @@ import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-import { Algorithm } from "@/types/algorithm";
-import { RequestCode } from "@/types/code";
+import { Algorithm } from "@/types2/algorithm";
+import { RequestCode } from "@/types2/code";
 
 import { sendCode } from "@/app/actions/code";
 

@@ -4,8 +4,8 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { IMAGE_URL } from "@/api";
-import { ResponseAnswerItem } from "@/types/code";
+import { IMAGE_URL } from "@/api/index2";
+import { ResponseAnswerItem } from "@/types2/code";
 
 import styles from "./answer.module.scss";
 import { notosansBold } from "@/styles/_font";
@@ -33,11 +33,7 @@ const Answer = ({ answer }: AnswerProps) => {
             className={styles.flex}
           >
             <Image
-              src={
-                answer.user.profile
-                  ? `${IMAGE_URL}/${answer.user.profile}`
-                  : "/svgs/user_profile_default.svg"
-              }
+              src={`${IMAGE_URL}/${answer.user.profile}`}
               alt="유저 아이콘"
               width={38}
               height={38}

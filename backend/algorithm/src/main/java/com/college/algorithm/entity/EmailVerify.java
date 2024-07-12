@@ -26,6 +26,9 @@ public class EmailVerify {
     @Column(name = "verify_code", nullable = false)
     private String verifyCode;
 
+    @Column(name = "verified")
+    private Boolean verified;
+
     @Column(name = "expiration_time", nullable = false)
     private LocalDateTime expirationTime;
 
@@ -38,5 +41,10 @@ public class EmailVerify {
         this.email = email;
         this.verifyCode = verifyCode;
         this.expirationTime = expirationTime;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.verified = false;
     }
 }

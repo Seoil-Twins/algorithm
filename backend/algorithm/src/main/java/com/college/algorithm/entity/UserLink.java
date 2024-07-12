@@ -1,7 +1,9 @@
 package com.college.algorithm.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "user_link")
+@NoArgsConstructor
 public class UserLink {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,4 +36,11 @@ public class UserLink {
     @CreationTimestamp
     @Column(name = "created_time")
     private LocalDateTime createdTime;
+
+    @Builder
+    public UserLink(AppUser user, String linkKind, String domain) {
+        this.user = user;
+        this.linkKind = linkKind;
+        this.domain = domain;
+    }
 }

@@ -3,20 +3,35 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 
-import { User } from "@/types/user";
-import { UserKeys } from "@/types/constants";
-import { getUser, logout } from "@/app/actions/user";
+import { User } from "@/app/api/model/user";
+import { SWRKeys } from "@/types2/constants";
+import { CustomException } from "@/app/api";
+import { checkAuth } from "@/utils/authorization";
+import { useRouter } from "next/navigation";
+import { UserAPI } from "@/api/user";
 
 export const useUser = () => {
-  const { data, isLoading, isValidating } = useSWR(
-    UserKeys.getUser,
-    async () => {
-      const userResponse = await getUser();
+  const router = useRouter();
 
-      if (userResponse.status !== 200) {
-        return null;
+  const { data, isLoading, isValidating } = useSWR(
+    SWRKeys.getUser,
+    async () => {
+      const response = await UserAPI.getUser();
+
+      if (response.ok) {
+        const user: User = await response.json();
+        return user;
+      } else {
+        const error: CustomException =
+          (await response.json()) as CustomException;
+        const isNotAuth: boolean = checkAuth(error.errorCode);
+
+        if (isNotAuth) {
+          await UserAPI.logout();
+          removeUser();
+          router.refresh();
+        }
       }
-      return userResponse.data as User;
     },
     {
       revalidateOnFocus: false,
@@ -30,9 +45,8 @@ export const useUser = () => {
     setUser(user);
   };
 
-  const removeUser = async () => {
+  const removeUser = () => {
     setUser(null);
-    await logout();
   };
 
   useEffect(() => {

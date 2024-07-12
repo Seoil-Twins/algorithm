@@ -70,9 +70,10 @@ public class AppUser {
     private LocalDateTime deletedTime;
 
     @Builder
-    public AppUser(String userPw, String email, String nickname) {
+    public AppUser(String userPw, String email, String nickname, String defaultProfilePath) {
         this.userPw = userPw;
         this.email = email;
         this.nickname = nickname;
+        this.profilePath = defaultProfilePath;
     }
 }

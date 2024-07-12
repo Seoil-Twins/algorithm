@@ -1,37 +1,86 @@
-import axios from "axios";
-
 const enviroment = process.env.NEXT_PUBLIC_ENVIROMENT;
 const API_URL =
   enviroment === "product"
-    ? process.env.NEXT_PUBLIC_API_URL_PRODUCT
-    : process.env.NEXT_PUBLIC_API_URL_DEVELOPMENT;
-
+    ? process.env.NEXT_PUBLIC_FRONT_API_URL_PRODUCT
+    : process.env.NEXT_PUBLIC_FRONT_API_URL_DEVELOPMENT;
 export const IMAGE_URL = `${API_URL}/display?filename=`;
 
-export const axiosInstance = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true,
-});
+export type Body = Record<string, any>;
 
-/**
- * Next js에서 페이지를 렌더링할 때 쿠키가 제공되지만 그 후에는 제공되지 않음.
- * 그렇기에, 다음 요청부터는 서버에 직접 쿠키를 전달해줘야 함.
- */
-axiosInstance.interceptors.request.use(async (config) => {
-  const isSSR = typeof window === "undefined";
+export const API_INSTANCE = {
+  getHeaders: async (): Promise<Headers> => {
+    const isSSR = typeof window === "undefined";
 
-  if (isSSR) {
-    const { cookies } = await import("next/headers");
-    const key = (process.env.NEXT_PUBLIC_SESSION_KEY as string) || "JSESSIONID";
-    const sessionId = cookies().get(key)?.value;
-
-    if (sessionId) {
-      config.headers.set("cookie", `${key}=${sessionId}`);
+    if (isSSR) {
+      const { headers } = await import("next/headers");
+      const requestHeaders = new Headers(headers());
+      requestHeaders.append("Content-Type", "application/json");
+      return requestHeaders;
     }
-  }
 
-  return config;
-});
+    return new Headers({
+      "Content-Type": "application/json",
+    });
+  },
+
+  GET: async (url: string): Promise<Response> => {
+    const headers = await API_INSTANCE.getHeaders();
+    const response = await fetch(API_URL + url, {
+      method: "GET",
+      headers,
+      credentials: "include",
+    });
+
+    return response;
+  },
+
+  POST: async (url: string, body?: Body): Promise<Response> => {
+    const headers = await API_INSTANCE.getHeaders();
+    const response = await fetch(API_URL + url, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: JSON.stringify(body),
+      cache: "no-cache",
+    });
+
+    return response;
+  },
+
+  PATCH: async (url: string, body?: Body): Promise<Response> => {
+    const headers = await API_INSTANCE.getHeaders();
+    const response = await fetch(API_URL + url, {
+      method: "PATCH",
+      headers,
+      credentials: "include",
+      body: JSON.stringify(body),
+      cache: "no-cache",
+    });
+
+    return response;
+  },
+
+  PUT: async (url: string, body?: Body): Promise<Response> => {
+    const headers = await API_INSTANCE.getHeaders();
+    const response = await fetch(API_URL + url, {
+      method: "PUT",
+      headers,
+      credentials: "include",
+      body: JSON.stringify(body),
+    });
+
+    return response;
+  },
+
+  DELETE: async (url: string, body?: Body): Promise<Response> => {
+    const headers = await API_INSTANCE.getHeaders();
+    const response = await fetch(API_URL + url, {
+      method: "DELETE",
+      headers,
+      credentials: "include",
+      body: JSON.stringify(body),
+    });
+
+    return response;
+  },
+};

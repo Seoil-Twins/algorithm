@@ -1,9 +1,9 @@
 import React from "react";
 import Image from "next/image";
 
-import { User } from "@/types/user";
+import { User } from "@/types2/user";
 
-import { IMAGE_URL } from "@/api";
+import { IMAGE_URL } from "@/api/index2";
 
 import styles from "./user.module.scss";
 import { notosansBold } from "@/styles/_font";
@@ -77,11 +77,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       <Content title="">
         <div className={styles.profile}>
           <Image
-            src={
-              user.profile
-                ? `${IMAGE_URL}/${user.profile}`
-                : "/svgs/user_profile_default.svg"
-            }
+            src={`${IMAGE_URL}/${user.profile}`}
             alt="프로필 사진"
             width={38}
             height={38}

@@ -1,12 +1,10 @@
 package com.college.algorithm.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-@Builder
 public class ResponseOtherUserDto {
     private final Long userId;
     private final String nickname;

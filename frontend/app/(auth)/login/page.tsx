@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
@@ -12,15 +11,16 @@ import Input from "@/components/common/input";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { getUser, login as loginAPI } from "@/app/actions/user";
 import SubmitButton from "@/components/common/submitButton";
+import { CustomException } from "@/app/api";
+import { UserAPI } from "@/api/user";
 
 const Login = () => {
-  const [state, formAction] = useFormState(loginAPI, null);
   const router = useRouter();
   const searchParam = useSearchParams();
   const { login, logout } = useAuth();
 
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,29 +37,32 @@ const Login = () => {
     setPassword(value);
   }, []);
 
-  const success = useCallback(async () => {
-    try {
-      const user = (await getUser()).data;
-      login(user);
-      router.replace(redirectUrl.current || "/");
-    } catch (error) {
-      toast.error("로그인에 실패하였습니다.\n나중에 다시 시도 해주세요.");
-    }
-  }, [router, login]);
+  const handleLogin = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setIsPending(true);
 
-  useEffect(() => {
-    if (!state) return;
+      try {
+        const response = await UserAPI.login({
+          email,
+          password,
+        });
 
-    if (state.status === 200) {
-      success();
-    } else if (state?.status === 400) {
-      toast.error(state.data || "서버 에러가 발생하였습니다.");
-    } else if (state?.status === 406) {
-      toast.error(state.data || "서버 에러가 발생하였습니다.");
-    } else if (state?.status === 500) {
-      toast.error("서버 에러가 발생하였습니다.");
-    }
-  }, [state, success]);
+        if (response.ok) {
+          login();
+          router.replace(redirectUrl.current ? redirectUrl.current : "/");
+        } else if (!response.ok) {
+          const body = (await response.json()) as CustomException;
+          toast.error(body.message);
+        }
+      } catch (error: any) {
+        toast.error(error.message);
+      } finally {
+        setIsPending(false);
+      }
+    },
+    [router, email, password, login],
+  );
 
   useEffect(() => {
     if (error.current === "unauthorized") {
@@ -70,7 +73,7 @@ const Login = () => {
 
   return (
     <>
-      <form className={styles.formBox} action={formAction}>
+      <form className={styles.formBox} method="POST" onSubmit={handleLogin}>
         <div className={`${styles.title} ${notosansMedium.className}`}>
           로그인
         </div>
@@ -102,6 +105,7 @@ const Login = () => {
           />
         </div>
         <SubmitButton
+          isPending={isPending}
           btnTitle="로그인"
           pendingTitle="로그인 중"
           className={`${styles.button} ${notosansBold.className}`}

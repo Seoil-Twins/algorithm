@@ -8,15 +8,19 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
+    NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀립니다.", 40010),
+    EXPIRED_TIME_EMAIL(HttpStatus.BAD_REQUEST, "인증 시간이 만료된 이메일입니다.", 40030),
+    NOT_MATCH_VERIFY_CODE(HttpStatus.BAD_REQUEST, "인증 번호가 일치하지 않습니다.", 40040),
+    BROKEN_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 깨져있거나 존재하지 않습니다.", 40050),
+    BAD_REQUEST_BOARD_TYPE(HttpStatus.BAD_REQUEST,"같은 카테고리에서만 변경이 가능합니다.",40060),
     BAD_REQUEST_SEARCH(HttpStatus.BAD_REQUEST,"검색 인자 값이 잘못 되었습니다.",40010),
     EXPIRED_TIME_EMAIL(HttpStatus.BAD_REQUEST,"인증이 만료된 이메일입니다..",40030),
     NOT_MATCH_VERIFY_CODE(HttpStatus.BAD_REQUEST,"인증 번호가 일치하지 않습니다.",40040),
     BROKEN_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 깨져있거나 존재하지 않습니다.", 40050),
-    BAD_REQUEST_BOARD_TYPE(HttpStatus.BAD_REQUEST,"같은 카테고리에서만 변경이 가능합니다.",40060),
 
     /* 401 UNAUTHORIZED : 잘못된 권한 */
     INVALID_COOKIE(HttpStatus.UNAUTHORIZED, "유효하지 않은 쿠키입니다.", 40110),
-    EXPIRED_COOKIE(HttpStatus.UNAUTHORIZED, "만료된 쿠키입니다.", 40120),
+    BLANK_COOKIE(HttpStatus.UNAUTHORIZED, "쿠키가 존재하지 않습니다.", 40120),
 
     /* 403 FORBIDDEN : 잘못된 접근 */
     NOT_VERIFIED_EMAIL(HttpStatus.FORBIDDEN, "인증이 되어 있지 않은 이메일입니다.", 40310),
@@ -24,6 +28,11 @@ public enum ErrorCode {
     DELETED_USER(HttpStatus.FORBIDDEN, "이미 삭제된 사용자입니다.", 40330),
     DELETED_BOARD(HttpStatus.FORBIDDEN, "이미 삭제된 게시글입니다.", 40340),
     NOT_MATCHED_BOARD(HttpStatus.FORBIDDEN, "해당 게시글의 댓글이 아닙니다", 40350),
+
+    /* 404 NOT FOUND : 리소스 없음 */
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다.", 40410),
+    NOT_FOUND_BOARD_TYPE(HttpStatus.NOT_FOUND, "게시판 유형이 존재하지 않습니다.", 40470),
+    NOT_FOUND_EMAIL_VERIFIED(HttpStatus.NOT_FOUND, "인증을 요청한 이메일이 존재하지 않습니다.", 40480),
 
     /* 404 NOT FOUND : 리소스 없음 */
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다.", 40410),
@@ -38,7 +47,6 @@ public enum ErrorCode {
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다.", 40491),
     NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "더미 이미지가 존재하지 않습니다.", 40492),
 
-
     /* 409 CONFLICT : 리소스 충돌 */
     DUPLICATE_PARAMETER_NICKNAME(HttpStatus.CONFLICT, "닉네임이 이미 존재합니다", 40910),
     DUPLICATE_PARAMETER_EMAIL(HttpStatus.CONFLICT, "이메일이 이미 존재합니다", 40920),
@@ -46,10 +54,11 @@ public enum ErrorCode {
     DUPLICATE_ADOPT(HttpStatus.CONFLICT, "채택된 댓글이 이미 존재합니다", 40940),
 
 
-    /* 500 SERVER : 서버측 에러 */
+    /* 500 Internal Server Error : 예기치 못한 서버 에러 */
     SQL_EXCEPTION(HttpStatus.CONFLICT, "SQL 실행 중 오류가 발생했습니다.", 50010),
-    ERROR_IMAGE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장에 실패하였습니다.", 50020),
-    ERROR_CODE_RUNNER(HttpStatus.INTERNAL_SERVER_ERROR, "코드 외부 실행 중 오류가 발생했습니다.", 50030),
+    ERROR_EMAIL_SENDER(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패하였습니다.", 50020),
+    ERROR_IMAGE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장에 실패하였습니다.", 50030),
+    ERROR_CODE_RUNNER(HttpStatus.INTERNAL_SERVER_ERROR, "코드 외부 실행 중 오류가 발생했습니다.", 50040),
     ;
 
     private final HttpStatus httpStatus;
