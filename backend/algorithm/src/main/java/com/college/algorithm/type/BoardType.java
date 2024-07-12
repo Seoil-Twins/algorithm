@@ -16,4 +16,3 @@ public enum BoardType {
         this.typeName = typeName;
     }
 }
-

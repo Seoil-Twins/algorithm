@@ -42,4 +42,19 @@ public interface UserMapper {
     @Mapping(source = "user.answerNofi", target = "answerNofi")
     @Mapping(source = "user.eventNofi", target = "eventNofi")
     ResponseNotificationSettingsDto toResponseNotificationSettingsDto(AppUser user);
+
+    @Mapping(source = "user.userId", target = "userId")
+    @Mapping(source = "user.profilePath", target = "profile")
+    @Mapping(source = "user.nickname", target = "nickname")
+    ResponseAlgorithmUserDto toResponseAlgorithmUserDto(AppUser user);
+
+    @Mapping(source = "user.userId", target = "userId")
+    @Mapping(source = "user.profilePath", target = "profile")
+    @Mapping(source = "user.nickname", target = "nickname")
+    ResponseBoardUserDto toResponseBoardUserDto(AppUser user);
+
+    @Mapping(source = "user.userId", target = "userId")
+    @Mapping(source = "user.profilePath", target = "profile")
+    @Mapping(source = "user.nickname", target = "nickname")
+    ResponseRankingUserDto toResponseRankingUserDto(AppUser user);
 }
