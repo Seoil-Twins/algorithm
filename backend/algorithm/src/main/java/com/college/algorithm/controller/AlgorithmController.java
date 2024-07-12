@@ -5,6 +5,7 @@ import com.college.algorithm.exception.BadRequestException;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.AlgorithmService;
+import com.college.algorithm.type.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -37,31 +37,34 @@ public class AlgorithmController {
                                              @RequestParam(required = false, value = "tag") String tag, // 1~14
                                              @RequestParam(required = false, value = "keyword") String keyword,
                                              HttpServletRequest request) {
-        Set<String> validLevel = new HashSet<>(Arrays.asList("-1","0","1","2","3","4","5"));
-        if (!validLevel.contains(level)) {
-            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
-        }
-        Set<String> validSort = new HashSet<>(Arrays.asList("r","or","t","R","OR","T"));
-        if (!validSort.contains(sort)) {
-            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
+        boolean paramChecker = Arrays.stream(LevelRange.values())
+                .anyMatch(type -> level.equals(type.getLevel()));
+        if(!paramChecker)
+            throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
+
+        paramChecker = Arrays.stream(SortType.values())
+                .anyMatch(type -> sort.equalsIgnoreCase(type.getSort()));
+        if(!paramChecker)
+            throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
+
+        paramChecker = Arrays.stream(SolvedCheck.values())
+                .anyMatch(type -> solved.equalsIgnoreCase(type.getSolved()));
+        if(!paramChecker)
+            throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
+
+
+        if(rate != null) {
+            paramChecker = Arrays.stream(RateOrder.values())
+                    .anyMatch(type -> rate.equalsIgnoreCase(type.getRate()));
+            if (!paramChecker)
+                throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
-        Set<String> validSolved = new HashSet<>(Arrays.asList("a","s","ns","A","S","NS"));
-        if (!validSolved.contains(solved)) {
-            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
-        }
-
-        Set<String> validRate = new HashSet<>(Arrays.asList("h","l","H","L"));
-        if (!validRate.contains(rate) && rate != null) {
-            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
-        } else if (rate != null){
-            rate = rate.toLowerCase();
-        }
-
-        Set<String> validTag = new HashSet<>(Arrays.asList("1001","1002","1003","1004","1005","1006","1007","1008","1009","1010","1011","1012","1013","1014"));
-        if (!validTag.contains(tag) && tag != null) {
-
-            throw new BadRequestException(ErrorCode.BAD_REQUEST_SEARCH);
+        if (tag != null) {
+            paramChecker = Arrays.stream(AlgorithmTag.values())
+                    .anyMatch(type -> tag.equalsIgnoreCase(type.getTag()));
+            if (!paramChecker)
+                throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
         }
 
 
@@ -84,7 +87,7 @@ public class AlgorithmController {
 
     @GetMapping("/algorithm/recommend")
     public ResponseEntity<?> getSuggestAlgorithm() {
-        AlgorithmSuggestResponseDto response = algorithmService.getSuggestAlgorithms();
+        ResponseAlgorithmSuggestDto response = algorithmService.getSuggestAlgorithms();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -106,7 +109,7 @@ public class AlgorithmController {
 
     @GetMapping("/algorithm/kind")
     public ResponseEntity<?> getKinds() {
-        AlgorithmKindResponseDto response = algorithmService.getKinds();
+        ResponseAlgorithmKindDto response = algorithmService.getKinds();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -128,7 +131,7 @@ public class AlgorithmController {
     }
 
     @PostMapping("/algorithm/{algorithm_id}")
-    public ResponseEntity<?> postCode(@RequestBody RequestCodeDto dto,
+    public ResponseEntity<?> postCode(@Valid @RequestBody RequestCodeDto dto,
                                       @PathVariable(value = "algorithm_id") Long algorithm_id,
                                       HttpServletRequest request) {
 //        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
@@ -140,7 +143,7 @@ public class AlgorithmController {
     }
 
     @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/comment")
-    public ResponseEntity<?> postAlgorithmCorrectComment(@RequestBody(required = false) RequestCorrectComment requestCorrectComment,
+    public ResponseEntity<?> postAlgorithmCorrectComment(@Valid @RequestBody(required = false) RequestCorrectComment requestCorrectComment,
                                                         @PathVariable(value = "algorithm_id") Long algorithm_id,
                                                         @PathVariable(value = "correct_id") Long correct_id,
                                                         HttpServletRequest request) {

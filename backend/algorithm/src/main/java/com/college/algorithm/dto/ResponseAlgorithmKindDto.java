@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class AlgorithmKindResponseDto {
+public class ResponseAlgorithmKindDto {
     private List<AlgorithmKindDto> kinds;
 }

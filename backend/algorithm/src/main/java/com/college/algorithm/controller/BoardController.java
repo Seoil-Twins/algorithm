@@ -113,7 +113,7 @@ public class BoardController {
     }
 
     @PostMapping("/{board_id}/comment")
-    public ResponseEntity<?> postBoardComment(@RequestBody(required = false) RequestBoardComment requestBoardComment,
+    public ResponseEntity<?> postBoardComment(@Valid @RequestBody(required = false) RequestBoardComment requestBoardComment,
                                                          @PathVariable(value = "board_id") Long board_id,
                                                          HttpServletRequest request) {
 //        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
@@ -148,7 +148,7 @@ public class BoardController {
     }
 
     @PatchMapping("/{board_id}")
-    public ResponseEntity<?> patchBoard(@RequestBody(required = false) RequestBoardUpdateDto boardUpdateDto,
+    public ResponseEntity<?> patchBoard(@Valid @RequestBody(required = false) RequestBoardUpdateDto boardUpdateDto,
                                         @PathVariable(value = "board_id") Long boardId,
                                             HttpServletRequest request){
 

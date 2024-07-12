@@ -6,6 +6,7 @@ import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class CommentController {
         return ResponseEntity.status(commentService.postCommentRecommend(commentId,loginUserId)).build();
     }
     @PatchMapping("/{comment_id}")
-    public ResponseEntity<?> patchBoard(@RequestBody(required = false) RequestCommentUpdateDto commentUpdateDto,
+    public ResponseEntity<?> patchBoard(@Valid @RequestBody(required = false) RequestCommentUpdateDto commentUpdateDto,
                                         @PathVariable(value = "comment_id") Long commentId,
                                         HttpServletRequest request){
 

@@ -2,7 +2,6 @@ package com.college.algorithm.service;
 
 import com.college.algorithm.dto.*;
 import com.college.algorithm.entity.*;
-import com.college.algorithm.exception.BadRequestException;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.mapper.AlgorithmMapper;
@@ -10,11 +9,9 @@ import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
 import com.college.algorithm.util.AlgorithmSpecification;
 import com.college.algorithm.util.CodeRunner;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -149,14 +144,14 @@ public class AlgorithmService {
         }
     }
 
-    public AlgorithmSuggestResponseDto getSuggestAlgorithms(){
+    public ResponseAlgorithmSuggestDto getSuggestAlgorithms(){
 
         List<AlgorithmSuggest> algorithms = suggestRepository.findAll();
 
         if(algorithms.isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_SUGGEST);
 
-        AlgorithmSuggestResponseDto response = new AlgorithmSuggestResponseDto();
+        ResponseAlgorithmSuggestDto response = new ResponseAlgorithmSuggestDto();
         List<AlgorithmSuggestDto> dtos = new ArrayList<>();
 
         for(AlgorithmSuggest algorithmSuggest : algorithms)
@@ -209,10 +204,10 @@ public class AlgorithmService {
 
         return response;
     }
-    public AlgorithmKindResponseDto getKinds(){
+    public ResponseAlgorithmKindDto getKinds(){
 
         List<AlgorithmKind> kinds = kindRepository.findAll();
-        AlgorithmKindResponseDto response = new AlgorithmKindResponseDto();
+        ResponseAlgorithmKindDto response = new ResponseAlgorithmKindDto();
         List<AlgorithmKindDto> kindDtos = new ArrayList<>();
 
         for(AlgorithmKind kind : kinds){
@@ -297,8 +292,11 @@ public class AlgorithmService {
         postCode.setCode(codeDto.getCode());
 
         if(solved){
-            AlgorithmCorrect savedEntity = algorithmCorrectRepository.save(postCode);
-            Try codeTry = new Try(user,algorithmEntity,savedEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
+            algorithmCorrectRepository.save(postCode);
+            Try codeTry = new Try(user,algorithmEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
+            tryRepository.save(codeTry);
+        } else{
+            Try codeTry = new Try(user,algorithmEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
             tryRepository.save(codeTry);
         }
 

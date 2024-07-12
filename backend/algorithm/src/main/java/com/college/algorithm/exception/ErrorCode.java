@@ -9,8 +9,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     BAD_REQUEST_SEARCH(HttpStatus.BAD_REQUEST,"검색 인자 값이 잘못 되었습니다.",40010),
-    BAD_REQUEST_BOARD_TYPE(HttpStatus.BAD_REQUEST,"같은 카테고리에서만 변경이 가능합니다.",40060),
+    EXPIRED_TIME_EMAIL(HttpStatus.BAD_REQUEST,"인증이 만료된 이메일입니다..",40030),
+    NOT_MATCH_VERIFY_CODE(HttpStatus.BAD_REQUEST,"인증 번호가 일치하지 않습니다.",40040),
     BROKEN_IMAGE(HttpStatus.BAD_REQUEST, "이미지 파일이 깨져있거나 존재하지 않습니다.", 40050),
+    BAD_REQUEST_BOARD_TYPE(HttpStatus.BAD_REQUEST,"같은 카테고리에서만 변경이 가능합니다.",40060),
 
     /* 401 UNAUTHORIZED : 잘못된 권한 */
     INVALID_COOKIE(HttpStatus.UNAUTHORIZED, "유효하지 않은 쿠키입니다.", 40110),
@@ -19,6 +21,7 @@ public enum ErrorCode {
     /* 403 FORBIDDEN : 잘못된 접근 */
     NOT_VERIFIED_EMAIL(HttpStatus.FORBIDDEN, "인증이 되어 있지 않은 이메일입니다.", 40310),
     NOT_MATCHED_USER(HttpStatus.FORBIDDEN, "본인이 아닌 사용자의 접근입니다.", 40320),
+    DELETED_USER(HttpStatus.FORBIDDEN, "이미 삭제된 사용자입니다.", 40330),
     DELETED_BOARD(HttpStatus.FORBIDDEN, "이미 삭제된 게시글입니다.", 40340),
     NOT_MATCHED_BOARD(HttpStatus.FORBIDDEN, "해당 게시글의 댓글이 아닙니다", 40350),
 
@@ -29,6 +32,8 @@ public enum ErrorCode {
     NOT_FOUND_SUGGEST(HttpStatus.NOT_FOUND, "추천 아이템이 존재하지 않습니다.", 40440),
     NOT_FOUND_CORRECT(HttpStatus.NOT_FOUND, "해당 정답 코드는 존재하지 않습니다.", 40450),
     NOT_FOUND_RECOMMEND(HttpStatus.NOT_FOUND, "해당 추천이 존재하지 않습니다.", 40460),
+    NOT_FOUND_BOARD_TYPE(HttpStatus.NOT_FOUND, "게시판 유형이 존재하지 않습니다.", 40470),
+    NOT_FOUND_EMAIL_VERIFIED(HttpStatus.NOT_FOUND, "인증을 요청한 이메일이 존재하지 않습니다.", 40480),
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "게시글이 존재하지 않습니다.", 40490),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "댓글이 존재하지 않습니다.", 40491),
     NOT_FOUND_IMAGE(HttpStatus.NOT_FOUND, "더미 이미지가 존재하지 않습니다.", 40492),
@@ -38,7 +43,7 @@ public enum ErrorCode {
     DUPLICATE_PARAMETER_NICKNAME(HttpStatus.CONFLICT, "닉네임이 이미 존재합니다", 40910),
     DUPLICATE_PARAMETER_EMAIL(HttpStatus.CONFLICT, "이메일이 이미 존재합니다", 40920),
     DUPLICATE_RECOMMEND(HttpStatus.CONFLICT, "추천이 이미 존재합니다", 40930),
-    DUPLICATE_ADOPT(HttpStatus.CONFLICT, "추천이 이미 존재합니다", 40940),
+    DUPLICATE_ADOPT(HttpStatus.CONFLICT, "채택된 댓글이 이미 존재합니다", 40940),
 
 
     /* 500 SERVER : 서버측 에러 */
