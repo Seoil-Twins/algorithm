@@ -12,6 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        System.out.println("hin?");
         HttpSession session = request.getSession(false);
         Cookie[] cookies = request.getCookies();
 
