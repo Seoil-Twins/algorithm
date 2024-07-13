@@ -162,38 +162,39 @@ const Signup = () => {
   const handleSignup = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setIsFinish(true);
+
+      if (!isCheck) {
+        toast.error("약관에 등의해주세요.");
+        return;
+      }
+      if (!isVerified) {
+        toast.error("이메일 인증을 진행해주세요.");
+        return;
+      }
+      if (signupInfo.password.value !== signupInfo.confirmPassword.value) {
+        toast.error("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      const validatedNickname = validationNickname(signupInfo.nickname.value);
+      const validatedEmail = validationEmail(signupInfo.email.value);
+      const validatedPassword = validationPassword(signupInfo.password.value);
+
+      if (validatedNickname.isError) {
+        toast.error(validatedNickname.errMsg);
+        return;
+      }
+      if (validatedEmail.isError) {
+        toast.error(validatedEmail.errMsg);
+        return;
+      }
+      if (validatedPassword.isError) {
+        toast.error(validatedPassword.errMsg);
+        return;
+      }
 
       try {
-        if (!isCheck) {
-          toast.error("약관에 등의해주세요.");
-          return;
-        }
-        if (!isVerified) {
-          toast.error("이메일 인증을 진행해주세요.");
-          return;
-        }
-        if (signupInfo.password.value !== signupInfo.confirmPassword.value) {
-          toast.error("비밀번호가 일치하지 않습니다.");
-          return;
-        }
-
-        const validatedNickname = validationNickname(signupInfo.nickname.value);
-        const validatedEmail = validationEmail(signupInfo.email.value);
-        const validatedPassword = validationPassword(signupInfo.password.value);
-
-        if (validatedNickname.isError) {
-          toast.error(validatedNickname.errMsg);
-          return;
-        }
-        if (validatedEmail.isError) {
-          toast.error(validatedEmail.errMsg);
-          return;
-        }
-        if (validatedPassword.isError) {
-          toast.error(validatedPassword.errMsg);
-          return;
-        }
+        setIsFinish(true);
 
         const response = await UserAPI.signup({
           email: signupInfo.email.value,
@@ -251,7 +252,7 @@ const Signup = () => {
               handleSignupInfo(changedValue, "nickname")
             }
             minLength={2}
-            maxLength={16}
+            maxLength={10}
             required
           />
         </div>

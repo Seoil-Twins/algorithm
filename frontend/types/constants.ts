@@ -1,4 +1,4 @@
-import { RateOptions, SolvedOptions, SortOptions } from "./algorithm";
+import { RateOptions, SolvedOptions, SortOptions } from "../types2/algorithm";
 
 export const BOARD_TYPE = {
   PUBLIC_QUESTION: 1,
@@ -45,3 +45,10 @@ export const getTitleByCode = (code: number) => {
       return "python";
   }
 };
+
+export const SnsKind = {
+  GITHUB: "1001",
+  GOOGLE: "1002",
+  NAVER: "1003",
+  KAKAO: "1004",
+} as const;

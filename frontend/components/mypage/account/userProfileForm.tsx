@@ -1,21 +1,23 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  startTransition,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import Image from "next/image";
 import { useSWRConfig } from "swr";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
+import { useDebouncedCallback } from "use-debounce";
 
-import { User } from "@/types2/user";
-import { SWRKeys } from "@/types2/constants";
+import { SWRKeys } from "@/types/constants";
 
-import { IMAGE_URL } from "@/app/actions";
-import {
-  compareVerifyCode,
-  sendVerifyCode as sendVerifyCodeAPI,
-  updateProfileImg,
-  updateProfileUser,
-} from "@/app/actions/user";
+import { User } from "@/app/api/model/user";
+
+import { IMAGE_URL } from "@/api";
+import { UserAPI } from "@/api/user";
+import { CustomException } from "@/app/api";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./userProfileForm.module.scss";
@@ -24,6 +26,9 @@ import Input from "@/components/common/input";
 import EmailVerify, { EmailInfo } from "@/components/common/emailVerify";
 import Spinner from "@/components/common/spinner";
 import SubmitButton from "@/components/common/submitButton";
+
+import { validationEmail, validationNickname } from "@/utils/validation";
+import { useRouter } from "next/navigation";
 
 interface UserProfileProperty {
   nickname: string;
@@ -45,40 +50,126 @@ type UserProfileProps = {
 };
 
 const UserProfileForm = ({ user }: UserProfileProps) => {
+  const router = useRouter();
   const { mutate } = useSWRConfig();
 
   const [isProfileDisabled, setIsProfileDisabled] = useState<boolean>(true);
   const [profileInfo, setProfileInfo] = useState<UserProfile>({
     email: {
-      value: user?.email,
+      value: user.email,
       disabled: true,
     },
     nickname: {
-      value: user?.nickname,
+      value: user.nickname,
+      disabled: true,
     },
     verifyCode: {
       value: "",
       disabled: true,
     },
   });
-  const [profileImg, setProfileImg] = useState<string | undefined>(
-    user.profile,
-  );
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [isVerified, setIsVerified] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [isChangeNickname, setIsChangeNickname] = useState<boolean>(false);
   const [isChangeEmail, setIsChangeEmail] = useState<boolean>(false);
-  const [state, formAction] = useFormState(
-    async (_: any, formData: FormData) => {
-      return await updateProfileUser(
-        isVerified,
-        isChangeEmail,
-        isChangeNickname,
-        profileInfo.email.value,
-        formData,
-      );
+
+  const handleUpdateProfileInfo = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (isChangeEmail && !isVerified) {
+        toast.error("이메일 인증을 진행해주세요.");
+        return;
+      }
+
+      const validatedNickname = validationNickname(profileInfo.nickname.value);
+      const validatedEmail = validationEmail(profileInfo.email.value);
+
+      if (!isChangeNickname && !isChangeEmail) {
+        return;
+      }
+      if (isChangeNickname && validatedNickname.isError) {
+        toast.error(validatedNickname.errMsg);
+        return;
+      }
+      if (isChangeEmail && validatedEmail.isError) {
+        toast.error(validatedEmail.errMsg);
+        return;
+      }
+
+      try {
+        setIsPending(true);
+
+        const response = await UserAPI.updateProfile({
+          email: isChangeEmail ? profileInfo.email.value : null,
+          nickname: isChangeNickname ? profileInfo.nickname.value : null,
+        });
+
+        if (response.ok) {
+          toast.success("정보를 성공적으로 변경하였습니다.");
+          setIsVerified(false);
+          setIsProfileDisabled(true);
+          setIsChangeEmail(false);
+          setIsChangeNickname(false);
+          mutate(SWRKeys.getUser);
+
+          const {
+            ["nickname"]: nicknameField,
+            ["email"]: emailField,
+            ...prev
+          } = profileInfo;
+
+          setProfileInfo({
+            ...prev,
+            nickname: {
+              ...nicknameField,
+              disabled: true,
+            },
+            email: {
+              ...emailField,
+              disabled: true,
+            },
+            verifyCode: {
+              value: "",
+              disabled: true,
+            },
+          });
+        } else {
+          const error: CustomException =
+            (await response.json()) as CustomException;
+          toast.error(error.message);
+        }
+      } catch (error) {
+        toast.error("서버에 오류가 발생하였습니다.");
+      } finally {
+        setIsPending(false);
+      }
     },
-    null,
+    [isChangeEmail, isVerified, profileInfo, isChangeNickname, mutate],
+  );
+
+  const handleProfileImg = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files;
+      if (!files || !user) return;
+
+      const profile = files[0];
+      const formData = new FormData();
+      formData.append("profile", profile);
+
+      const response = await UserAPI.updateProfileImage(formData);
+
+      if (response.ok) {
+        toast.success("정상적으로 변경하였습니다.");
+        router.refresh();
+        mutate(SWRKeys.getUser);
+      } else {
+        const error = await response.json();
+        toast.error(error.message);
+      }
+    },
+    [user, router, mutate],
   );
 
   const handleProfileInfo = useCallback(
@@ -98,92 +189,75 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
     [],
   );
 
-  const handleProfileImg = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files;
-      if (!files || !user) return;
-
-      const profile = files[0];
-      const response = await updateProfileImg(user.userId, {
-        image: profile,
-      });
-
-      if (response.status === 200) {
-        mutate(SWRKeys.getUser);
-        setProfileImg(response.data.profile);
-      } else {
-        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
+  const sendVerifyCode = useDebouncedCallback(
+    useCallback(async () => {
+      if (!profileInfo.verifyCode.disabled || isVerified) return;
+      else if (user?.email === profileInfo.email.value) {
+        toast.error("이메일을 변경하고 시도해주세요.");
+        return;
       }
-    },
-    [user, mutate],
+
+      try {
+        setIsSending(true);
+        const response = await UserAPI.sendVerfiyCode({
+          email: profileInfo.email.value,
+        });
+
+        if (response.ok) {
+          const {
+            ["email"]: emailField,
+            ["verifyCode"]: verifyCodeField,
+            ...prev
+          } = profileInfo;
+
+          setProfileInfo({
+            ...prev,
+            email: {
+              ...emailField,
+              disabled: true,
+            },
+            verifyCode: {
+              ...verifyCodeField,
+              disabled: false,
+            },
+          });
+        } else {
+          const error: CustomException =
+            (await response.json()) as CustomException;
+          toast.error(error.message);
+        }
+      } catch (error) {
+        toast.error("나중에 다시 시도해주세요.");
+      } finally {
+        setIsSending(false);
+      }
+    }, [isVerified, profileInfo, user?.email]),
+    500,
   );
 
-  const sendVerifyCode = useCallback(async () => {
-    if (!profileInfo.verifyCode.disabled || isVerified) return;
-    else if (user?.email === profileInfo.email.value) {
-      toast.error("이메일을 변경하고 시도해주세요.");
-      return;
-    }
+  const checkVerifyCode = useDebouncedCallback(
+    useCallback(async () => {
+      if (profileInfo.verifyCode.disabled || isVerified) return;
 
-    // 이메일 전송 API 구현
-    try {
-      setIsSending(true);
-      const response = await sendVerifyCodeAPI({
-        email: profileInfo.email.value,
-      });
-
-      if (response.status === 200) {
-        const {
-          ["email"]: emailField,
-          ["verifyCode"]: verifyCodeField,
-          ...prev
-        } = profileInfo;
-
-        setProfileInfo({
-          ...prev,
-          email: {
-            ...emailField,
-            disabled: true,
-          },
-          verifyCode: {
-            ...verifyCodeField,
-            disabled: false,
-          },
+      try {
+        const response = await UserAPI.compareVerifyCode({
+          email: profileInfo.email.value,
+          verifyCode: profileInfo.verifyCode.value,
         });
-      } else if (response.status === 40920) {
-        toast.error("이미 가입된 이메일입니다.");
-      } else if (response.status === 400) {
-        toast.error(response.data);
-      } else {
+
+        if (response.ok) {
+          setIsVerified(true);
+        } else {
+          const error: CustomException =
+            (await response.json()) as CustomException;
+          toast.error(error.message);
+        }
+      } catch (error) {
         toast.error("서버와의 통신 중 오류가 발생하였습니다.");
       }
-    } catch (error) {
-      toast.error("나중에 다시 시도해주세요.");
-    } finally {
-      setIsSending(false);
-    }
-  }, [isVerified, profileInfo, user?.email]);
-
-  const checkVerifyCode = useCallback(async () => {
-    if (profileInfo.verifyCode.disabled || isVerified) return;
-
-    try {
-      const response = await compareVerifyCode({
-        email: profileInfo.email.value,
-        verifyCode: profileInfo.verifyCode.value,
-      });
-
-      if (response.status === 200) {
-        setIsVerified(true);
-      } else if (response.status === 406) {
-        toast.error("인증 번호가 맞지 않습니다.");
-      } else {
-        toast.error("나중에 다시 시도해주세요.");
-      }
-    } catch (error) {
-      toast.error("서버와의 통신 중 오류가 발생하였습니다.");
-    }
-  }, [isVerified, profileInfo]);
+    }, [isVerified, profileInfo]),
+    500,
+  );
 
   const handleCancel = useCallback(() => {
     setIsProfileDisabled(true);
@@ -234,46 +308,6 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
   }, []);
 
   useEffect(() => {
-    if (!state) return;
-
-    if (state.status === 200) {
-      toast.success("정보를 성공적으로 변경하였습니다.");
-      setIsVerified(false);
-      setIsProfileDisabled(true);
-      setProfileInfo((prev: UserProfile) => {
-        const user = state.data as User;
-        const {
-          ["nickname"]: nicknameField,
-          ["email"]: emailField,
-          ["verifyCode"]: verifyCodeField,
-          ...rest
-        } = prev;
-
-        return {
-          ...rest,
-          nickname: {
-            ...nicknameField,
-            value: user.nickname,
-          },
-          email: {
-            ...emailField,
-            value: user.email,
-            disabled: true,
-          },
-          verifyCode: {
-            ...verifyCodeField,
-            value: "",
-            disabled: true,
-          },
-        } as UserProfile;
-      });
-      mutate(SWRKeys.getUser);
-    } else {
-      toast.error((state.data as string) || "서버 에러가 발생하였습니다.");
-    }
-  }, [state, mutate]);
-
-  useEffect(() => {
     if (!user) return;
 
     setProfileInfo((prev) => {
@@ -316,12 +350,12 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
   return (
     <>
       <Spinner isVisible={isSending} isPage />
-      <form className={styles.form} action={formAction}>
+      <form className={styles.form} onSubmit={handleUpdateProfileInfo}>
         <input type="hidden" name="userId" value={user.userId} />
         <div className={styles.profile}>
           <label htmlFor="profile">
             <Image
-              src={`${IMAGE_URL}/${profileImg}`}
+              src={`${IMAGE_URL}/${user.profile}`}
               alt="프로필 사진"
               width={96}
               height={96}
@@ -353,7 +387,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
             handleProfileInfo(changedValue, "nickname")
           }
           minLength={2}
-          maxLength={8}
+          maxLength={10}
           required
         />
         {isProfileDisabled && !isVerified ? (
@@ -395,6 +429,7 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
                 onClick={handleCancel}
               />
               <SubmitButton
+                isPending={isPending}
                 btnTitle="수정"
                 pendingTitle="수정 중"
                 className={`${styles.update} ${notosansBold.className}`}

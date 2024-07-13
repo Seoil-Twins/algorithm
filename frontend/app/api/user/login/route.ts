@@ -49,12 +49,12 @@ export const POST = async (req: Request) => {
   }
 
   try {
-    const response = await API_INSTANCE.POST(API_URL, req.headers, {
+    const { headers } = await API_INSTANCE.POST(API_URL, req.headers, {
       email: body["email"],
       userPw: body["password"],
     });
 
-    const cookie = response.headers.get("set-cookie");
+    const cookie = headers.get("set-cookie");
     if (!cookie) {
       const response: CustomException = createNextApiError(null);
       return NextResponse.json(response, { status: response.status });
@@ -63,9 +63,7 @@ export const POST = async (req: Request) => {
     revalidatePath("/", "layout");
     return new Response(null, {
       status: 204,
-      headers: {
-        "Set-Cookie": cookie,
-      },
+      headers,
     });
   } catch (error: any) {
     const headers: Headers = handleUnAuthorization(error, req.headers);

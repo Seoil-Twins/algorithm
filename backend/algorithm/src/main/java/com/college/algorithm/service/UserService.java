@@ -350,7 +350,8 @@ public class UserService {
         userLinkRepository.save(link);
     }
 
-    public void updateNickname(long userId, RequestNicknameDto dto) {
+    @Transactional
+    public void updateProfile(long userId, RequestUpdateProfileDto dto) {
         AppUser user = userRepository.findByUserId(userId)
                 .map(item -> {
                     if (item.getDeleted()) { throw new CustomException(ErrorCode.DELETED_USER); }
@@ -358,10 +359,24 @@ public class UserService {
                 })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        boolean hasNicknameUser = userRepository.existsByNickname(dto.getNickname());
-        if (hasNicknameUser) { throw new CustomException(ErrorCode.DUPLICATE_PARAMETER_NICKNAME); }
+        if (dto.getNickname() != null && !dto.getNickname().isBlank()) {
+            if (!user.getNickname().equals(dto.getNickname())) {
+                boolean hasNicknameUser = userRepository.existsByNickname(dto.getNickname());
+                if (hasNicknameUser) { throw new CustomException(ErrorCode.DUPLICATE_PARAMETER_NICKNAME); }
+            }
 
-        user.setNickname(dto.getNickname());
+            user.setNickname(dto.getNickname());
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            boolean hasEmailUser = userRepository.existsByEmail(dto.getEmail());
+            if (hasEmailUser) { throw new CustomException(ErrorCode.DUPLICATE_PARAMETER_EMAIL); }
+
+            EmailVerify emailVerify = emailVerifyRepository.findByEmail(dto.getEmail())
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_VERIFIED_EMAIL));
+            if (!emailVerify.getVerified()) { throw new CustomException(ErrorCode.NOT_VERIFIED_EMAIL); }
+
+            user.setEmail(dto.getEmail());
+        }
 
         userRepository.save(user);
     }

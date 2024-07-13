@@ -1,6 +1,6 @@
 package com.college.algorithm.dto;
 
-import com.college.algorithm.util.ValidFile;
+import com.college.algorithm.validation.ValidFile;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;

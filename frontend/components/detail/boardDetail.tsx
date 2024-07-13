@@ -19,7 +19,7 @@ import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
-import { BOARD_TYPE } from "@/types2/constants";
+import { BOARD_TYPE } from "@/types/constants";
 import FeedbackSolve from "./feedbackSolve";
 
 type BoardDetailProps = {

@@ -13,7 +13,7 @@ import styles from "./notification.module.scss";
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
-import { SWRKeys } from "@/types2/constants";
+import { SWRKeys } from "@/types/constants";
 import { getNotifications, updateNotifications } from "@/app/actions/user";
 import toast from "react-hot-toast";
 

@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { useFormState } from "react-dom";
 
 import { BOARD_TYPE_VALUE, Board, RequestBoard } from "@/types2/board";
-import { BOARD_TYPE } from "@/types2/constants";
+import { BOARD_TYPE } from "@/types/constants";
 
 import { getBoardDetail, patchBoard } from "@/app/actions/baord";
 

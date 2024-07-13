@@ -1,6 +1,6 @@
 import { AnswerResponse } from "@/types2/code";
 
-import { getTitleByCode } from "@/types2/constants";
+import { getTitleByCode } from "@/types/constants";
 
 import { getAnswer } from "@/app/actions/code";
 

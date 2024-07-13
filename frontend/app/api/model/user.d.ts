@@ -1,6 +1,7 @@
 export type User = {
   userId: number;
   nickname: string;
+  email: string;
   profile: string;
   tried: number;
   solved: number;
@@ -36,4 +37,14 @@ export type NotificationItem = {
 
 export type Notification = {
   notifications: NotificationItem[];
+};
+
+export type SnsInfoItem = {
+  linkKind: string;
+  domain: string;
+  createdTime: string;
+};
+
+export type SnsInfo = {
+  links: SnsInfoItem[];
 };

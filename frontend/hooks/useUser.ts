@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 import { User } from "@/app/api/model/user";
-import { SWRKeys } from "@/types2/constants";
+import { SWRKeys } from "@/types/constants";
 import { CustomException } from "@/app/api";
 import { checkAuth } from "@/utils/authorization";
 import { useRouter } from "next/navigation";

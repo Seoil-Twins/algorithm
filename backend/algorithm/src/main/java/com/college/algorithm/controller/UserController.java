@@ -177,12 +177,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@Valid @RequestBody RequestNicknameDto dto, final  HttpServletRequest request) {
+    @PatchMapping
+    public ResponseEntity<?> updateNickname(@Valid @RequestBody RequestUpdateProfileDto dto, final  HttpServletRequest request) {
         final String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.updateNickname(Long.parseLong(userId), dto);
+        userService.updateProfile(Long.parseLong(userId), dto);
         return ResponseEntity.noContent().build();
     }
 

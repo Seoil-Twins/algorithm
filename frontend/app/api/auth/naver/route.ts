@@ -1,9 +1,10 @@
-import { AxiosError, AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-import { axiosInstance } from "@/api/index2";
+import { API_INSTANCE, handleUnAuthorization } from "../..";
 
-import { User } from "@/types2/user";
+import { SnsKind } from "@/types/constants";
+
+const API_URL = "/user/link";
 
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;
@@ -59,22 +60,19 @@ export const GET = async (req: NextRequest) => {
 
   // https://developers.naver.com/docs/login/devguide/devguide.md#3-4-5-%EC%A0%91%EA%B7%BC-%ED%86%A0%ED%81%B0%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-%ED%94%84%EB%A1%9C%ED%95%84-api-%ED%98%B8%EC%B6%9C%ED%95%98%EA%B8%B0
   const linkingData = {
-    linkKind: "1003",
-    id: userData.response.id,
+    linkKind: SnsKind.NAVER,
     domain: userData.response.email,
   };
 
-  // linking API 호출
   try {
-    const user: AxiosResponse<User> = await axiosInstance.get("/user/me");
-    await axiosInstance.post(`/user/link/${user.data.userId}`, linkingData);
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      return NextResponse.redirect(
-        `${cloneUrl}?errorCode=${error.response?.data.errorCode}&message=${error.response?.data.message}`,
-      );
-    }
+    req.headers.set("Content-Type", "application/json");
+    await API_INSTANCE.POST(API_URL, req.headers, linkingData);
+    return NextResponse.redirect(cloneUrl);
+  } catch (error: any) {
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=${error.errorCode}&message=${error.message}`,
+      { headers },
+    );
   }
-
-  return NextResponse.redirect(cloneUrl);
 };

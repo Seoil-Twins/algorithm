@@ -13,7 +13,7 @@ import {
   SOLVED_OPTIONS_ARRAY,
   SORT_OPTIONS_ARRAY,
   checkMyType,
-} from "@/types2/constants";
+} from "@/types/constants";
 
 import { getAlgorithmKinds, getAlgorithms } from "../actions/algorithm";
 

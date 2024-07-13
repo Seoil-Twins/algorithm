@@ -8,12 +8,9 @@ import toast from "react-hot-toast";
 import { notosansBold } from "@/styles/_font";
 import styles from "./snsAccount.module.scss";
 
-interface Link {
-  linkId: string;
-  linkKind: string;
-  domain: string;
-  createdTime: string;
-}
+import { SnsInfo } from "@/app/api/model/user";
+
+import { SnsKind } from "@/types/constants";
 
 interface SNSLinking {
   id: string;
@@ -22,46 +19,36 @@ interface SNSLinking {
   disabled: boolean;
 }
 
-type SnsAccountProps = {
-  links: Link[];
-};
-
-const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
+const SnsAccount = ({ sns }: { sns: SnsInfo }) => {
   const params = useSearchParams();
   const errorCode = params.get("errorCode");
 
   const router = useRouter();
-  const snsId = {
-    github: "1001",
-    google: "1002",
-    naver: "1003",
-    kakao: "1004",
-  };
 
   const [snsLinkings, _] = useState<SNSLinking[]>([
     {
-      id: snsId.github,
+      id: SnsKind.GITHUB,
       title: "Github",
       imgSrc: "./svgs/github.svg",
-      disabled: sns.links.some((link) => snsId.github === link.linkKind),
+      disabled: sns.links.some((link) => SnsKind.GITHUB === link.linkKind),
     },
     {
-      id: snsId.google,
+      id: SnsKind.GOOGLE,
       title: "Google",
       imgSrc: "./svgs/google.svg",
-      disabled: sns.links.some((link) => snsId.google === link.linkKind),
+      disabled: sns.links.some((link) => SnsKind.GOOGLE === link.linkKind),
     },
     {
-      id: snsId.naver,
+      id: SnsKind.NAVER,
       title: "Naver",
       imgSrc: "./svgs/naver.svg",
-      disabled: sns.links.some((link) => snsId.naver === link.linkKind),
+      disabled: sns.links.some((link) => SnsKind.NAVER === link.linkKind),
     },
     {
-      id: snsId.kakao,
+      id: SnsKind.KAKAO,
       title: "Kakako",
       imgSrc: "./svgs/kakao.svg",
-      disabled: sns.links.some((link) => snsId.kakao === link.linkKind),
+      disabled: sns.links.some((link) => SnsKind.KAKAO === link.linkKind),
     },
   ]);
 
@@ -74,7 +61,7 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
   );
 
   const handleGithub = useCallback(() => {
-    if (findSnsLinkInfo(snsId.github)?.disabled) return;
+    if (findSnsLinkInfo(SnsKind.GITHUB)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
     if (!clientId) return;
@@ -89,10 +76,10 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
 
     // gihub Login 주소로 이동
     router.replace(githubUrl);
-  }, [findSnsLinkInfo, router, snsId.github]);
+  }, [findSnsLinkInfo, router]);
 
   const handleGoogle = useCallback(() => {
-    if (findSnsLinkInfo(snsId.google)?.disabled) return;
+    if (findSnsLinkInfo(SnsKind.GOOGLE)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_CODE_REDIRECT_URI;
@@ -109,10 +96,10 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
     const googleUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(googleUrl);
-  }, [findSnsLinkInfo, router, snsId.google]);
+  }, [findSnsLinkInfo, router]);
 
   const handleNaver = useCallback(() => {
-    if (findSnsLinkInfo(snsId.naver)?.disabled) return;
+    if (findSnsLinkInfo(SnsKind.NAVER)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_NAVER_CODE_REDIRECT_URI;
@@ -131,10 +118,10 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
     const naverUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(naverUrl);
-  }, [findSnsLinkInfo, router, snsId.naver]);
+  }, [findSnsLinkInfo, router]);
 
   const handleKakao = useCallback(() => {
-    if (findSnsLinkInfo(snsId.kakao)?.disabled) return;
+    if (findSnsLinkInfo(SnsKind.KAKAO)?.disabled) return;
 
     const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_CODE_REDIRECT_URI;
@@ -154,21 +141,21 @@ const SnsAccount = ({ sns }: { sns: SnsAccountProps }) => {
     const kakaoUrl = `${baseUrl}?${params.toString()}`;
 
     router.push(kakaoUrl);
-  }, [findSnsLinkInfo, router, snsId.kakao]);
+  }, [findSnsLinkInfo, router]);
 
   const handleSnsLinking = useCallback(
     (id: string) => {
       switch (id) {
-        case "1001":
+        case SnsKind.GITHUB:
           handleGithub();
           break;
-        case "1002":
+        case SnsKind.GOOGLE:
           handleGoogle();
           break;
-        case "1003":
+        case SnsKind.NAVER:
           handleNaver();
           break;
-        case "1004":
+        case SnsKind.KAKAO:
           handleKakao();
           break;
         default:

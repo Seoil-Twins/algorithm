@@ -93,32 +93,47 @@ const updateCookie = (response: Response): Headers => {
   return headers;
 };
 
+const handleResponse = async (
+  response: Response,
+  hasResponseData: boolean,
+): Promise<CustomResponse> => {
+  if (response.ok) {
+    const responseHeaders = updateCookie(response);
+    const data = hasResponseData ? await response.json() : null;
+
+    return { data, headers: responseHeaders };
+  } else {
+    const error = (await response.json()) as CustomException;
+    if (!error.message) {
+      error.message = "알 수 없는 오류가 발생하였습니다.";
+    }
+
+    throw error;
+  }
+};
+
+const fetchWithHandling = async (
+  url: string,
+  options: RequestInit,
+  hasResponseData: boolean,
+): Promise<CustomResponse> => {
+  let response;
+  try {
+    response = await fetch(API_URL + url, options);
+  } catch (error: any) {
+    throw createNextApiError(error.message);
+  }
+
+  return await handleResponse(response, hasResponseData);
+};
+
 export const API_INSTANCE = {
   GET: async (url: string, headers: Headers): Promise<CustomResponse> => {
-    try {
-      const response = await fetch(API_URL + url, {
-        method: "GET",
-        headers,
-      });
-
-      if (response.ok) {
-        const responseHeaders = updateCookie(response);
-        const data = await response.json();
-        return {
-          data,
-          headers: responseHeaders,
-        };
-      } else {
-        const error = (await response.json()) as CustomException;
-        if (!error.message) {
-          error.message = "알 수 없는 오류가 발생하였습니다.";
-        }
-        throw error;
-      }
-    } catch (error: any) {
-      const response: CustomException = createNextApiError(error.message);
-      throw response;
-    }
+    const options: RequestInit = {
+      method: "GET",
+      headers,
+    };
+    return await fetchWithHandling(url, options, true);
   },
 
   POST: async (
@@ -127,43 +142,48 @@ export const API_INSTANCE = {
     body?: Body,
     hasResponseData: boolean = false,
   ): Promise<CustomResponse> => {
-    try {
-      // Fornt에서 보낸 Contet-Length랑 Next js에서 보내는 Content-Length가 다르기 때문에 삭제
-      // next js에서 자동으로 넣게 변경
-      headers.delete("Content-Length");
+    headers.delete("Content-Length");
 
-      const response = await fetch(API_URL + url, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
+    const options: RequestInit = {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    };
+    return await fetchWithHandling(url, options, hasResponseData);
+  },
 
-      if (response.ok) {
-        const responseHeaders = updateCookie(response);
+  PATCH: async (
+    url: string,
+    headers: Headers,
+    body?: Body,
+    hasResponseData: boolean = false,
+  ): Promise<CustomResponse> => {
+    headers.delete("Content-Length");
 
-        if (hasResponseData) {
-          const data = await response.json();
-          return {
-            data,
-            headers: responseHeaders,
-          };
-        } else {
-          return {
-            data: null,
-            headers: response.headers,
-          };
-        }
-      } else {
-        const error = (await response.json()) as CustomException;
-        if (!error.message) {
-          error.message = "알 수 없는 오류가 발생하였습니다.";
-        }
+    const options: RequestInit = {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body),
+    };
+    return await fetchWithHandling(url, options, hasResponseData);
+  },
 
-        throw error;
-      }
-    } catch (error: any) {
-      const response: CustomException = createNextApiError(error.message);
-      throw response;
-    }
+  PATCH_FORMDATA: async (
+    url: string,
+    headers: Headers,
+    formData: FormData,
+    hasResponseData: boolean = false,
+  ): Promise<CustomResponse> => {
+    headers.delete("Content-Length");
+    // 브라우저가 자동으로 지정하게 설정
+    // 라이브러리 사용하지 않고는 최선의 방법
+    headers.delete("Content-Type");
+
+    const options: RequestInit = {
+      method: "PATCH",
+      headers,
+      body: formData,
+    };
+    return await fetchWithHandling(url, options, hasResponseData);
   },
 };

@@ -1,4 +1,4 @@
-package com.college.algorithm.util;
+package com.college.algorithm.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
