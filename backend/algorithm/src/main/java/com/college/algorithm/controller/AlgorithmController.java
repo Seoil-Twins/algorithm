@@ -6,7 +6,6 @@ import com.college.algorithm.exception.ErrorCode;
 import com.college.algorithm.service.AlgorithmService;
 import com.college.algorithm.type.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -67,19 +66,10 @@ public class AlgorithmController {
 
         AlgorithmSearchRequestDto algorithmRequestDTO = new AlgorithmSearchRequestDto(page,count,solved.toLowerCase(),sort.toLowerCase(),level,rate,tag,keyword);
 
-        HttpSession session = request.getSession(false); // default true
-        Long loginUserId = null;
-        if(session != null){
-            // 상수로 뺼 예정
-            loginUserId = (Long)session.getAttribute("로그인 암호 키 무언가");
-            if(loginUserId == null)
-                throw new CustomException(ErrorCode.INVALID_COOKIE);
-        } else{
-            // 무언가 오류처리
-        }
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, loginUserId));
-
+        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.getAll(algorithmRequestDTO, Long.parseLong(userId)));
     }
 
     @GetMapping("/algorithm/recommend")
@@ -91,15 +81,15 @@ public class AlgorithmController {
     @GetMapping("/algorithm/{algorithm_id}")
     public ResponseEntity<?> getAlgorithmDetail(@PathVariable(value = "algorithm_id") Long algorithm_id,
                                                 HttpServletRequest request) {
-        Long loginUserId = (Long) request.getAttribute("유저유저키키");
-        AlgorithmDetailDto response = algorithmService.getAlgorithmDetail(algorithm_id,1L);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
+
+        AlgorithmDetailDto response = algorithmService.getAlgorithmDetail(algorithm_id,Long.parseLong(userId));
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/algorithm/{algorithm_id}/explanation")
-    public ResponseEntity<?> getExplanation(@PathVariable(value = "algorithm_id") Long algorithm_id,
-                                            HttpServletRequest request) {
-        Long loginUserId = (Long) request.getAttribute("유저유저키키");
+    public ResponseEntity<?> getExplanation(@PathVariable(value = "algorithm_id") Long algorithm_id) {
         ExplanationResponseDto response = algorithmService.getExplanation(algorithm_id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -131,12 +121,10 @@ public class AlgorithmController {
     public ResponseEntity<?> postCode(@Valid @RequestBody RequestCodeDto dto,
                                       @PathVariable(value = "algorithm_id") Long algorithm_id,
                                       HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.ok().body(algorithmService.postCode(dto,algorithm_id,loginUserId));
+        return ResponseEntity.ok().body(algorithmService.postCode(dto,algorithm_id, Long.parseLong(userId)));
     }
 
     @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/comment")
@@ -144,35 +132,29 @@ public class AlgorithmController {
                                                         @PathVariable(value = "algorithm_id") Long algorithm_id,
                                                         @PathVariable(value = "correct_id") Long correct_id,
                                                         HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(algorithmService.postCorrectComment(correct_id,requestCorrectComment,loginUserId)).build();
+        return ResponseEntity.status(algorithmService.postCorrectComment(correct_id,requestCorrectComment, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/algorithm/{algorithm_id}/correct/{correct_id}/recommend")
     public ResponseEntity<?> postAlgorithmCorrectRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
                                                          @PathVariable(value = "correct_id") Long correct_id,
                                                          HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(algorithmService.postCorrectRecommend(correct_id,loginUserId)).build();
+        return ResponseEntity.status(algorithmService.postCorrectRecommend(correct_id, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/algorithm/{algorithm_id}/recommend")
     public ResponseEntity<?> postAlgorithmRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
                                                            HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(algorithmService.postAlgorithmRecommend(algorithm_id,loginUserId)).build();
+        return ResponseEntity.status(algorithmService.postAlgorithmRecommend(algorithm_id, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/algorithm/{algorithm_id}/board")
@@ -180,35 +162,28 @@ public class AlgorithmController {
                                        @PathVariable(value = "algorithm_id") Long algorithm_id,
                                        HttpServletRequest request){
 
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.postAlgorithmBoard(dto,algorithm_id, loginUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(algorithmService.postAlgorithmBoard(dto, algorithm_id, Long.parseLong(userId)));
     }
 
     @DeleteMapping("/algorithm/{algorithm_id}/correct/{correct_id}/recommend")
     public ResponseEntity<?> deleteAlgorithmCorrectRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
                                                            @PathVariable(value = "correct_id") Long correct_id,
                                                            HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(algorithmService.deleteCorrectRecommend(correct_id,loginUserId)).build();
+        return ResponseEntity.status(algorithmService.deleteCorrectRecommend(correct_id, Long.parseLong(userId))).build();
     }
 
     @DeleteMapping("/algorithm/{algorithm_id}/recommend")
     public ResponseEntity<?> deleteAlgorithmRecommend(@PathVariable(value = "algorithm_id") Long algorithm_id,
                                                              HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(algorithmService.deleteAlgorithmRecommend(algorithm_id,loginUserId)).build();
+        return ResponseEntity.status(algorithmService.deleteAlgorithmRecommend(algorithm_id, Long.parseLong(userId))).build();
     }
-
 }

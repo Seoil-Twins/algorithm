@@ -22,46 +22,37 @@ public class CommentController {
     @PostMapping("/{comment_id}/recommend")
     public ResponseEntity<?> postCommentRecommend(@PathVariable(value = "comment_id") Long commentId,
                                                            HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.postCommentRecommend(commentId,loginUserId)).build();
+        return ResponseEntity.status(commentService.postCommentRecommend(commentId, Long.parseLong(userId))).build();
     }
     @PatchMapping("/{comment_id}")
     public ResponseEntity<?> patchBoard(@Valid @RequestBody(required = false) RequestCommentUpdateDto commentUpdateDto,
                                         @PathVariable(value = "comment_id") Long commentId,
                                         HttpServletRequest request){
 
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.patchComment(commentUpdateDto,commentId,loginUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.patchComment(commentUpdateDto, commentId, Long.parseLong(userId)));
     }
 
     @DeleteMapping("/{comment_id}/recommend")
     public ResponseEntity<?> deleteCommentRecommend(@PathVariable(value = "comment_id") Long commentId,
                                                              HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.deleteCommentRecommend(commentId,loginUserId)).build();
+        return ResponseEntity.status(commentService.deleteCommentRecommend(commentId, Long.parseLong(userId))).build();
     }
 
     @DeleteMapping("/{comment_id}")
     public ResponseEntity<?> deleteComment(@PathVariable(value = "comment_id") Long commentId,
                                                              HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.deleteComment(commentId,loginUserId)).build();
+        return ResponseEntity.status(commentService.deleteComment(commentId, Long.parseLong(userId))).build();
     }
-
 }
