@@ -6,9 +6,6 @@ export const UserAPI = {
   getUser: async () => {
     return await API_INSTANCE.GET(API_URL);
   },
-  getNotifications: async (page: number = 1, count: number = 10) => {
-    return await API_INSTANCE.GET(`${API_URL}?page=${page}&count=${count}`);
-  },
   getSnsInfo: async () => {
     return await API_INSTANCE.GET(`${API_URL}/link`);
   },

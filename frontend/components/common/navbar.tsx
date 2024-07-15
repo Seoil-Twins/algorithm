@@ -18,13 +18,13 @@ import { notosansBold, notosansMedium } from "@/styles/_font";
 import { useAuth } from "@/providers/authProvider";
 
 import { NotificationItem } from "@/app/api/model/user";
+import { NotificationAPI } from "@/api/notification";
+import { IMAGE_URL } from "@/api";
 
 import { MenuItems } from "./navigation";
 import ThemeSwitch from "./themeSwitch";
 import ThemeImage from "./themeImage";
 import Alram from "./alram";
-import { UserAPI } from "@/api/user";
-import { IMAGE_URL } from "@/api";
 
 type NavbarProps = {
   menuItems: MenuItems[];
@@ -98,11 +98,14 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   }, [logout]);
 
   const getNotifications = useCallback(async () => {
-    const response = await UserAPI.getNotifications();
+    const response = await NotificationAPI.getNotifications();
 
     if (response.ok) {
       const newAlrams = await response.json();
+      console.log(newAlrams);
       setAlrams(newAlrams.notifications);
+    } else {
+      setAlrams([]);
     }
   }, []);
 

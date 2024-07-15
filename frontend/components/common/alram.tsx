@@ -8,6 +8,7 @@ import { notosansMedium } from "@/styles/_font";
 import styles from "./alram.module.scss";
 import { NotificationType } from "@/types/notiication.d";
 import { IMAGE_URL } from "@/api";
+import { getTimeAgo } from "@/utils/day";
 
 type AlramProps = {
   isVisible: boolean;
@@ -79,44 +80,45 @@ const Alram = forwardRef<HTMLDivElement, AlramProps>(
   ({ isVisible, alrams }, ref) => {
     const notitifcations: Notification[] = renderNotifications(alrams);
 
+    if (!isVisible) return;
+
     return (
       <>
-        {isVisible && (
-          <div className={styles.alramModalBox} ref={ref}>
-            <div className={styles.title}>알림</div>
-            <div className={styles.content}>
-              {alrams ? (
-                notitifcations.map((notitifcation, idx) => (
-                  <Link href={notitifcation.link} key={idx}>
-                    <div className={styles.item}>
-                      <div>
-                        <Image
-                          src={`${IMAGE_URL}/${notitifcation.fromUser.profile}`}
-                          alt="프로필 사진"
-                          width={28}
-                          height={28}
-                          className={styles.profileImg}
-                        />
-                      </div>
-                      <div>{notitifcation.fromUser.nickname}</div>
-                      <div>{notitifcation.createdTime}</div>
-                      <div
-                        className={`${styles.oneline} ${notosansMedium.className}`}
-                      >
-                        {notitifcation.title}
-                      </div>
-                      <div className={styles.oneline}>
-                        {notitifcation.content}
-                      </div>
+        <div className={styles.alramModalBox} ref={ref}>
+          <div className={styles.title}>알림</div>
+          <div className={styles.content}>
+            {notitifcations &&
+              notitifcations.length > 0 &&
+              notitifcations.map((notitifcation, idx) => (
+                <Link href={notitifcation.link} key={idx}>
+                  <div className={styles.item}>
+                    <div>
+                      <Image
+                        src={`${IMAGE_URL}/${notitifcation.fromUser.profile}`}
+                        alt="프로필 사진"
+                        width={28}
+                        height={28}
+                        className={styles.profileImg}
+                      />
                     </div>
-                  </Link>
-                ))
-              ) : (
-                <div>없음</div>
-              )}
-            </div>
+                    <div>{notitifcation.fromUser.nickname}</div>
+                    <div>{getTimeAgo(notitifcation.createdTime)}</div>
+                    <div
+                      className={`${styles.oneline} ${notosansMedium.className}`}
+                    >
+                      {notitifcation.title}
+                    </div>
+                    <div className={styles.oneline}>
+                      {notitifcation.content}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            {notitifcations.length <= 0 && (
+              <div className={styles.noContent}>알림이 존재하지 않습니다.</div>
+            )}
           </div>
-        )}
+        </div>
       </>
     );
   },
