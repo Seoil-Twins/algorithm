@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_INSTANCE, getPagination, handleUnAuthorization } from "..";
+import { API_INSTANCE, getPagination, handleUnAuthorization } from "../../..";
 
-const API_URL = "/notification";
+const API_URL = "/user/{userId}/question";
 
-export const GET = async (req: NextRequest) => {
-  const searchParams = getPagination(req.nextUrl.search);
+export const GET = async (
+  req: NextRequest,
+  { params }: { params: { userId: string } },
+) => {
+  const { userId } = params;
+  const searchParams = getPagination(req.nextUrl.search, 1, 5);
 
   try {
     const { data, headers } = await API_INSTANCE.GET(
-      `${API_URL}?${searchParams}`,
+      `${API_URL.replace("{userId}", userId)}?${searchParams}`,
       req.headers,
     );
 

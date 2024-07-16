@@ -1,5 +1,7 @@
-import { getBoardTypes } from "@/app/actions/baord";
-import { getMyFavorites } from "@/app/actions/user";
+import { BoardAPI } from "@/api/board";
+import { UserAPI } from "@/api/user";
+import { BoardType, BoardTypeItem, MyBoardIntro } from "@/app/api/model/board";
+import { User } from "@/app/api/model/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -11,28 +13,26 @@ const Answer = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const boardTypes = await getBoardTypes();
-  let favorites;
-  try {
-    const responseFavorites = await getMyFavorites({ page, count });
-    favorites = responseFavorites.data;
-  } catch (error) {
-    favorites = {
-      results: [],
-      totals: 0,
-    };
-  }
+
+  const user: User = (await (await UserAPI.getUser()).json()) as User;
+  const boardTypes: BoardTypeItem[] = (
+    (await (await BoardAPI.getBoardTypes()).json()) as BoardType
+  ).types;
+  const recommend: MyBoardIntro = (await (
+    await UserAPI.getMyRecommend(user.userId.toString(), page, count)
+  ).json()) as MyBoardIntro;
 
   return (
     <>
       <Table
-        items={favorites.results}
         boardTypes={boardTypes}
+        items={recommend.boards}
+        total={recommend.total}
         errorTitle="좋아요한 게시글이 없습니다."
       />
       <Pagination
         count={count}
-        total={favorites.totals}
+        total={recommend.total}
         current={page}
         marginTop={25}
       />

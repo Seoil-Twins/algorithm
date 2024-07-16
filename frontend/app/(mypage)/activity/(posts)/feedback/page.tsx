@@ -1,5 +1,7 @@
-import { getBoardTypes } from "@/app/actions/baord";
-import { getMyFeedbacks } from "@/app/actions/user";
+import { BoardAPI } from "@/api/board";
+import { UserAPI } from "@/api/user";
+import { BoardType, BoardTypeItem, MyBoardIntro } from "@/app/api/model/board";
+import { User } from "@/app/api/model/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -11,28 +13,26 @@ const Feedback = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const boardTypes = await getBoardTypes();
-  let feedbacks;
-  try {
-    const responseFeedbacks = await getMyFeedbacks({ page, count });
-    feedbacks = responseFeedbacks.data;
-  } catch (error) {
-    feedbacks = {
-      results: [],
-      totals: 0,
-    };
-  }
+
+  const boardTypes: BoardTypeItem[] = (
+    (await (await BoardAPI.getBoardTypes()).json()) as BoardType
+  ).types;
+  const user: User = (await (await UserAPI.getUser()).json()) as User;
+  const feedback: MyBoardIntro = (await (
+    await UserAPI.getMyFeedback(user.userId.toString(), page, count)
+  ).json()) as MyBoardIntro;
 
   return (
     <>
       <Table
-        items={feedbacks.results}
         boardTypes={boardTypes}
+        items={feedback.boards}
+        total={feedback.total}
         errorTitle="작성하신 피드백이 없습니다."
       />
       <Pagination
         count={count}
-        total={feedbacks.totals}
+        total={feedback.total}
         current={page}
         marginTop={25}
       />

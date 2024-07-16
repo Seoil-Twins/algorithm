@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_INSTANCE, getPagination, handleUnAuthorization } from "..";
+import { API_INSTANCE, handleUnAuthorization } from "../..";
 
-const API_URL = "/notification";
+const API_URL = "/user/try";
 
 export const GET = async (req: NextRequest) => {
-  const searchParams = getPagination(req.nextUrl.search);
-
   try {
-    const { data, headers } = await API_INSTANCE.GET(
-      `${API_URL}?${searchParams}`,
-      req.headers,
-    );
+    const { data, headers } = await API_INSTANCE.GET(API_URL, req.headers);
 
     return NextResponse.json(data, {
       status: 200,

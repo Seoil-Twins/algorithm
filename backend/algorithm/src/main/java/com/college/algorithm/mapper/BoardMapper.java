@@ -16,6 +16,7 @@ public interface BoardMapper {
     BoardMapper INSTANCE = Mappers.getMapper(BoardMapper.class);
 
     @Mapping(source = "board.boardId", target = "boardId")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "board.title", target = "title")
     @Mapping(source = "board.content", target = "content")
     @Mapping(source = "board.recommendCount", target = "likeCount")
@@ -25,6 +26,7 @@ public interface BoardMapper {
     BoardIntroDto toResponseBoardIntroDto(Board board);
 
     @Mapping(source = "board.boardId", target = "boardId")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "board.title", target = "title")
     @Mapping(source = "board.content", target = "content")
     @Mapping(source = "board.recommendCount", target = "likeCount")

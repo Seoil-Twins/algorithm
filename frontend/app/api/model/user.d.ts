@@ -48,3 +48,9 @@ export type SnsInfoItem = {
 export type SnsInfo = {
   links: SnsInfoItem[];
 };
+
+export type HistoryAlgorithm = {
+  tried: number;
+  solved: number;
+  favorite: number;
+};

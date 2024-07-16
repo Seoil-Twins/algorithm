@@ -187,3 +187,21 @@ export const API_INSTANCE = {
     return await fetchWithHandling(url, options, hasResponseData);
   },
 };
+
+export const getPagination = (
+  requestSearch: string,
+  defaultPage: number = 1,
+  defaultCount: number = 10,
+): string => {
+  const urlSearchParams = new URLSearchParams(requestSearch);
+  const params = Object.fromEntries(urlSearchParams.entries());
+  const page = params.page ? params.page : defaultPage;
+  const count = params.count ? params.count : defaultCount;
+  const pageOptions = {
+    page: String(page),
+    count: String(count),
+  };
+
+  const searchParams = new URLSearchParams(pageOptions).toString();
+  return searchParams;
+};

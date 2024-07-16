@@ -13,6 +13,7 @@ public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
     @Mapping(source = "board.boardId", target = "boardId")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "comment.content", target = "title")
     @Mapping(source = "board.title", target = "content")
     @Mapping(source = "comment.recommendCount", target = "likeCount")
@@ -21,6 +22,7 @@ public interface CommentMapper {
     ResponseMyCommentDto.CommentDto toResponseCommentDto(Board board, Comment comment);
 
     @Mapping(source = "board.boardId", target = "boardId")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "comment.content", target = "title")
     @Mapping(source = "board.title", target = "content")
     @Mapping(source = "comment.recommendCount", target = "likeCount")

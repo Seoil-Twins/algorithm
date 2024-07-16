@@ -9,6 +9,51 @@ export const UserAPI = {
   getSnsInfo: async () => {
     return await API_INSTANCE.GET(`${API_URL}/link`);
   },
+  getHistoryAlgirhtm: async () => {
+    return await API_INSTANCE.GET(`${API_URL}/try`);
+  },
+  getMyQuestion: async (
+    userId: string,
+    page: number = 1,
+    count: number = 5,
+  ) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/question?page=${page}&count=${count}`,
+    );
+  },
+  getMyFeedback: async (
+    userId: string,
+    page: number = 1,
+    count: number = 5,
+  ) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/feedback?page=${page}&count=${count}`,
+    );
+  },
+  getMyFree: async (userId: string, page: number = 1, count: number = 5) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/free?page=${page}&count=${count}`,
+    );
+  },
+  getMyAnswer: async (userId: string, page: number = 1, count: number = 5) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/answer?page=${page}&count=${count}`,
+    );
+  },
+  getMyComment: async (userId: string, page: number = 1, count: number = 5) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/comment?page=${page}&count=${count}`,
+    );
+  },
+  getMyRecommend: async (
+    userId: string,
+    page: number = 1,
+    count: number = 5,
+  ) => {
+    return await API_INSTANCE.GET(
+      `${API_URL}/${userId}/recommend?page=${page}&count=${count}`,
+    );
+  },
   login: async (body: Body) => {
     return await API_INSTANCE.POST(`${API_URL}/login`, body);
   },
