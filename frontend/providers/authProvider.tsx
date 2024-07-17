@@ -29,11 +29,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, isLoading, isValidating, addUser, removeUser } = useUser();
 
   const login = async () => {
-    const response = await UserAPI.getUser();
-
-    if (response.ok) {
+    try {
+      const response = await UserAPI.getUser();
       const user: User = await response.json();
       addUser(user);
+    } catch (error) {
+      console.log(error);
     }
   };
 

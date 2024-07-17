@@ -48,13 +48,8 @@ const Login = () => {
           password,
         });
 
-        if (response.ok) {
-          login();
-          router.replace(redirectUrl.current ? redirectUrl.current : "/");
-        } else if (!response.ok) {
-          const body = (await response.json()) as CustomException;
-          toast.error(body.message);
-        }
+        login();
+        router.replace(redirectUrl.current ? redirectUrl.current : "/");
       } catch (error: any) {
         toast.error(error.message);
       } finally {

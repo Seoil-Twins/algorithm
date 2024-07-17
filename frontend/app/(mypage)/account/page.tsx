@@ -7,10 +7,8 @@ import { UserAPI } from "@/api/user";
 import { SnsInfo, User } from "@/app/api/model/user";
 
 const Account = async () => {
-  const user: User = (await (await UserAPI.getUser()).json()) as User;
-  const snsInfo: SnsInfo = (await (
-    await UserAPI.getSnsInfo()
-  ).json()) as SnsInfo;
+  const user: User = await (await UserAPI.getUser()).json();
+  const snsInfo: SnsInfo = await (await UserAPI.getSnsInfo()).json();
 
   return (
     <>

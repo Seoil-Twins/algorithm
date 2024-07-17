@@ -16,15 +16,13 @@ export const useUser = () => {
   const { data, isLoading, isValidating } = useSWR(
     SWRKeys.getUser,
     async () => {
-      const response = await UserAPI.getUser();
-
-      if (response.ok) {
+      try {
+        const response = await UserAPI.getUser();
         const user: User = await response.json();
         return user;
-      } else {
-        const error: CustomException =
-          (await response.json()) as CustomException;
-        const isNotAuth: boolean = checkAuth(error.errorCode);
+      } catch (error) {
+        const exception: CustomException = error as CustomException;
+        const isNotAuth: boolean = checkAuth(exception.errorCode);
 
         if (isNotAuth) {
           await UserAPI.logout();

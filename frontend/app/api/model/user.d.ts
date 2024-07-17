@@ -54,3 +54,11 @@ export type HistoryAlgorithm = {
   solved: number;
   favorite: number;
 };
+
+export type NotificationSetting = {
+  primaryNofi: boolean;
+  commentNofi: boolean;
+  likeNofi: boolean;
+  answerNofi: boolean;
+  eventNofi: boolean;
+};

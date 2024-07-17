@@ -98,13 +98,11 @@ const Navbar = ({ menuItems }: NavbarProps) => {
   }, [logout]);
 
   const getNotifications = useCallback(async () => {
-    const response = await NotificationAPI.getNotifications();
-
-    if (response.ok) {
+    try {
+      const response = await NotificationAPI.getNotifications();
       const newAlrams = await response.json();
-      console.log(newAlrams);
       setAlrams(newAlrams.notifications);
-    } else {
+    } catch (error) {
       setAlrams([]);
     }
   }, []);

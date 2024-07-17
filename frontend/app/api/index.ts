@@ -7,7 +7,7 @@ const API_URL =
     : process.env.BACKEND_API_URL_DEVELOPMENT;
 const sessionId = process.env.NEXT_PUBLIC_SESSION_KEY;
 
-export class CustomException {
+export class CustomException extends Error {
   status: number;
   errorCode: number;
   error: string;
@@ -23,6 +23,7 @@ export class CustomException {
     code: string,
     timestamp: string,
   ) {
+    super();
     this.status = status;
     this.errorCode = errorCode;
     this.error = error;
@@ -104,6 +105,7 @@ const handleResponse = async (
     return { data, headers: responseHeaders };
   } else {
     const error = (await response.json()) as CustomException;
+
     if (!error.message) {
       error.message = "알 수 없는 오류가 발생하였습니다.";
     }
@@ -155,7 +157,7 @@ export const API_INSTANCE = {
   PATCH: async (
     url: string,
     headers: Headers,
-    body?: Body,
+    body: Body,
     hasResponseData: boolean = false,
   ): Promise<CustomResponse> => {
     headers.delete("Content-Length");
@@ -185,6 +187,32 @@ export const API_INSTANCE = {
       body: formData,
     };
     return await fetchWithHandling(url, options, hasResponseData);
+  },
+
+  PUT: async (
+    url: string,
+    headers: Headers,
+    body: Body,
+    hasResponseData: boolean = false,
+  ): Promise<CustomResponse> => {
+    headers.delete("Content-Length");
+
+    const options: RequestInit = {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(body),
+    };
+    return await fetchWithHandling(url, options, hasResponseData);
+  },
+
+  DELETE: async (url: string, headers: Headers): Promise<CustomResponse> => {
+    headers.delete("Content-Length");
+
+    const options: RequestInit = {
+      method: "DELETE",
+      headers,
+    };
+    return await fetchWithHandling(url, options, false);
   },
 };
 

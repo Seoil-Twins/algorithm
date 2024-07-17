@@ -106,42 +106,37 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
           nickname: isChangeNickname ? profileInfo.nickname.value : null,
         });
 
-        if (response.ok) {
-          toast.success("정보를 성공적으로 변경하였습니다.");
-          setIsVerified(false);
-          setIsProfileDisabled(true);
-          setIsChangeEmail(false);
-          setIsChangeNickname(false);
-          mutate(SWRKeys.getUser);
+        toast.success("정보를 성공적으로 변경하였습니다.");
+        setIsVerified(false);
+        setIsProfileDisabled(true);
+        setIsChangeEmail(false);
+        setIsChangeNickname(false);
+        mutate(SWRKeys.getUser);
 
-          const {
-            ["nickname"]: nicknameField,
-            ["email"]: emailField,
-            ...prev
-          } = profileInfo;
+        const {
+          ["nickname"]: nicknameField,
+          ["email"]: emailField,
+          ...prev
+        } = profileInfo;
 
-          setProfileInfo({
-            ...prev,
-            nickname: {
-              ...nicknameField,
-              disabled: true,
-            },
-            email: {
-              ...emailField,
-              disabled: true,
-            },
-            verifyCode: {
-              value: "",
-              disabled: true,
-            },
-          });
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        setProfileInfo({
+          ...prev,
+          nickname: {
+            ...nicknameField,
+            disabled: true,
+          },
+          email: {
+            ...emailField,
+            disabled: true,
+          },
+          verifyCode: {
+            value: "",
+            disabled: true,
+          },
+        });
       } catch (error) {
-        toast.error("서버에 오류가 발생하였습니다.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       } finally {
         setIsPending(false);
       }
@@ -158,15 +153,14 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       const formData = new FormData();
       formData.append("profile", profile);
 
-      const response = await UserAPI.updateProfileImage(formData);
-
-      if (response.ok) {
+      try {
+        const response = await UserAPI.updateProfileImage(formData);
         toast.success("정상적으로 변경하였습니다.");
         router.refresh();
         mutate(SWRKeys.getUser);
-      } else {
-        const error = await response.json();
-        toast.error(error.message);
+      } catch (error) {
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       }
     },
     [user, router, mutate],
@@ -199,35 +193,31 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
 
       try {
         setIsSending(true);
+
         const response = await UserAPI.sendVerfiyCode({
           email: profileInfo.email.value,
         });
 
-        if (response.ok) {
-          const {
-            ["email"]: emailField,
-            ["verifyCode"]: verifyCodeField,
-            ...prev
-          } = profileInfo;
+        const {
+          ["email"]: emailField,
+          ["verifyCode"]: verifyCodeField,
+          ...prev
+        } = profileInfo;
 
-          setProfileInfo({
-            ...prev,
-            email: {
-              ...emailField,
-              disabled: true,
-            },
-            verifyCode: {
-              ...verifyCodeField,
-              disabled: false,
-            },
-          });
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        setProfileInfo({
+          ...prev,
+          email: {
+            ...emailField,
+            disabled: true,
+          },
+          verifyCode: {
+            ...verifyCodeField,
+            disabled: false,
+          },
+        });
       } catch (error) {
-        toast.error("나중에 다시 시도해주세요.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       } finally {
         setIsSending(false);
       }
@@ -240,20 +230,14 @@ const UserProfileForm = ({ user }: UserProfileProps) => {
       if (profileInfo.verifyCode.disabled || isVerified) return;
 
       try {
-        const response = await UserAPI.compareVerifyCode({
+        await UserAPI.compareVerifyCode({
           email: profileInfo.email.value,
           verifyCode: profileInfo.verifyCode.value,
         });
-
-        if (response.ok) {
-          setIsVerified(true);
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        setIsVerified(true);
       } catch (error) {
-        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       }
     }, [isVerified, profileInfo]),
     500,

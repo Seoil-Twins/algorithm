@@ -54,6 +54,9 @@ export const UserAPI = {
       `${API_URL}/${userId}/recommend?page=${page}&count=${count}`,
     );
   },
+  getNotification: async () => {
+    return await API_INSTANCE.GET(`${API_URL}/notification`);
+  },
   login: async (body: Body) => {
     return await API_INSTANCE.POST(`${API_URL}/login`, body);
   },
@@ -74,5 +77,11 @@ export const UserAPI = {
   },
   updateProfileImage: async (formData: FormData) => {
     return await API_INSTANCE.PATCH_FORMDATA(`${API_URL}/profile`, formData);
+  },
+  updateNotification: async (body: Body) => {
+    return await API_INSTANCE.PUT(`${API_URL}/notification`, body);
+  },
+  deleteUser: async () => {
+    return await API_INSTANCE.DELETE(`${API_URL}`);
   },
 };

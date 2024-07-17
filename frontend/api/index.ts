@@ -1,3 +1,5 @@
+import { CustomException } from "@/app/api";
+
 const enviroment = process.env.NEXT_PUBLIC_ENVIROMENT;
 const API_URL =
   enviroment === "product"
@@ -43,6 +45,18 @@ export const API_INSTANCE = {
       cache,
     });
 
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
+
     return response;
   },
 
@@ -60,6 +74,18 @@ export const API_INSTANCE = {
       cache: "no-store",
     });
 
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
+
     return response;
   },
 
@@ -71,6 +97,18 @@ export const API_INSTANCE = {
       credentials: "include",
       body: JSON.stringify(body),
     });
+
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
 
     return response;
   },
@@ -92,6 +130,18 @@ export const API_INSTANCE = {
       cache: "no-store",
     });
 
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
+
     return response;
   },
 
@@ -104,6 +154,18 @@ export const API_INSTANCE = {
       body: JSON.stringify(body),
     });
 
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
+
     return response;
   },
 
@@ -115,6 +177,18 @@ export const API_INSTANCE = {
       credentials: "include",
       body: JSON.stringify(body),
     });
+
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
 
     return response;
   },
