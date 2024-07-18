@@ -11,10 +11,10 @@ import Dropdown, { DropdownItem } from "../common/dropdown";
 
 import { useAuth } from "@/providers/authProvider";
 
-import { AlgorithmKind } from "@/types2/algorithm";
+import { AlgorithmKindItem } from "@/app/api/model/algorithm";
 
 type NavigationProps = {
-  algorithmKinds: AlgorithmKind[];
+  algorithmKinds: AlgorithmKindItem[];
 };
 
 type DropdownItems = {
@@ -144,7 +144,7 @@ const Navigation = ({ algorithmKinds }: NavigationProps) => {
       JSON.stringify(tagDropdownItems),
     );
 
-    algorithmKinds.forEach((value: AlgorithmKind) => {
+    algorithmKinds.forEach((value: AlgorithmKindItem) => {
       newTagDropdownItems.items.push({
         title: value.kindName,
         value: value.kindId,

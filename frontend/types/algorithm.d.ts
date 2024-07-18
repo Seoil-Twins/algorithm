@@ -1,33 +1,34 @@
 import { ALGORITHM_BOARD_TYPE, PageOptions } from ".";
 import { BOARD_TYPE } from "./board";
 
-export const SolvedOptions = {
+export const SolvedOptionItem = {
   ALL: "a",
   SOLVED: "s",
   NOT_SOLVED: "ns",
 } as const;
-export type SOLVED_OPTIONS = (typeof SolvedOptions)[keyof typeof SolvedOptions];
+export type SolvedOptions =
+  (typeof SolvedOptionItem)[keyof typeof SolvedOptionItem];
 
-export const SortOptions = {
+export const SortOptionItem = {
   RECNET: "r",
   OLDER: "or",
   TRIED: "t",
 } as const;
-export type SORT_OPTIONS = (typeof SortOptions)[keyof typeof SortOptions];
+export type SortOptions = (typeof SortOptionItem)[keyof typeof SortOptionItem];
 
-export const RateOptions = {
+export const RateOptionItem = {
   HIGH: "h",
   LOW: "l",
 } as const;
-export type RATE_OPTIONS = (typeof RateOptions)[keyof typeof RateOptions];
+export type RateOptions = (typeof RateOptionItem)[keyof typeof RateOptionItem];
 
 export type AlgorithmOptions = {
   count: number;
   page: number;
-  solved: SOLVED_OPTIONS;
-  sort: SORT_OPTIONS;
+  solved: SolvedOptions;
+  sort: SortOptions;
   level: number;
-  rate?: RATE_OPTIONS;
+  rate?: RateOptions;
   tag?: number;
   keyword?: string;
 };

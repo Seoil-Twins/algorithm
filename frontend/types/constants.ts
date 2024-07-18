@@ -1,4 +1,4 @@
-import { RateOptions, SolvedOptions, SortOptions } from "../types2/algorithm";
+import { RateOptions, SolvedOptions, SortOptions } from "./algorithm";
 
 export const BOARD_TYPE = {
   PUBLIC_QUESTION: 1,
