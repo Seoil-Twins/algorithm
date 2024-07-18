@@ -24,3 +24,17 @@ export type MyBoardIntro = {
   [key: string]: MyBoardIntroItem[];
   total: number;
 };
+
+export type RecommendBoardItem = {
+  boardId: number;
+  boardType: string;
+  user: RequireUser;
+  thumbnail: string | null;
+  title: string;
+  tags: string[] | null;
+  createdTime: string;
+};
+
+export type RecommendBoard = {
+  boards: RecommendBoardItem;
+};

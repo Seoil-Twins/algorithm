@@ -14,19 +14,22 @@ import { Board } from "@/types2/board";
 
 import { getRecommendAlgorithms } from "./actions/algorithm";
 import { getRecommendPosts } from "./actions/baord";
+import {
+  RecommendAlgorithm,
+  RecommendAlgorithmItem,
+} from "./api/model/algorithm";
+import { AlgorithmAPI } from "@/api/algorithm";
+import { RecommendBoardItem } from "./api/model/board";
+import { BoardAPI } from "@/api/board";
 
 const Home = async () => {
-  const responseAlgorithms = await getRecommendAlgorithms();
-  let algorithms: Algorithm[] = [];
-  if (responseAlgorithms.status === 200) {
-    algorithms = responseAlgorithms.data.algorithms;
-  }
+  const algorithms: RecommendAlgorithmItem[] = (
+    await (await AlgorithmAPI.getRecommendAlgorithms()).json()
+  ).algorithms;
 
-  const responsePosts = await getRecommendPosts();
-  let posts: Board[] = [];
-  if (responsePosts.status === 200) {
-    posts = responsePosts.data.contents;
-  }
+  const boards: RecommendBoardItem[] = (
+    await (await BoardAPI.getRecommendBoards()).json()
+  ).boards;
 
   return (
     <>
@@ -81,7 +84,7 @@ const Home = async () => {
             </div>
           </div>
           <div className={`${styles.cardBox} ${styles.algorithmCardBox}`}>
-            {algorithms.map((algorithm: Algorithm) => (
+            {algorithms.map((algorithm: RecommendAlgorithmItem) => (
               <AlgorithmCard
                 key={algorithm.algorithmId}
                 algorithm={algorithm}
@@ -90,7 +93,7 @@ const Home = async () => {
           </div>
         </>
       )}
-      {posts.length > 0 && (
+      {boards.length > 0 && (
         <>
           <div className={styles.cardTop}>
             <div className={styles.topBox}>
@@ -103,8 +106,8 @@ const Home = async () => {
             </div>
           </div>
           <div className={`${styles.cardBox} ${styles.postCardBox}`}>
-            {posts.map((post) => (
-              <PostCard key={post.boardId} post={post} />
+            {boards.map((board: RecommendBoardItem) => (
+              <PostCard key={board.boardId} post={board} />
             ))}
           </div>
         </>

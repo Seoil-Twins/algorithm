@@ -15,4 +15,6 @@ public class BoardSuggestDto {
     private ResponseBoardUserDto user;
     private String title;
     private List<String> tags;
+    private String thumbnail;
+    private String createdTime;
 }

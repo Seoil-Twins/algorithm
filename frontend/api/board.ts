@@ -6,4 +6,7 @@ export const BoardAPI = {
   getBoardTypes: async () => {
     return await API_INSTANCE.GET(`${API_URL}/kind`);
   },
+  getRecommendBoards: async () => {
+    return await API_INSTANCE.GET(`${API_URL}/recommend`);
+  },
 };

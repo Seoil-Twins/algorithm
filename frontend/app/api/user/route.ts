@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { API_INSTANCE, handleUnAuthorization } from "..";
-import { revalidatePath } from "next/cache";
 
 const API_URL = "/user";
 

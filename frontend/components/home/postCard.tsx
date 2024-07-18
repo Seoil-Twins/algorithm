@@ -7,10 +7,11 @@ import { notosansMedium } from "@/styles/_font";
 
 import TagSlider from "./tagSlider";
 
-import { Board } from "@/types2/board";
+import { RecommendBoardItem } from "@/app/api/model/board";
+import { IMAGE_URL } from "@/api";
 
 type PostCardProps = {
-  post: Board;
+  post: RecommendBoardItem;
 };
 
 const PostCard = async ({ post }: PostCardProps) => {
@@ -23,7 +24,7 @@ const PostCard = async ({ post }: PostCardProps) => {
       <div className={styles.imgBox}>
         {post.thumbnail ? (
           <Image
-            src={post.thumbnail}
+            src={`${IMAGE_URL}${post.thumbnail}`}
             alt="이미지 없음"
             width={0}
             height={0}

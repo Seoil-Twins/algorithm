@@ -145,11 +145,7 @@ public class AlgorithmService {
     }
 
     public ResponseAlgorithmSuggestDto getSuggestAlgorithms(){
-
         List<AlgorithmSuggest> algorithms = suggestRepository.findAll();
-
-        if(algorithms.isEmpty())
-            throw new CustomException(ErrorCode.NOT_FOUND_SUGGEST);
 
         ResponseAlgorithmSuggestDto response = new ResponseAlgorithmSuggestDto();
         List<AlgorithmSuggestDto> dtos = new ArrayList<>();

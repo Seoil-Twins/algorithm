@@ -32,7 +32,6 @@ public enum ErrorCode {
     NOT_FOUND_EMAIL_VERIFIED(HttpStatus.NOT_FOUND, "인증을 요청한 이메일이 존재하지 않습니다.", 40480),
     NOT_FOUND_ALGORITHM(HttpStatus.NOT_FOUND, "알고리즘이 존재하지 않습니다.", 40420),
     NOT_FOUND_EXPLANATION(HttpStatus.NOT_FOUND, "풀이가 존재하지 않습니다.", 40430),
-    NOT_FOUND_SUGGEST(HttpStatus.NOT_FOUND, "추천 아이템이 존재하지 않습니다.", 40440),
     NOT_FOUND_CORRECT(HttpStatus.NOT_FOUND, "해당 정답 코드는 존재하지 않습니다.", 40450),
     NOT_FOUND_RECOMMEND(HttpStatus.NOT_FOUND, "해당 추천이 존재하지 않습니다.", 40460),
     NOT_FOUND_BOARD(HttpStatus.NOT_FOUND, "게시글이 존재하지 않습니다.", 40490),

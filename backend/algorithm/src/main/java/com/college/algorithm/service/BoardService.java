@@ -136,11 +136,7 @@ public class BoardService {
         return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isSolved,isView,isRecommend);
     }
     public ResponseBoardSuggestDto getSuggestBoards(){
-        List<BoardSuggest> boards = suggestRepository.findAll();
-
-        if(boards.isEmpty())
-            throw new CustomException(ErrorCode.NOT_FOUND_SUGGEST);
-
+        List<BoardSuggest> boards = suggestRepository.findAllByOrderByCreatedTimeDesc();
         List<BoardSuggestDto> dtos = new ArrayList<>();
 
         for(BoardSuggest boardSuggest : boards) {
@@ -152,7 +148,8 @@ public class BoardService {
             if(tagNames.isEmpty())
                 tagNames = null;
 
-            dtos.add(BoardMapper.INSTANCE.toBoardSuggestDto(boardSuggest.getBoard(),user,tagNames));
+            BoardImage image = boardImageRepository.findByBoardOrderByCreatedTimeAsc(boardSuggest.getBoard());
+            dtos.add(BoardMapper.INSTANCE.toBoardSuggestDto(boardSuggest.getBoard(), image, user, tagNames));
         }
 
 

@@ -5,12 +5,12 @@ import Link from "next/link";
 import styles from "./algorithmCard.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { Algorithm } from "@/types2/algorithm";
+import { RecommendAlgorithmItem } from "@/app/api/model/algorithm";
 
 import TagSlider from "./tagSlider";
 
 type AlgorithmCardProps = {
-  algorithm: Algorithm;
+  algorithm: RecommendAlgorithmItem;
 };
 
 const AlgorithmCard = ({ algorithm }: AlgorithmCardProps) => {
