@@ -25,4 +25,10 @@ export const AlgorithmAPI = {
   submitAlgorithm: async (algorithmId: number, body: Body) => {
     return await API_INSTANCE.POST(`${API_URL}/${algorithmId}`, body);
   },
+  addBookmark: async (algorithmId: number) => {
+    return await API_INSTANCE.POST(`${API_URL}/${algorithmId}/recommend`);
+  },
+  deleteBookmark: async (algorithmId: number) => {
+    return await API_INSTANCE.DELETE(`${API_URL}/${algorithmId}/recommend`);
+  },
 };

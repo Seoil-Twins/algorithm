@@ -5,6 +5,7 @@ import com.college.algorithm.entity.Board;
 import com.college.algorithm.entity.BoardType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.List;
@@ -19,9 +20,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             AppUser user,
             Pageable pageable
     );
-    Page<Board> findAllByBoardType_TypeIdAndTitleContaining(Pageable pageable, Character typeId,String keyword);
-  
-    Page<Board> findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(Pageable pageable, Character typeId1, Character typeId2,String keyword);
-  
+    @EntityGraph(
+            value = "board.getBoard",
+            attributePaths = { "user" }
+    )
+    Page<Board> findAllByBoardType_TypeIdInAndTitleContaining(Pageable pageable, List<Character> typeIds, String keyword);
+    Page<Board> findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmId(Pageable pageable, List<Character> typeIds, String keyword, Long algorithmId);
     Optional<Board> findByBoardId(Long boardId);
 }

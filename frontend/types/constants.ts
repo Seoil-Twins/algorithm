@@ -1,12 +1,5 @@
 import { RateOptions, SolvedOptions, SortOptions } from "./algorithm";
 
-export const BOARD_TYPE = {
-  PUBLIC_QUESTION: 1,
-  PUBLIC_FREE: 2,
-  ALGORITHM_QUESTION: 3,
-  ALGORITHM_FEEDBACK: 4,
-} as const;
-
 export const NO_AUTH_PATHS = ["/login", "/signup"];
 export const AUTH_PATHS = [
   "/account",
@@ -63,4 +56,13 @@ export const SnsKind = {
   GOOGLE: "1002",
   NAVER: "1003",
   KAKAO: "1004",
+} as const;
+
+export const BoardType = {
+  ALGORITHM_ALL: "a",
+  ALGORITHM_QUESTION: "aq",
+  ALGORITHM_FEEDBACK: "af",
+  PUBLIC_ALL: "p",
+  PUBLIC_QUESTION: "pq",
+  PUBLIC_FEEDBACK: "pf",
 } as const;

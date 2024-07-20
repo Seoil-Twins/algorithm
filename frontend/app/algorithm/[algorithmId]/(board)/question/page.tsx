@@ -1,3 +1,4 @@
+import { BoardType } from "@/types/constants";
 import Content from "../content";
 
 type QuestionParams = { algorithmId: number };
@@ -14,7 +15,7 @@ const Question = async ({
       <Content
         algorithmId={params.algorithmId}
         options={{
-          kind: 3,
+          boardType: BoardType.ALGORITHM_QUESTION,
           page: Number(searchParams?.page) || 1,
           count: Number(searchParams?.count) || 10,
           keyword: searchParams?.keyword,

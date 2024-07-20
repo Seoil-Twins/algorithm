@@ -33,11 +33,6 @@ export type AlgorithmOptions = {
   keyword?: string;
 };
 
-export type AlgorithmPageOptions = PageOptions & {
-  kind: ALGORITHM_BOARD_TYPE;
-  keyword?: string;
-};
-
 export type AlgorithmKind = {
   kindId: string;
   kindName: string;

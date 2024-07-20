@@ -3,11 +3,14 @@
 import { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { notosansBold } from "@/styles/_font";
 import styles from "./navbar.module.scss";
 
 import { Algorithm } from "@/app/api/model/algorithm";
+import { AlgorithmAPI } from "@/api/algorithm";
 
 import Share from "./share";
 import Dropdown from "@/components/common/dropdown";
@@ -44,6 +47,7 @@ const codeTypeDropdownItems = [
 ];
 
 const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
+  const router = useRouter();
   const { user } = useAuth();
   const { type, setType } = useCodeType();
   const defaultTitle = codeTypeDropdownItems.filter(({ value }) => {
@@ -70,10 +74,31 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
     [setType],
   );
 
-  const handleBoomark = useCallback(() => {
-    if (!user) return;
-    console.log("bookmark");
-  }, [user]);
+  const handleBoomark = useCallback(async () => {
+    console.log("in");
+    if (!user) {
+      toast.error("로그인이 필요한 시스템입니다.");
+      router.push(
+        `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
+      );
+      return;
+    }
+
+    try {
+      console.log(algorithm.isRecommend);
+      if (algorithm.isRecommend) {
+        await AlgorithmAPI.deleteBookmark(algorithm.algorithmId);
+      } else {
+        await AlgorithmAPI.addBookmark(algorithm.algorithmId);
+      }
+
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        "예상치 못한 에러가 발생하였습니다.\n나중에 다시 시도해주세요.",
+      );
+    }
+  }, [algorithm.algorithmId, algorithm.isRecommend, router, user]);
 
   return (
     <header className={styles.header}>
@@ -115,27 +140,23 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
           description={algorithm.content}
           thumbnail={algorithm.thumbnail}
         />
-        {algorithm.isRecommend ? (
-          <button className={styles.btn}>
-            <ThemeImage
-              lightSrc="/svgs/bookmark_active_black.svg"
-              darkSrc="/svgs/bookmark_active_white.svg"
-              alt="북마크"
-              width={28}
-              height={28}
-            />
-          </button>
-        ) : (
-          <button className={styles.btn} onClick={handleBoomark}>
-            <ThemeImage
-              lightSrc="/svgs/bookmark_none_black.svg"
-              darkSrc="/svgs/bookmark_none_white.svg"
-              alt="북마크"
-              width={28}
-              height={28}
-            />
-          </button>
-        )}
+        <button className={styles.btn} onClick={handleBoomark}>
+          <ThemeImage
+            lightSrc={`${
+              algorithm.isRecommend
+                ? "/svgs/bookmark_active_black.svg"
+                : "/svgs/bookmark_none_black.svg"
+            }`}
+            darkSrc={`${
+              algorithm.isRecommend
+                ? "/svgs/bookmark_active_white.svg"
+                : "/svgs/bookmark_none_white.svg"
+            }`}
+            alt="북마크"
+            width={28}
+            height={28}
+          />
+        </button>
         <ThemeSwitch className={styles.btn} />
         <Dropdown
           defaultTitle={defaultTitle}

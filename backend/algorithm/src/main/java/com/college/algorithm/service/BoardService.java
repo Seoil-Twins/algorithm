@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,62 +40,68 @@ public class BoardService {
     private final DummyImageRepository dummyImageRepository;
     private final BoardImageRepository boardImageRepository;
 
-    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId){
+    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId, Long algorithmId){
         Pageable pageable = PageRequest.of(page-1, count);
         Page<Board> boards = null;
-        BoardType searchType1,searchType2;
-        switch (searchType){
-            case "p":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 질문");
-                searchType2 = kindRepository.findBoardTypeByTypeName("일반 자유");
-                boards = boardRepository.findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),searchType2.getTypeId(),keyword);
-                break;
-            case "pq":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 질문");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "pf":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 자유");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "a":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 질문");
-                searchType2 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
-                boards = boardRepository.findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),searchType2.getTypeId(),keyword);
-                break;
-            case "aq":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 질문");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "af":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
+        Map<String, String[]> searchTypeMappings = Map.of(
+                "p", new String[] {"일반 질문", "일반 자유"},
+                "pq", new String[] {"일반 질문"},
+                "pf", new String[] {"일반 자유"},
+                "a", new String[] {"알고리즘 질문", "알고리즘 피드백"},
+                "aq", new String[] {"알고리즘 질문"},
+                "af", new String[] {"알고리즘 피드백"}
+        );
+        List<BoardType> boardTypes = new ArrayList<>();
+        String[] typeNames = searchTypeMappings.get(searchType);
+
+        if (typeNames != null) {
+            for (String typeName : typeNames) {
+                boardTypes.add(kindRepository.findBoardTypeByTypeName(typeName));
+            }
+        }
+
+        List<Character> typeIds = boardTypes.stream()
+                .map(BoardType::getTypeId)
+                .toList();
+
+        if (searchType.equals("a") || searchType.equals("aq") || searchType.equals("af")) {
+            if (algorithmId == null) {
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContaining(pageable, typeIds, keyword);
+            } else {
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmId(pageable, typeIds, keyword, algorithmId);
+            }
+        } else {
+            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContaining(pageable, typeIds, keyword);
         }
 
         List<BoardDto> dtos = new ArrayList<>();
-        int total = 0;
+        List<Tag> tags = tagRepository.findAllByBoardIn(boards.getContent().stream().toList());
+        long total = boards.getTotalElements();
+
         for(Board board : boards){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-            Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
+            Boolean isSolved = loginUserId != null && board.getAdopt() != null;
 
-            Boolean isRecommend = null;
-            if(loginUserId != null)
-                isRecommend = recommendRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
+            Boolean isRecommend = loginUserId != null && board.getRecommendCount() > 0 && (
+                    recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+            );
 
-            List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
+            List<Tag> boardTags = tags.stream()
+                    .filter(tag -> tag.getBoard().getBoardId().equals(board.getBoardId()))
+                    .toList();
             List<String> tagNames = new ArrayList<>();
-            for(Tag tag : tags)
+
+            for(Tag tag : boardTags)
                 tagNames.add(tag.getContent());
+
             if(tagNames.isEmpty())
                 tagNames = null;
 
-            dtos.add(BoardMapper.INSTANCE.toBoardDto(board,user,tagNames,isSolved,isRecommend));
-            total++;
+            dtos.add(BoardMapper.INSTANCE.toBoardDto(board, user, tagNames, isSolved, isRecommend));
         }
 
-        return new ResponseBoardsDto(dtos,total);
+        return new ResponseBoardsDto(dtos, total);
     }
     public ResponseBoardTypeDto getKinds(){
 
@@ -115,15 +123,17 @@ public class BoardService {
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-        Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
+        Boolean isSolved = loginUserId != null && board.getAdopt() != null;
 
-        Boolean isView = null;
+        boolean isView = loginUserId != null && (
+                boardViewRepository.existsByBoardAndUserUserId(board, loginUserId)
+        );
         if(loginUserId != null)
             isView = boardViewRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
 
-        Boolean isRecommend = null;
-        if(loginUserId != null)
-            isRecommend = recommendRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
+        Boolean isRecommend = loginUserId != null && (
+                recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+        );
 
         List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
         List<String> tagNames = new ArrayList<>();

@@ -23,7 +23,7 @@ export type REQUEST_BOARD_TYPE = Exclude<
 export const AlgorithmBoardType = {
   ALGORITHM_ALL: "a",
   ALGORITHM_QUESTION: "aq",
-  ALGORITHM_FEEDBACK: "aaf",
+  ALGORITHM_FEEDBACK: "af",
 } as const;
 export type ALGORITHM_BOARD_TYPE =
   (typeof AlgorithmBoardType)[keyof typeof AlgorithmBoardType];

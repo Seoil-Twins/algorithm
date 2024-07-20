@@ -25,7 +25,7 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getBoards(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                        @RequestParam(required = false, defaultValue = "10", value = "count") int count,
                                        @RequestParam(required = false, value = "boardType") String boardType, /* p : 일반 전체
@@ -35,6 +35,7 @@ public class BoardController {
                                                                                                                aq : 알고리즘 질문
                                                                                                                af : 알고리즘 피드백*/
                                        @RequestParam(required = false, value = "keyword") String keyword,
+                                       @RequestParam(required = false, value = "algorithmId") Long algorithmId,
                                        HttpServletRequest request){
         boolean paramFlag = Arrays.stream(BoardTypeWithSearchParam.values())
                 .anyMatch(type -> boardType.equals(type.getSearchParam()));
@@ -47,7 +48,7 @@ public class BoardController {
         String userId = request.getSession().getAttribute("userId").toString();
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoards(page, count, boardType, keyword, Long.parseLong(userId)));
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoards(page, count, boardType, keyword, Long.parseLong(userId), algorithmId));
     }
 
     @GetMapping("/kind")

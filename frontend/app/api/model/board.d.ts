@@ -38,3 +38,27 @@ export type RecommendBoardItem = {
 export type RecommendBoard = {
   boards: RecommendBoardItem;
 };
+
+export type BoardListItem = {
+  boardId: number;
+  boardType: string;
+  user: {
+    userId: number;
+    profile: string;
+    nickname: string;
+  };
+  title: string;
+  viewCount: number;
+  recommendCount: number;
+  commentCount: number;
+  tags: string[] | null;
+  isSolved: boolean;
+  // Session이 없으면 null이 반환됩니다.
+  isRecommed: boolean | null;
+  createdTime: string;
+};
+
+export type BoardList = {
+  boards: BoardListItem[];
+  total: number;
+};
