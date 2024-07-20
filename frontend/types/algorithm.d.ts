@@ -44,6 +44,11 @@ export type AlgorithmKind = {
 };
 
 export type RequestAlgorithm = {
+  code: string;
+  type: string;
+};
+
+export type RequestAlgorithmBoard = {
   title: string;
   content: string;
   boardType: ALGORITHM_BOARD_TYPE;

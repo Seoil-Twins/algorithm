@@ -1,5 +1,5 @@
 import { AlgorithmOptions } from "@/types/algorithm";
-import { API_INSTANCE } from ".";
+import { API_INSTANCE, Body } from ".";
 
 const API_URL = "/algorithm";
 
@@ -18,5 +18,11 @@ export const AlgorithmAPI = {
   },
   getAlgorithmKinds: async () => {
     return await API_INSTANCE.GET(`${API_URL}/kind`);
+  },
+  getAlgorithm: async (algorithmId: number) => {
+    return await API_INSTANCE.GET(`${API_URL}/${algorithmId}`);
+  },
+  submitAlgorithm: async (algorithmId: number, body: Body) => {
+    return await API_INSTANCE.POST(`${API_URL}/${algorithmId}`, body);
   },
 };

@@ -28,7 +28,8 @@ export type Algorithm = {
   limitTime: string;
   limitMemory: string;
   isRecommend: boolean | null;
-  testcase: TestCase[];
+  thumbnail: string | null;
+  testcases: TestCase[];
 };
 
 type AlgorithmsItem = {

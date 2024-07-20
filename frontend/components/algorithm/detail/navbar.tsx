@@ -7,21 +7,22 @@ import Link from "next/link";
 import { notosansBold } from "@/styles/_font";
 import styles from "./navbar.module.scss";
 
-import { Algorithm } from "@/types2/algorithm";
+import { Algorithm } from "@/app/api/model/algorithm";
 
 import Share from "./share";
 import Dropdown from "@/components/common/dropdown";
 import ThemeSwitch from "@/components/common/themeSwitch";
 import ThemeImage from "@/components/common/themeImage";
 
+import { useCodeType } from "@/providers/codeTypeProvider";
+import { useAuth } from "@/providers/authProvider";
+
 import {
   CODE_TYPE_OPTIONS_ARRAY,
   CodeType,
-  useCodeType,
-} from "@/providers/codeTypeProvider";
-import { useAuth } from "@/providers/authProvider";
-
-import { checkMyType } from "@/types/constants";
+  Language,
+  checkMyType,
+} from "@/types/constants";
 
 type AlgorithmNavbarProps = {
   algorithm: Algorithm;
@@ -30,15 +31,15 @@ type AlgorithmNavbarProps = {
 const codeTypeDropdownItems = [
   {
     title: "C++",
-    value: "c",
+    value: Language.CPP,
   },
   {
     title: "Python",
-    value: "p",
+    value: Language.PYTHON,
   },
   {
     title: "Java",
-    value: "j",
+    value: Language.JAVA,
   },
 ];
 
@@ -94,7 +95,7 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
             height={12}
             className={styles.m15}
           />
-          <span>{algorithm.kinds}</span>
+          <span>{algorithm.kind}</span>
           <Image
             src="/svgs/arrow_right_gray.svg"
             alt="오른쪽 회색 화살표"
@@ -114,7 +115,7 @@ const Navbar = ({ algorithm }: AlgorithmNavbarProps) => {
           description={algorithm.content}
           thumbnail={algorithm.thumbnail}
         />
-        {algorithm.isFavorite ? (
+        {algorithm.isRecommend ? (
           <button className={styles.btn}>
             <ThemeImage
               lightSrc="/svgs/bookmark_active_black.svg"

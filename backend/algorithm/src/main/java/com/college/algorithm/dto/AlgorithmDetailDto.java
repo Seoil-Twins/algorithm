@@ -18,6 +18,7 @@ public class AlgorithmDetailDto {
     private String content;
     private String limitTime;
     private String limitMemory;
+    private String thumbnail;
     private Boolean isRecommend;
     private List<AlgorithmDetailTestcaseDto> testcases;
 }

@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  CODE_TYPE_OPTIONS_ARRAY,
+  CodeTitle,
+  CodeType,
+  Language,
+  checkMyType,
+} from "@/types/constants";
+import {
   ReactNode,
   createContext,
   useState,
@@ -8,60 +15,30 @@ import {
   useEffect,
 } from "react";
 
-export type CodeType = "c" | "p" | "j";
-export const CODE_TYPE_OPTIONS_ARRAY: CodeType[] = ["c", "p", "j"];
-
-export const getCodeValue = (code: CodeType) => {
-  switch (code) {
-    case "c":
-      return 3001;
-    case "p":
-      return 3002;
-    case "j":
-      return 3003;
-    default:
-      return 3001;
-  }
-};
-
 type CodeTypeProviderContext = {
   type: CodeType;
   setType: (value: CodeType) => void;
 };
 
 const CodeTypeContext = createContext<CodeTypeProviderContext>({
-  type: "p",
+  type: Language.PYTHON,
   setType: () => {},
 });
 
-export type CodeTypeInfo = {
-  [K in (typeof CODE_TYPE_OPTIONS_ARRAY)[number]]: string;
-};
-
-const myCodeTitle: CodeTypeInfo = {
-  c: "cpp",
-  j: "java",
-  p: "python",
-};
-
 export const findMyTitle = (value: CodeType) => {
-  return myCodeTitle[value];
-};
-
-export const checkMyType = (compareArray: CodeType[], value: CodeType) => {
-  return compareArray.includes(value);
+  return CodeTitle[value];
 };
 
 export const CodeTypeProvider = ({ children }: { children: ReactNode }) => {
-  const [type, setStateType] = useState<CodeType>("p");
+  const [type, setStateType] = useState<CodeType>(Language.PYTHON);
 
   useEffect(() => {
-    const codeType = window.localStorage.getItem("codeType") || "p";
+    const codeType = window.localStorage.getItem("codeType") || Language.PYTHON;
 
     setStateType(
       checkMyType(CODE_TYPE_OPTIONS_ARRAY, codeType as CodeType)
         ? (codeType as CodeType)
-        : "p",
+        : Language.PYTHON,
     );
   }, [type]);
 

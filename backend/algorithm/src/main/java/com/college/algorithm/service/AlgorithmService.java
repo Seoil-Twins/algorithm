@@ -33,6 +33,7 @@ public class AlgorithmService {
     private final UserRepository userRepository;
 
     private final AlgorithmRepository algorithmRepository;
+    private final AlgorithmImageRepository algorithmImageRepository;
     private final AlgorithmTestcaseRepository testcaseRepository;
     private final AlgorithmSuggestRepository suggestRepository;
     private final AlgorithmRecommendRepository recommendRepository;
@@ -159,6 +160,7 @@ public class AlgorithmService {
     }
     public AlgorithmDetailDto getAlgorithmDetail(Long algorithmId, Long loginUserId){
         Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
+        AlgorithmImage algorithmImage = algorithmImageRepository.findFirstByAlgorithmOrderByCreatedTimeAsc(algorithmEntity);
 
         if(algorithmEntity == null)
             throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
@@ -178,11 +180,8 @@ public class AlgorithmService {
         }
 
         // algorithmId 및 loginUserId로 추천 점검
-        boolean isRecommend = true;
-        if(loginUserId != null)
-             isRecommend = recommendRepository.countByAlgorithm_AlgorithmIdAndUserUserId(algorithmId, loginUserId) >= 1;
-
-        return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithmEntity,isRecommend,testcases);
+        boolean isRecommend = recommendRepository.existsByAlgorithmAndUser_UserId(algorithmEntity, loginUserId);
+        return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithmEntity, algorithmImage, isRecommend, testcases);
     }
     public ExplanationResponseDto getExplanation(Long algorithmId){
 

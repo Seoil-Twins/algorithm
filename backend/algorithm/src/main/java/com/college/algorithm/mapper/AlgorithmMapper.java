@@ -33,9 +33,10 @@ public interface AlgorithmMapper {
     @Mapping(source = "algorithm.content", target = "content")
     @Mapping(source = "algorithm.limitTime", target = "limitTime")
     @Mapping(source = "algorithm.limitMemory", target = "limitMemory")
+    @Mapping(source = "algorithmImage.imagePath", target = "thumbnail")
     @Mapping(source = "isRecommend", target = "isRecommend")
     @Mapping(source = "testcases", target = "testcases")
-    AlgorithmDetailDto toAlgorithmDetailDto(Algorithm algorithm, boolean isRecommend, List<AlgorithmDetailTestcaseDto> testcases);
+    AlgorithmDetailDto toAlgorithmDetailDto(Algorithm algorithm, AlgorithmImage algorithmImage, boolean isRecommend, List<AlgorithmDetailTestcaseDto> testcases);
 
     @Mapping(source = "algorithm.title", target = "title")
     @Mapping(source = "algorithm.level", target = "level")

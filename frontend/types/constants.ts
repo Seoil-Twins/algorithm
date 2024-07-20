@@ -26,24 +26,36 @@ export const SOLVED_OPTIONS_ARRAY: SolvedOptions[] = ["a", "s", "ns"];
 export const SORT_OPTIONS_ARRAY: SortOptions[] = ["r", "or", "t"];
 export const RATE_OPTIONS_ARRAY: RateOptions[] = ["h", "l"];
 
-export const checkMyType = (
-  compareArray: SolvedOptions[] | SortOptions[] | RateOptions[],
-  value: string,
-) => {
+export const checkMyType = <T>(compareArray: T[], value: string) => {
   return compareArray.includes(value as never);
 };
 
-export const getTitleByCode = (code: number) => {
-  switch (code) {
-    case 3001:
-      return "c++";
-    case 3002:
-      return "python";
-    case 3003:
-      return "java";
-    default:
-      return "python";
-  }
+export const Language = {
+  CPP: "cpp",
+  PYTHON: "p",
+  JAVA: "j",
+} as const;
+
+export type CodeType = (typeof Language)[keyof typeof Language];
+export const CODE_TYPE_OPTIONS_ARRAY: CodeType[] = ["cpp", "p", "j"];
+export type CodeTypeInfo = {
+  [K in (typeof CODE_TYPE_OPTIONS_ARRAY)[number]]: string;
+};
+
+export const CodeTitle: CodeTypeInfo = {
+  cpp: "cpp",
+  j: "java",
+  p: "python",
+} as const;
+
+export const CodeValue = {
+  cpp: "3001",
+  p: "3002",
+  j: "3003",
+} as const;
+
+export const getTitleByCode = (code: CodeType) => {
+  return CodeTitle[code];
 };
 
 export const SnsKind = {
