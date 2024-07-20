@@ -79,11 +79,13 @@ public class Board {
         return adopt != null;
     }
 
+
     @Builder
-    public Board(BoardType boardType, AppUser user, String title, String content) {
+    public Board(BoardType boardType, AppUser user, String title, String content, Algorithm algorithm) {
         this.boardType = boardType;
         this.user = user;
         this.title = title;
         this.content = content;
+        this.algorithm = algorithm;
     }
 }

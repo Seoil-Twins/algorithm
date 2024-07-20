@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_INSTANCE, handleUnAuthorization } from "..";
+import { API_INSTANCE, handleUnAuthorization } from "../..";
 
-const API_URL = "/board";
+const API_URL = "/board/image";
 
-export const GET = async (req: NextRequest) => {
+export const POST = async (req: NextRequest) => {
   try {
-    const { data, headers } = await API_INSTANCE.GET(
-      `${API_URL}?${req.nextUrl.searchParams.toString()}`,
+    const formData = await req.formData();
+    const { data, headers } = await API_INSTANCE.POST_FORMDATA(
+      API_URL,
       req.headers,
+      formData,
+      true,
     );
 
     return NextResponse.json(data, {

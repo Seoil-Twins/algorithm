@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseBoardCommentDto {
     List<BoardCommentDto> comments;
-    Integer total;
+    Long total;
 }

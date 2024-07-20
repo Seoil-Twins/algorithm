@@ -6,9 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import { Comment as CommentType } from "@/types2/comment";
+import { CommentListItem } from "@/app/api/model/comment";
 
-import { IMAGE_URL } from "@/app/actions";
 import {
   deleteComment,
   patchComment,
@@ -24,10 +23,13 @@ import CommentUpdateEditor from "./commentUpdateEditor";
 import RecommendPost from "./recommendPost";
 import Modal from "../common/modal";
 
+import { IMAGE_URL } from "@/api";
+import { BoardTypeId } from "@/types/constants";
+
 type CommentProps = {
-  comment: CommentType;
+  comment: CommentListItem;
   userId: number;
-  boardTypeId: number;
+  boardTypeId: string;
   solved?: number | null;
 };
 
@@ -87,7 +89,11 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
   );
 
   const renderCheckMark = () => {
-    if (boardTypeId !== 2 && userId === user?.userId && !solved) {
+    if (
+      boardTypeId !== String(BoardTypeId.PUBLIC_FREE) &&
+      userId === user?.userId &&
+      !solved
+    ) {
       return (
         <button onClick={handleSolved}>
           <Image
@@ -124,7 +130,7 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
           <div className={styles.user}>
             <Link href={`/user/${comment.user.userId}/question`}>
               <Image
-                src={`${IMAGE_URL}/${comment.user.profile}`}
+                src={`${IMAGE_URL}${comment.user.profile}`}
                 alt="프로필 사진"
                 width={38}
                 height={38}

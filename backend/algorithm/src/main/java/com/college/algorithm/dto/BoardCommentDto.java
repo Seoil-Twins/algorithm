@@ -9,6 +9,7 @@ public class BoardCommentDto {
     private Long commentId;
     private ResponseBoardUserDto user;
     private String content;
+    private Boolean isRecommend;
     private Integer recommendCount;
     private String createdTime;
 }

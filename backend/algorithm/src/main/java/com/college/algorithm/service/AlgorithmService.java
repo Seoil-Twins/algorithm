@@ -372,7 +372,6 @@ public class AlgorithmService {
         if(algorithm == null)
             throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
 
-
         List<Long> dummyImageIds = boardPostDto.getImageIds();
         List<DummyImage> dummyImages = new ArrayList<>();
         for(Long imageId : dummyImageIds){
@@ -383,11 +382,13 @@ public class AlgorithmService {
                 throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
 
-        Board board = new Board();
-        board.setTitle(boardPostDto.getTitle());
-        board.setContent(boardPostDto.getContent());
-        board.setBoardType(boardTypeRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
-        board.setAlgorithm(algorithm);
+        Board board = Board.builder()
+                .user(user)
+                .title(boardPostDto.getTitle())
+                .content(boardPostDto.getContent())
+                .boardType(boardTypeRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)))
+                .algorithm(algorithm)
+                .build();
         Board savedBoard = boardRepository.save(board);
 
         for(DummyImage image : dummyImages){
@@ -396,14 +397,16 @@ public class AlgorithmService {
             dummyImageRepository.delete(image);
         }
 
-        List<Tag> tags = new ArrayList<>();
         List<String> tagNames = boardPostDto.getTags();
-        for (String tagName : tagNames) {
-            Tag tag = new Tag(savedBoard, tagName);
-            tags.add(tag);
-        }
 
-        tagRepository.saveAll(tags);
+        if (tagNames != null && !tagNames.isEmpty()) {
+            List<Tag> tags = new ArrayList<>();
+            for (String tagName : tagNames) {
+                tags.add(new Tag(savedBoard, tagName));
+            }
+
+            tagRepository.saveAll(tags);
+        }
 
         return HttpStatus.OK;
     }

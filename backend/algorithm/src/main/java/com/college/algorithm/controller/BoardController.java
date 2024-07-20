@@ -46,7 +46,6 @@ public class BoardController {
             keyword="";
 
         String userId = request.getSession().getAttribute("userId").toString();
-        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoards(page, count, boardType, keyword, Long.parseLong(userId), algorithmId));
     }
@@ -61,8 +60,6 @@ public class BoardController {
                                        HttpServletRequest request){
 
         String userId = request.getSession().getAttribute("userId").toString();
-        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
-
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId, Long.parseLong(userId)));
     }
 
@@ -74,8 +71,10 @@ public class BoardController {
     @GetMapping("/{board_id}/comment")
     public ResponseEntity<?> getBoardComments(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                               @RequestParam(required = false, defaultValue = "10", value = "count") int count,
-                                              @PathVariable(value = "board_id") Long boardId){
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardComments(page,count,boardId));
+                                              @PathVariable(value = "board_id") Long boardId,
+                                              HttpServletRequest request){
+        String userId = request.getSession().getAttribute("userId").toString();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardComments(page, count, boardId, Long.parseLong(userId)));
     }
 
     @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

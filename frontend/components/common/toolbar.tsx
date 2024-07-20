@@ -2,22 +2,23 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import { Editor } from "@tiptap/react";
+import toast from "react-hot-toast";
 
 import styles from "./toolbar.module.scss";
 
 import EditorInputModal, { ModalItem } from "./editorInputModal";
 
-import { postBoardImage } from "@/api/board";
-import { useParams } from "next/navigation";
+import { BoardAPI } from "@/api/board";
+import { IMAGE_URL } from "@/api";
+
+import { DummyImage } from "@/app/api/model/dummyImage";
 
 type ToolbarProps = {
   editor: Editor;
+  onChangeImage?: (imageId: number) => void;
 };
 
-const Toolbar = ({ editor }: ToolbarProps) => {
-  const param = useParams();
-  const boardId = param.boardId;
-
+const Toolbar = ({ editor, onChangeImage }: ToolbarProps) => {
   const linkKeys = useMemo(() => ["url", "text"], []);
   const [isVisibleLinkModal, setIsVisibleLinkModal] = useState<boolean>(false);
   const [linkItems, setLinkItems] = useState<ModalItem[]>([
@@ -256,9 +257,18 @@ const Toolbar = ({ editor }: ToolbarProps) => {
     const file = imageItems[1].value;
 
     if (file && typeof file === "object") {
-      // upload 후 src 받아서 처리
-      // await postBoardImage(boardId, file);
-      editor.commands.setImage({ src: URL.createObjectURL(file) });
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await BoardAPI.addDummyImage(formData);
+        const data: DummyImage = await response.json();
+
+        editor.commands.setImage({ src: IMAGE_URL + data.path });
+        onChangeImage?.(data.imageId);
+      } catch (error: any) {
+        toast.error("이미지 업로드에 실패하였습니다.");
+      }
     } else {
       editor.commands.setImage({ src: url as string });
     }
@@ -269,7 +279,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
 
     setImageItems(newImageItems);
     setIsVisibleImageModal(false);
-  }, [boardId, imageItems, param, editor.commands]);
+  }, [imageItems, editor.commands, onChangeImage]);
 
   const handleImageFile = useCallback(
     (key: string, file: File) => {

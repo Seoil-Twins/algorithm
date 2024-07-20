@@ -154,6 +154,25 @@ export const API_INSTANCE = {
     return await fetchWithHandling(url, options, hasResponseData);
   },
 
+  POST_FORMDATA: async (
+    url: string,
+    headers: Headers,
+    formData: FormData,
+    hasResponseData: boolean = false,
+  ): Promise<CustomResponse> => {
+    headers.delete("Content-Length");
+    // 브라우저가 자동으로 지정하게 설정
+    // 라이브러리 사용하지 않고는 최선의 방법
+    headers.delete("Content-Type");
+
+    const options: RequestInit = {
+      method: "POST",
+      headers,
+      body: formData,
+    };
+    return await fetchWithHandling(url, options, hasResponseData);
+  },
+
   PATCH: async (
     url: string,
     headers: Headers,

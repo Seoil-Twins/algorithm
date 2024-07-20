@@ -73,6 +73,7 @@ public interface BoardMapper {
     @Mapping(source = "user", target = "user")
     @Mapping(source = "comment.content", target = "content")
     @Mapping(source = "comment.recommendCount", target = "recommendCount")
+    @Mapping(source = "isRecommend", target = "isRecommend")
     @Mapping(source = "comment.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class})
-    BoardCommentDto toBoardCommentDto(Comment comment, ResponseBoardUserDto user);
+    BoardCommentDto toBoardCommentDto(Comment comment, ResponseBoardUserDto user, boolean isRecommend);
 }

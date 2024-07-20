@@ -89,6 +89,35 @@ export const API_INSTANCE = {
     return response;
   },
 
+  POST_FORMDATA: async (url: string, formData: FormData): Promise<Response> => {
+    /**
+     * 브라우저에서 자동 감지 하도록 변경
+     * formData의 getBoundary()도 사라지면서, 현재로썬 브라우저가 자동 감지하여 넣는게 최선
+     */
+    const headers = await getCookie();
+    const response = await fetch(API_URL + url, {
+      method: "POST",
+      credentials: "include",
+      headers,
+      body: formData,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const error: CustomException = await response.json();
+      throw new CustomException(
+        error.status,
+        error.errorCode,
+        error.error,
+        error.message,
+        error.code,
+        error.timestamp,
+      );
+    }
+
+    return response;
+  },
+
   PATCH: async (url: string, body?: Body): Promise<Response> => {
     const headers = await getHeaders();
     const response = await fetch(API_URL + url, {

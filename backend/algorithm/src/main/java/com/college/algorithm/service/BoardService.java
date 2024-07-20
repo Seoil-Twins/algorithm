@@ -16,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +31,7 @@ public class BoardService {
 
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final CommentRecommendRepository commentRecommendRepository;
     private final TagRepository tagRepository;
 
     private final FileStore fileStore;
@@ -66,12 +64,12 @@ public class BoardService {
 
         if (searchType.equals("a") || searchType.equals("aq") || searchType.equals("af")) {
             if (algorithmId == null) {
-                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContaining(pageable, typeIds, keyword);
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingOrderByCreatedTimeDesc(pageable, typeIds, keyword);
             } else {
-                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmId(pageable, typeIds, keyword, algorithmId);
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdOrderByCreatedTimeDesc(pageable, typeIds, keyword, algorithmId);
             }
         } else {
-            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContaining(pageable, typeIds, keyword);
+            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingOrderByCreatedTimeDesc(pageable, typeIds, keyword);
         }
 
         List<BoardDto> dtos = new ArrayList<>();
@@ -165,23 +163,28 @@ public class BoardService {
 
         return new ResponseBoardSuggestDto(dtos);
     }
-    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId){
-
+    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId, Long userId){
         if(boardRepository.findByBoardId(boardId).isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_BOARD);
 
         Pageable pageable = PageRequest.of(page-1, count);
         Page<Comment> comments = commentRepository.findAllByBoardBoardId(pageable, boardId);
+
+        List<Long> commentIds = comments.stream().map(Comment::getCommentId).collect(Collectors.toList());
+
+        List<CommentRecommend> recommends = commentRecommendRepository.findAllByUserUserIdAndCommentCommentIdIn(userId, commentIds);
+        Set<Long> recommendedCommentIds = recommends.stream().map(cr -> cr.getComment().getCommentId()).collect(Collectors.toSet());
+
         List<BoardCommentDto> dtos = new ArrayList<>();
-        int total = 0;
+        long total = comments.getTotalElements();
+
         for(Comment comment : comments){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(comment.getUser());
-
-            dtos.add(BoardMapper.INSTANCE.toBoardCommentDto(comment,user));
-            total++;
+            boolean isRecommend = recommendedCommentIds.contains(comment.getCommentId());
+            dtos.add(BoardMapper.INSTANCE.toBoardCommentDto(comment, user, isRecommend));
         }
 
-        return new ResponseBoardCommentDto(dtos,total);
+        return new ResponseBoardCommentDto(dtos, total);
     }
 
     public ResponseBoardImageDto postBoardImage(RequestBoardImageDto dto, Long loginUserId){
@@ -219,10 +222,12 @@ public class BoardService {
                 throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
 
-        Board board = new Board();
-        board.setTitle(boardPostDto.getTitle());
-        board.setContent(boardPostDto.getContent());
-        board.setBoardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
+        Board board = Board.builder()
+                .user(user)
+                .title(boardPostDto.getTitle())
+                .content(boardPostDto.getContent())
+                .boardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)))
+                .build();
         Board savedBoard = boardRepository.save(board);
 
         for(DummyImage image : dummyImages){

@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { RequestBoard } from "@/types2/board";
+import { RequestAlgorithmBoard } from "@/types/algorithm";
 
 import styles from "./boardForm.module.scss";
 import { notosansMedium } from "@/styles/_font";
@@ -11,13 +11,12 @@ import { notosansMedium } from "@/styles/_font";
 import Dropdown, { DropdownItem } from "@/components/common/dropdown";
 import Input from "@/components/common/input";
 import Editor from "@/components/common/editor";
-import SubmitButton from "./submitButton";
 
 type BoardFormProps = {
-  request: RequestBoard;
+  request: RequestAlgorithmBoard;
   dropdownItems: DropdownItem[];
-  action: (payload: FormData) => void;
-  onChangeRequest: (request: RequestBoard) => void;
+  action: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onChangeRequest: (request: RequestAlgorithmBoard) => void;
 };
 
 const BoardForm = ({
@@ -40,7 +39,7 @@ const BoardForm = ({
     (value: string | number) => {
       const newRequest = {
         ...request,
-        boardType: value as RequestBoard["boardType"],
+        boardType: value as RequestAlgorithmBoard["boardType"],
       };
 
       onChangeRequest(newRequest);
@@ -72,12 +71,27 @@ const BoardForm = ({
     [request, onChangeRequest],
   );
 
+  const handleImageIds = useCallback(
+    (imageId: number) => {
+      const imageIds = request.imageIds;
+      imageIds?.push(imageId);
+
+      const newRequest = {
+        ...request,
+        imageIds,
+      };
+
+      onChangeRequest(newRequest);
+    },
+    [request, onChangeRequest],
+  );
+
   const handleCancel = useCallback(() => {
     router.back();
   }, [router]);
 
   return (
-    <form className={styles.form} action={action}>
+    <form className={styles.form}>
       <div>
         <div className={styles.boardTitle}>
           <span className={`${notosansMedium.className}`}>카테고리</span>
@@ -121,6 +135,7 @@ const BoardForm = ({
         <Editor
           value={request.content}
           onChange={handleEditor}
+          onChangeImage={handleImageIds}
           className={styles.editor}
         />
       </div>
@@ -128,11 +143,9 @@ const BoardForm = ({
         <button type="button" className={styles.cancel} onClick={handleCancel}>
           취소
         </button>
-        <SubmitButton
-          btnTitle="작성"
-          pendingTitle="작성중"
-          className={styles.submit}
-        />
+        <button type="button" onClick={action} className={styles.submit}>
+          작성
+        </button>
       </div>
     </form>
   );

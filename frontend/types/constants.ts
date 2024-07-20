@@ -66,3 +66,12 @@ export const BoardType = {
   PUBLIC_QUESTION: "pq",
   PUBLIC_FEEDBACK: "pf",
 } as const;
+
+export const BoardTypeId = {
+  PUBLIC_QUESTION: 1,
+  PUBLIC_FREE: 2,
+  ALGORITHM_QUESTION: 3,
+  ALGORITHM_FEEDBACK: 4,
+} as const;
+
+export type BoardTypeIdValue = (typeof BoardTypeId)[keyof typeof BoardTypeId];

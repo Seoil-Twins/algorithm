@@ -29,6 +29,7 @@ type EditorProps = {
   className?: string;
   init?: boolean;
   onChange: (value: string) => void;
+  onChangeImage?: (imageId: number) => void;
 };
 
 const Editor = ({
@@ -38,6 +39,7 @@ const Editor = ({
   className,
   init = false,
   onChange,
+  onChangeImage,
 }: EditorProps) => {
   const editor = useEditor({
     extensions: [
@@ -71,7 +73,6 @@ const Editor = ({
   });
 
   useEffect(() => {
-    console.log(init);
     if (init) {
       editor?.commands.setContent("");
     }
@@ -82,7 +83,12 @@ const Editor = ({
 
   return (
     <div className={styles.editorBox}>
-      {isVisibleToolbar && <Toolbar editor={editor} />}
+      {isVisibleToolbar && (
+        <Toolbar
+          editor={editor}
+          onChangeImage={(imageId: number) => onChangeImage?.(imageId)}
+        />
+      )}
       <EditorContent
         editor={editor}
         className={className}

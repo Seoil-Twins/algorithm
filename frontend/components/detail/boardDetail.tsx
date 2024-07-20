@@ -1,14 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { User } from "@/types2/user";
-import { CommentResponse } from "@/types2/comment";
-
-import { getComments } from "@/app/actions/comment";
-import { IMAGE_URL } from "@/app/actions";
-import { getUser } from "@/app/actions/user";
-import { getBoardDetail } from "@/app/actions/baord";
-
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
@@ -19,8 +11,14 @@ import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
-import { BOARD_TYPE } from "@/types/constants";
 import FeedbackSolve from "./feedbackSolve";
+import { User } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
+import { Board } from "@/app/api/model/board";
+import { BoardAPI } from "@/api/board";
+import { IMAGE_URL } from "@/api";
+import { BoardTypeId } from "@/types/constants";
+import { CommentList, CommentListItem } from "@/app/api/model/comment";
 
 type BoardDetailProps = {
   boardId: number;
@@ -33,36 +31,32 @@ const BoardDetail = async ({
   boardId: BoardDetailProps["boardId"];
   searchParams?: { [key: string]: string | string[] | undefined };
 }) => {
-  const userResponse = await getUser();
-  let user;
-  if (userResponse.status === 200) {
-    user = userResponse.data as User;
-  } else {
-    user = undefined;
-  }
+  const user: User = await (await UserAPI.getUser()).json();
 
-  const boardResponse = await getBoardDetail(boardId);
-  if (typeof boardResponse.data === "string") {
-    return (
-      <NotFound
-        title="게시글이 존재하지 않습니다."
-        description="URL을 다시 확인해주세요."
-      />
-    );
+  let board: Board;
+  try {
+    board = await (await BoardAPI.getBoard(boardId)).json();
+  } catch (error: any) {
+    if (error.status === 404) {
+      return (
+        <NotFound
+          title="게시글이 존재하지 않습니다."
+          description="URL을 다시 확인해주세요."
+        />
+      );
+    } else {
+      throw error;
+    }
   }
-  const board = boardResponse.data;
 
   const count = Number(searchParams?.count) || 10;
   const page = Number(searchParams?.page) || 1;
-  const commentsResponse = await getComments(boardId, { count, page });
-
-  let comments: CommentResponse = {
-    total: 0,
-    comments: [],
-  };
-  if (commentsResponse.status === 200) {
-    comments = commentsResponse.data as CommentResponse;
-  }
+  const comment: CommentList = await (
+    await BoardAPI.getBoardComments(boardId, {
+      count,
+      page,
+    })
+  ).json();
 
   return (
     <div>
@@ -74,7 +68,7 @@ const BoardDetail = async ({
             className={styles.flex}
           >
             <Image
-              src={`${IMAGE_URL}/${board.user.profile}`}
+              src={`${IMAGE_URL}${board.user.profile}`}
               alt="프로필 사진"
               width={38}
               height={38}
@@ -87,8 +81,8 @@ const BoardDetail = async ({
               <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
           </Link>
-          {board.boardType === BOARD_TYPE.ALGORITHM_FEEDBACK &&
-            (board.solved ? (
+          {board.boardType === String(BoardTypeId.ALGORITHM_FEEDBACK) &&
+            (board.isSolved ? (
               <Image
                 src="/svgs/valid_check.svg"
                 alt="채택"
@@ -99,12 +93,12 @@ const BoardDetail = async ({
               <FeedbackSolve boardId={board.boardId} />
             ))}
         </div>
-        {board.solved && (
+        {board.isSolved && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>
             해결 완료
           </span>
         )}
-        {!board.solved && <span className={styles.notSolved}>미해결</span>}
+        {!board.isSolved && <span className={styles.notSolved}>미해결</span>}
         <div className={`${styles.title} ${notosansBold.className}`}>
           {board.title}
         </div>
@@ -128,21 +122,21 @@ const BoardDetail = async ({
         <hr className={styles.line} />
         <div className={styles.commentTotal}>{board.commentCount}개의 답변</div>
         <CommentEditor requestId={String(board.boardId)} />
-        {comments.total > 0 && (
+        {comment.total > 0 && (
           <div className={styles.commentBox}>
-            {comments.comments.map((comment) => (
+            {comment.comments.map((comment: CommentListItem) => (
               <Comment
                 key={comment.commentId}
                 comment={comment}
                 userId={board.user.userId}
                 boardTypeId={board.boardType}
-                solved={Number(board.solved)}
+                solved={Number(board.isSolved)}
               />
             ))}
             <Pagination
               current={page}
               count={count}
-              total={comments.total}
+              total={comment.total}
               marginTop={25}
             />
           </div>

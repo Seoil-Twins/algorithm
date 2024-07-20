@@ -7,11 +7,7 @@ type BoardParams = {
 const Board = async ({ params }: { params: BoardParams }) => {
   const boardId = params.boardId;
 
-  return (
-    <>
-      <BoardDetail boardId={boardId} />
-    </>
-  );
+  return <BoardDetail boardId={boardId} />;
 };
 
 export default Board;

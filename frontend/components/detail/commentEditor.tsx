@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useFormState } from "react-dom";
 
-import { IMAGE_URL } from "@/app/actions";
 import { postComment } from "@/app/actions/comment";
 
 import { useAuth } from "@/providers/authProvider";
@@ -14,6 +13,7 @@ import { useAuth } from "@/providers/authProvider";
 import Editor from "../common/editor";
 import styles from "./commentEditor.module.scss";
 import SubmitButton from "../common/submitButton";
+import { IMAGE_URL } from "@/api";
 
 type CommentEditorProps = {
   requestId: string;
@@ -72,7 +72,7 @@ const CommentEditor = ({
       <div className={styles.editorBox}>
         <div className={styles.profileImgBox}>
           <Image
-            src={`${IMAGE_URL}/${user?.profile}`}
+            src={`${IMAGE_URL}${user?.profile}`}
             alt="프로필 사진"
             width={38}
             height={38}
@@ -90,6 +90,7 @@ const CommentEditor = ({
       </div>
       <div className={styles.btnBox}>
         <SubmitButton
+          isPending={false}
           btnTitle="답변 작성"
           pendingTitle="작성 중"
           className={`${styles.btn} ${styles.comment}`}

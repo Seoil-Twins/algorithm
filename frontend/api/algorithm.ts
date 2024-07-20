@@ -28,6 +28,9 @@ export const AlgorithmAPI = {
   addBookmark: async (algorithmId: number) => {
     return await API_INSTANCE.POST(`${API_URL}/${algorithmId}/recommend`);
   },
+  addAlgorithmBoard: async (algorithmId: number, body: Body) => {
+    return await API_INSTANCE.POST(`${API_URL}/${algorithmId}/board`, body);
+  },
   deleteBookmark: async (algorithmId: number) => {
     return await API_INSTANCE.DELETE(`${API_URL}/${algorithmId}/recommend`);
   },
