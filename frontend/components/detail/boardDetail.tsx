@@ -4,33 +4,33 @@ import Link from "next/link";
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
+import { BoardTypeId } from "@/types/constants";
+
+import { User } from "@/app/api/model/user";
+import { Board } from "@/app/api/model/board";
+import { CommentList, CommentListItem } from "@/app/api/model/comment";
+
+import { IMAGE_URL } from "@/api";
+import { UserAPI } from "@/api/user";
+import { BoardAPI } from "@/api/board";
+import { CommentAPI } from "@/api/comment";
+
 import DetailNav from "./detailNav";
 import EditorViewer from "../common/editorViewer";
-import RecommendPost from "./recommendPost";
+import RecommendPost from "./recommendButton";
 import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
 import FeedbackSolve from "./feedbackSolve";
-import { User } from "@/app/api/model/user";
-import { UserAPI } from "@/api/user";
-import { Board } from "@/app/api/model/board";
-import { BoardAPI } from "@/api/board";
-import { IMAGE_URL } from "@/api";
-import { BoardTypeId } from "@/types/constants";
-import { CommentList, CommentListItem } from "@/app/api/model/comment";
 
 type BoardDetailProps = {
   boardId: number;
+  page: number;
+  count: number;
 };
 
-const BoardDetail = async ({
-  boardId,
-  searchParams,
-}: {
-  boardId: BoardDetailProps["boardId"];
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) => {
+const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
   const user: User = await (await UserAPI.getUser()).json();
 
   let board: Board;
@@ -49,10 +49,8 @@ const BoardDetail = async ({
     }
   }
 
-  const count = Number(searchParams?.count) || 10;
-  const page = Number(searchParams?.page) || 1;
   const comment: CommentList = await (
-    await BoardAPI.getBoardComments(boardId, {
+    await CommentAPI.getComments(boardId, {
       count,
       page,
     })
@@ -82,7 +80,7 @@ const BoardDetail = async ({
             </div>
           </Link>
           {board.boardType === String(BoardTypeId.ALGORITHM_FEEDBACK) &&
-            (board.isSolved ? (
+            (board.solved ? (
               <Image
                 src="/svgs/valid_check.svg"
                 alt="채택"
@@ -93,12 +91,12 @@ const BoardDetail = async ({
               <FeedbackSolve boardId={board.boardId} />
             ))}
         </div>
-        {board.isSolved && (
+        {board.solved && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>
             해결 완료
           </span>
         )}
-        {!board.isSolved && <span className={styles.notSolved}>미해결</span>}
+        {!board.solved && <span className={styles.notSolved}>미해결</span>}
         <div className={`${styles.title} ${notosansBold.className}`}>
           {board.title}
         </div>
@@ -112,11 +110,10 @@ const BoardDetail = async ({
             ))}
           </div>
           <RecommendPost
-            apiUrl={`/recommend/board/${board.boardId}`}
+            type="board"
+            requestId={board.boardId}
             isRecommend={board.isRecommend}
             recommendCount={Number(board.recommendCount)}
-            userId={user?.userId}
-            requestId={board.boardId}
           />
         </div>
         <hr className={styles.line} />
@@ -130,7 +127,7 @@ const BoardDetail = async ({
                 comment={comment}
                 userId={board.user.userId}
                 boardTypeId={board.boardType}
-                solved={Number(board.isSolved)}
+                solved={board.solved}
               />
             ))}
             <Pagination
@@ -138,6 +135,7 @@ const BoardDetail = async ({
               count={count}
               total={comment.total}
               marginTop={25}
+              useScrollTop={false}
             />
           </div>
         )}

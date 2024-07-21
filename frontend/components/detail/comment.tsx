@@ -20,11 +20,12 @@ import styles from "./comment.module.scss";
 
 import EditorViewer from "../common/editorViewer";
 import CommentUpdateEditor from "./commentUpdateEditor";
-import RecommendPost from "./recommendPost";
+import RecommendPost from "./recommendButton";
 import Modal from "../common/modal";
 
 import { IMAGE_URL } from "@/api";
 import { BoardTypeId } from "@/types/constants";
+import { CommentAPI } from "@/api/comment";
 
 type CommentProps = {
   comment: CommentListItem;
@@ -54,38 +55,35 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
   }, []);
 
   const handleSolved = useCallback(async () => {
-    const response = await postSolvedComment(boardId, comment.commentId);
-
-    if (response.status === 200) {
+    try {
+      await CommentAPI.addSolveComment(boardId, comment.commentId);
       router.refresh();
-    } else {
-      toast.error("채택에 실패했습니다.");
+    } catch (error) {
+      toast.error("댓글 채택에 실패하였습니다.\n나중에 다시 시도해주세요.");
     }
   }, [boardId, router, comment.commentId]);
 
   const handleCommentDelete = useCallback(async () => {
-    const response = await deleteComment(comment.commentId);
-
-    if (response.status === 200) {
+    try {
+      await CommentAPI.deleteComment(comment.commentId);
       router.refresh();
       setIsVisibleModal(false);
-    } else {
-      toast.error("삭제에 실패했습니다.");
+    } catch (error) {
+      toast.error("댓글 삭제에 실패하였습니다.\n나중에 다시 시도해주세요.");
     }
   }, [comment.commentId, router]);
 
   const handleCommentUpdate = useCallback(
     async (value: string) => {
-      const response = await patchComment(comment.commentId, value);
-
-      if (response.status === 200) {
-        router.refresh();
+      try {
+        await CommentAPI.updateComment(comment.commentId, { content: value });
         setIsVisibleEditor(false);
-      } else {
-        toast.error("수정에 실패했습니다.");
+        comment.content = value;
+      } catch (error) {
+        toast.error("댓글 수정에 실패하였습니다.\n나중에 다시 시도해주세요.");
       }
     },
-    [comment.commentId, router],
+    [comment],
   );
 
   const renderCheckMark = () => {
@@ -172,12 +170,10 @@ const Comment = ({ comment, userId, boardTypeId, solved }: CommentProps) => {
             <div className={styles.solved}>{renderCheckMark()}</div>
             <div className={styles.recommendBtnBox}>
               <RecommendPost
-                apiUrl={`/recommend/comment/${comment.commentId}`}
+                type="comment"
+                requestId={comment.commentId}
                 isRecommend={comment.isRecommend}
                 recommendCount={Number(comment.recommendCount)}
-                userId={user?.userId}
-                requestId={comment.commentId}
-                padding={10}
               />
             </div>
           </div>

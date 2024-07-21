@@ -79,7 +79,7 @@ public class BoardService {
         for(Board board : boards){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-            Boolean isSolved = loginUserId != null && board.getAdopt() != null;
+            Boolean isSolved = loginUserId != null && board.getIsSolved();
 
             Boolean isRecommend = loginUserId != null && board.getRecommendCount() > 0 && (
                     recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
@@ -121,8 +121,6 @@ public class BoardService {
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-        Boolean isSolved = loginUserId != null && board.getAdopt() != null;
-
         boolean isView = loginUserId != null && (
                 boardViewRepository.existsByBoardAndUserUserId(board, loginUserId)
         );
@@ -141,7 +139,7 @@ public class BoardService {
             tagNames = null;
 
 
-        return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isSolved,isView,isRecommend);
+        return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isView,isRecommend);
     }
     public ResponseBoardSuggestDto getSuggestBoards(){
         List<BoardSuggest> boards = suggestRepository.findAllByOrderByCreatedTimeDesc();
@@ -306,13 +304,13 @@ public class BoardService {
         if(board.getDeleted())
             throw new CustomException(ErrorCode.DELETED_BOARD);
 
-        if(board.getAdopt().getCommentId() != null)
+        if(board.getIsSolved())
             throw new CustomException(ErrorCode.DUPLICATE_ADOPT);
 
         if(!comment.getBoard().getBoardId().equals(board.getBoardId()))
             throw new CustomException(ErrorCode.NOT_MATCHED_BOARD);
 
-        board.setAdopt(comment);
+        board.setAdoptId(comment.getCommentId());
         boardRepository.save(board);
 
 

@@ -1,0 +1,14 @@
+.recommendWrapper {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+
+  .img {
+    margin-right: 5px;
+  }
+
+  .count {
+    position: relative;
+    top: 1px;
+  }
+}

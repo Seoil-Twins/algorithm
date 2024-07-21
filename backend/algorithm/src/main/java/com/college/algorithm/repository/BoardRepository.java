@@ -16,7 +16,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             AppUser user,
             Pageable pageable);
 
-    Page<Board> findAllByUserAndAdoptIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
+    Page<Board> findAllByUserAndAdoptIdIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
             AppUser user,
             Pageable pageable
     );

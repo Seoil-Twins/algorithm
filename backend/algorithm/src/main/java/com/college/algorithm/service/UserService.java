@@ -26,7 +26,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -162,15 +165,28 @@ public class UserService {
                 })
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        Page<Board> boardPage = boardRepository.findAllByUserAndAdoptIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
+        Page<Board> boardPage = boardRepository.findAllByUserAndAdoptIdIsNotNullAndDeletedIsFalseOrderByCreatedTimeDesc(
                 user,
                 pageable
         );
         List<Board> boards = boardPage.getContent();
 
-        List<ResponseMyCommentDto.CommentDto> commentDtos = boards.stream()
-                .map((board) -> CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(board, board.getAdopt()))
+        List<Long> commentIds = boards.stream()
+                .map(Board::getAdoptId)
+                .filter(Objects::nonNull) // null 값 제외
                 .toList();
+        List<Comment> comments = commentRepository.findAllByCommentIdIn(commentIds);
+
+        // adoptId와 Comment 객체를 매핑하는 Map 생성
+        Map<Long, Comment> commentMap = comments.stream()
+                .collect(Collectors.toMap(Comment::getCommentId, comment -> comment));
+
+        // ResponseMyCommentDto.CommentDto 리스트 생성
+        List<ResponseMyCommentDto.CommentDto> commentDtos = boards.stream()
+                .filter(board -> board.getAdoptId() != null)
+                .map(board -> CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(board, commentMap.get(board.getAdoptId())))
+                .collect(Collectors.toList());
+
         long total = boardPage.getTotalElements();
 
         return new ResponseMyCommentDto(commentDtos, total);
@@ -201,7 +217,8 @@ public class UserService {
                     if (boardType == freeType.getTypeId()) {
                         return  CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(comment.getBoard(), comment);
                     } else {
-                        return CommentMapper.INSTANCE.toResponseCommentDto(comment.getBoard(), comment);
+                        Board board = comment.getBoard();
+                        return CommentMapper.INSTANCE.toResponseCommentDto(board, comment, board.getAdoptId().equals(comment.getCommentId()));
                     }
                 })
                 .toList();

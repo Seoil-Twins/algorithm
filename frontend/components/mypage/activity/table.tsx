@@ -38,8 +38,8 @@ const Table = ({ boardTypes, items, total, errorTitle }: TableProps) => {
       {total <= 0 && (
         <NotFound title={errorTitle} description={""} size={70} marginTop={0} />
       )}
-      {items.map((item) => (
-        <Link href={`/forum/${item.boardId}`} key={item.boardId}>
+      {items.map((item, idx) => (
+        <Link href={`/forum/${item.boardId}`} key={idx}>
           <div className={styles.container}>
             <div className={`${styles.kind} ${notosansBold.className}`}>
               {getTitleById(item.boardType)}

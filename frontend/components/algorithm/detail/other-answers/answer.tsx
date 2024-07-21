@@ -15,7 +15,7 @@ import { useAuth } from "@/providers/authProvider";
 import Comment from "./comment";
 import EditorViewer from "@/components/common/editorViewer";
 import CommentEditor from "@/components/detail/commentEditor";
-import RecommendPost from "@/components/detail/recommendPost";
+import RecommendPost from "@/components/detail/recommendButton";
 
 type AnswerProps = {
   answer: ResponseAnswerItem;

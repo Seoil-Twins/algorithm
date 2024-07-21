@@ -73,8 +73,8 @@ export type Board = {
   recommendCount: number;
   commentCount: number;
   tags: string[] | null;
-  // 채택되지 않았다면 false, 채택되었다면 commentId를 반환합니다.
-  isSolved: false | number;
+  // 채택되지 않았다면 null, 채택되었다면 commentId를 반환합니다.
+  solved: number | null;
   // Session이 없으면 null이 반환됩니다.
   isView: boolean | null;
   // Session이 없으면 null이 반환됩니다.

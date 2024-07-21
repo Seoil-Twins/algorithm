@@ -17,9 +17,9 @@ public interface CommentMapper {
     @Mapping(source = "comment.content", target = "title")
     @Mapping(source = "board.title", target = "content")
     @Mapping(source = "comment.recommendCount", target = "likeCount")
-    @Mapping(source = "board.isSolved", target = "isSolved")
+    @Mapping(source = "isSolved", target = "isSolved")
     @Mapping(source = "comment.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class })
-    ResponseMyCommentDto.CommentDto toResponseCommentDto(Board board, Comment comment);
+    ResponseMyCommentDto.CommentDto toResponseCommentDto(Board board, Comment comment, Boolean isSolved);
 
     @Mapping(source = "board.boardId", target = "boardId")
     @Mapping(source = "board.boardType.typeId", target = "boardType")

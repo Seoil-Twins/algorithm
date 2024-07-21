@@ -1,6 +1,5 @@
 import { AlgorithmBoardPageOptions } from "@/types/board";
 import { API_INSTANCE } from ".";
-import { PageOptions } from "@/types";
 
 const API_URL = "/board";
 
@@ -23,18 +22,13 @@ export const BoardAPI = {
   getBoard: async (boardId: number) => {
     return await API_INSTANCE.GET(`${API_URL}/${boardId}`);
   },
-  getBoardComments: async (boardId: number, options: PageOptions) => {
-    const searchParams = new URLSearchParams();
-
-    Object.entries(options).forEach(([key, value]) => {
-      value && searchParams.append(key, String(value));
-    });
-
-    return await API_INSTANCE.GET(
-      `${API_URL}/${boardId}/comment?${searchParams.toString()}`,
-    );
-  },
   addDummyImage: async (formData: FormData) => {
     return await API_INSTANCE.POST_FORMDATA(`${API_URL}/image`, formData);
+  },
+  addRecommend: async (boardId: number) => {
+    return await API_INSTANCE.POST(`${API_URL}/${boardId}/recommend`);
+  },
+  deleteRecommend: async (boardId: number) => {
+    return await API_INSTANCE.DELETE(`${API_URL}/${boardId}/recommend`);
   },
 };

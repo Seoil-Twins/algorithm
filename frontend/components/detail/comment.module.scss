@@ -21,26 +21,10 @@
       }
 
       .recommendBtnBox {
+        position: relative;
+        top: -4px;
         display: flex;
         align-items: center;
-        border-radius: 8px;
-        border: 1px solid var(--color-border);
-
-        .count {
-          margin: 0 10px;
-        }
-
-        .btn {
-          padding: 10px;
-
-          &:first-child {
-            border-right: 1px solid var(--color-border);
-          }
-
-          &:last-child {
-            border-left: 1px solid var(--color-border);
-          }
-        }
       }
 
       .solved {

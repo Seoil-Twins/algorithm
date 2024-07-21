@@ -32,11 +32,6 @@ public class Board {
     @JoinColumn(name = "uploader_id", referencedColumnName = "user_id")
     private AppUser user;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "adopt_id", referencedColumnName = "comment_id")
-    private Comment adopt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "algorithm_id", referencedColumnName = "algorithm_id")
@@ -58,6 +53,9 @@ public class Board {
     @Column(name = "view_count")
     private Long viewCount;
 
+    @Column(name = "adopt_id")
+    private Long adoptId;
+
     @CreationTimestamp
     @Column(name = "created_time")
     private LocalDateTime createdTime;
@@ -76,7 +74,7 @@ public class Board {
     private Boolean isSolved;
 
     public Boolean getIsSolved() {
-        return adopt != null;
+        return adoptId != null;
     }
 
 
