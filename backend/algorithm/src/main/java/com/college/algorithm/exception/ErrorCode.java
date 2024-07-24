@@ -24,7 +24,7 @@ public enum ErrorCode {
     NOT_MATCHED_USER(HttpStatus.FORBIDDEN, "본인이 아닌 사용자의 접근입니다.", 40320),
     DELETED_USER(HttpStatus.FORBIDDEN, "이미 삭제된 사용자입니다.", 40330),
     DELETED_BOARD(HttpStatus.FORBIDDEN, "이미 삭제된 게시글입니다.", 40340),
-    NOT_MATCHED_BOARD(HttpStatus.FORBIDDEN, "해당 게시글의 댓글이 아닙니다", 40350),
+    NOT_MATCHED_BOARD(HttpStatus.FORBIDDEN, "해당 게시글의 댓글이 아닙니다.", 40350),
 
     /* 404 NOT FOUND : 리소스 없음 */
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자가 존재하지 않습니다.", 40410),
@@ -43,7 +43,7 @@ public enum ErrorCode {
     DUPLICATE_PARAMETER_EMAIL(HttpStatus.CONFLICT, "이메일이 이미 존재합니다", 40920),
     DUPLICATE_RECOMMEND(HttpStatus.CONFLICT, "추천이 이미 존재합니다", 40930),
     DUPLICATE_ADOPT(HttpStatus.CONFLICT, "채택된 댓글이 이미 존재합니다", 40940),
-
+    ALREADY_SOLVED(HttpStatus.FORBIDDEN, "이미 채택된 답변은 변경할 수 없습니다.", 40950),
 
     /* 500 Internal Server Error : 예기치 못한 서버 에러 */
     SQL_EXCEPTION(HttpStatus.CONFLICT, "SQL 실행 중 오류가 발생했습니다.", 50010),

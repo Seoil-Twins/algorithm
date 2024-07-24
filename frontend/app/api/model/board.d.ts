@@ -81,3 +81,13 @@ export type Board = {
   isRecommend: boolean | null;
   createdTime: string;
 };
+
+export type UpdateBoard = {
+  boardId: number;
+  boardType: string;
+  title: string;
+  content: string;
+  tags: string[] | null;
+  imageIds: number[] | null;
+  createdTime: string;
+};

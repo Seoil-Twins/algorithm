@@ -1,4 +1,5 @@
 import { ALGORITHM_BOARD_TYPE, PageOptions } from ".";
+import { RequestBoard } from "./board";
 import { BoardTypeIdValue } from "./constants";
 
 export const SolvedOptionItem = {
@@ -44,9 +45,5 @@ export type RequestAlgorithm = {
 };
 
 export type RequestAlgorithmBoard = {
-  title: string;
-  content: string;
   boardType: Pick<BoardTypeIdValue, 3, 4>;
-  tags?: string[];
-  imageIds?: number[];
-};
+} & RequestBoard;

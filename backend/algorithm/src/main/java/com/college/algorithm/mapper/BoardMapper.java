@@ -76,4 +76,13 @@ public interface BoardMapper {
     @Mapping(source = "isRecommend", target = "isRecommend")
     @Mapping(source = "comment.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class})
     BoardCommentDto toBoardCommentDto(Comment comment, ResponseBoardUserDto user, boolean isRecommend);
+
+    @Mapping(source = "board.boardId", target = "boardId")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
+    @Mapping(source = "board.title", target = "title")
+    @Mapping(source = "board.content", target = "content")
+    @Mapping(source = "imageIds", target = "imageIds")
+    @Mapping(source = "tags", target = "tags")
+    @Mapping(source = "board.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class})
+    ResponseUpdateBoardDetail toUpdateBoardDetail(Board board, List<Long> imageIds, List<String> tags);
 }

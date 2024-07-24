@@ -56,9 +56,20 @@ const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
     })
   ).json();
 
+  try {
+    if (!board.isView) {
+      await BoardAPI.addView(boardId);
+    }
+  } catch (error) {
+    /* empty */
+  }
+
   return (
     <div>
-      <DetailNav isEditable={user?.userId === board.user.userId} />
+      <DetailNav
+        isEditable={user?.userId === board.user.userId && !board.solved}
+        isDeletable={user?.userId === board.user.userId}
+      />
       <div className={styles.contentBox}>
         <div className={styles.user}>
           <Link

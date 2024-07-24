@@ -63,6 +63,13 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId, Long.parseLong(userId)));
     }
 
+    @GetMapping("/{board_id}/update")
+    public ResponseEntity<?> getUpdateBoardDetail(@PathVariable(value = "board_id") Long boardId,
+                                        HttpServletRequest request) {
+        String userId = request.getSession().getAttribute("userId").toString();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getUpdateBoardDetail(boardId, Long.parseLong(userId)));
+    }
+
     @GetMapping("/recommend")
     public ResponseEntity<?> getSuggests() {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getSuggestBoards());

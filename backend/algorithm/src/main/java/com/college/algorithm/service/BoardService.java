@@ -8,6 +8,7 @@ import com.college.algorithm.mapper.BoardMapper;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
 import com.college.algorithm.util.FileStore;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,12 +65,12 @@ public class BoardService {
 
         if (searchType.equals("a") || searchType.equals("aq") || searchType.equals("af")) {
             if (algorithmId == null) {
-                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingOrderByCreatedTimeDesc(pageable, typeIds, keyword);
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword);
             } else {
-                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdOrderByCreatedTimeDesc(pageable, typeIds, keyword, algorithmId);
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword, algorithmId);
             }
         } else {
-            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingOrderByCreatedTimeDesc(pageable, typeIds, keyword);
+            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword);
         }
 
         List<BoardDto> dtos = new ArrayList<>();
@@ -141,6 +142,27 @@ public class BoardService {
 
         return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isView,isRecommend);
     }
+
+    public ResponseUpdateBoardDetail getUpdateBoardDetail(Long boardId, Long userId) {
+        Board board = boardRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+        if (!board.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.NOT_MATCHED_USER);
+        }
+        if (board.getIsSolved()) {
+            throw new CustomException(ErrorCode.ALREADY_SOLVED);
+        }
+
+        List<BoardImage> images = boardImageRepository.findAllByBoard(board);
+        List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
+
+        List<Long> imageIds = images.stream().map(BoardImage::getImageId).toList();
+        List<String> tagContents = tags.stream().map(Tag::getContent).toList();
+
+        return BoardMapper.INSTANCE.toUpdateBoardDetail(board, imageIds, tagContents);
+    }
+
     public ResponseBoardSuggestDto getSuggestBoards(){
         List<BoardSuggest> boards = suggestRepository.findAllByOrderByCreatedTimeDesc();
         List<BoardSuggestDto> dtos = new ArrayList<>();
@@ -204,6 +226,7 @@ public class BoardService {
         return new ResponseBoardImageDto(savedImage.getImageId(),savedImage.getImagePath());
     }
 
+    @Transactional
     public HttpStatus postBoard(RequestBoardPostDto boardPostDto, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -228,11 +251,19 @@ public class BoardService {
                 .build();
         Board savedBoard = boardRepository.save(board);
 
+        List<BoardImage> addImages = new ArrayList<>();
         for(DummyImage image : dummyImages){
-            BoardImage boardImage = new BoardImage(savedBoard, image.getImagePath(), image.getImageType(), image.getImageSize());
-            boardImageRepository.save(boardImage);
-            dummyImageRepository.delete(image);
+            addImages.add(BoardImage.builder()
+                            .imageId(image.getImageId())
+                            .board(savedBoard)
+                            .imageType(image.getImageType())
+                            .imageSize(image.getImageSize())
+                            .imagePath(image.getImagePath())
+                    .build());
         }
+
+        boardImageRepository.saveAll(addImages);
+        dummyImageRepository.deleteAll(dummyImages);
 
         List<Tag> tags = new ArrayList<>();
         List<String> tagNames = boardPostDto.getTags();
@@ -246,6 +277,7 @@ public class BoardService {
         return HttpStatus.OK;
     }
 
+    @Transactional
     public HttpStatus postBoardRecommend(Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -340,6 +372,8 @@ public class BoardService {
 
         return HttpStatus.CREATED;
     }
+
+    @Transactional
     public HttpStatus patchBoard(RequestBoardUpdateDto boardUpdateDto,Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -365,24 +399,55 @@ public class BoardService {
 
 
         List<Tag> existingTags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
-
         List<String> newTags = boardUpdateDto.getTags();
 
+        List<Tag> deleteTags = new ArrayList<>();
         for (Tag tag : existingTags) {
             if (!newTags.contains(tag.getContent())) {
-                tagRepository.delete(tag);
+                deleteTags.add(tag);
             } else {
                 newTags.remove(tag.getContent());
             }
         }
+        tagRepository.deleteAll(deleteTags);
 
+        List<Tag> addTags = new ArrayList<>();
         // 새로운 태그 추가
         if (newTags != null) {
             for (String content : newTags) {
-                Tag tag = new Tag(board, content);
-                tagRepository.save(tag);
+                addTags.add(new Tag(board, content));
             }
         }
+        tagRepository.saveAll(addTags);
+
+        List<BoardImage> boardImages = boardImageRepository.findAllByBoard(board);
+        List<BoardImage> deleteImages = boardImages.stream().filter((image -> !boardUpdateDto.getImageIds().contains(image.getImageId()))).toList();
+        boardImageRepository.deleteAll(deleteImages);
+
+        for (BoardImage image : deleteImages) {
+            fileStore.deleteFile(image.getImagePath());
+        }
+
+        List<Long> existingImageIds = boardImages.stream()
+                .map(BoardImage::getImageId)
+                .toList();
+        List<Long> newImageIds = boardUpdateDto.getImageIds().stream()
+                .filter(imageId -> !existingImageIds.contains(imageId))
+                .toList();
+        List<DummyImage> dummyImages = dummyImageRepository.findAllByImageIdIn(newImageIds);
+
+        List<BoardImage> addImages = new ArrayList<>();
+        for (DummyImage image : dummyImages) {
+            addImages.add(BoardImage.builder()
+                            .imageId(image.getImageId())
+                            .board(board)
+                            .imagePath(image.getImagePath())
+                            .imageSize(image.getImageSize())
+                            .imageType(image.getImageType())
+                    .build());
+        }
+        boardImageRepository.saveAll(addImages);
+        dummyImageRepository.deleteAll(dummyImages);
 
         board.setTitle(boardUpdateDto.getTitle());
         board.setContent(boardUpdateDto.getContent());

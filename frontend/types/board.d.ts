@@ -5,6 +5,7 @@ import {
   PageOptions,
   REQUEST_BOARD_TYPE,
 } from ".";
+import { BoardTypeIdValue } from "./constants";
 
 export type AlgorithmBoardPageOptions = PageOptions & {
   boardType: ALGORITHM_BOARD_TYPE;
@@ -21,5 +22,11 @@ export type PublicBoardPageOptions = PageOptions & {
 export type RequestBoard = {
   title: string;
   content: string;
-  boardType: REQUEST_BOARD_TYPE;
+  boardType: BoardTypeIdValue;
+  tags?: string[] | null;
+  imageIds?: number[] | null;
 };
+
+export type RequestPublicBoard = {
+  boardType: Pick<BoardTypeIdValue, 1, 2>;
+} & RequestBoard;

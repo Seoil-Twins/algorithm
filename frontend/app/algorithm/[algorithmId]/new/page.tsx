@@ -38,9 +38,14 @@ const New = ({ params }: { params: NewParams }) => {
     content: "",
     imageIds: [],
   });
+  const [imageIds, setImageIds] = useState<number[]>([]);
 
   const handleChangeRequest = useCallback((request: RequestAlgorithmBoard) => {
     setRequest(request);
+  }, []);
+
+  const handleChangeImageIds = useCallback((imageId: number) => {
+    setImageIds((prev) => [...prev, imageId]);
   }, []);
 
   const handleAddBoard = useDebouncedCallback(
@@ -49,7 +54,10 @@ const New = ({ params }: { params: NewParams }) => {
         event.preventDefault();
 
         try {
-          await AlgorithmAPI.addAlgorithmBoard(algorithmId, request);
+          await AlgorithmAPI.addAlgorithmBoard(algorithmId, {
+            ...request,
+            imageIds,
+          });
           toast.success("게시글이 작성되었습니다.");
           router.refresh();
           router.replace(`/algorithm/${algorithmId}/all`);
@@ -65,7 +73,7 @@ const New = ({ params }: { params: NewParams }) => {
           return;
         }
       },
-      [request, algorithmId, router],
+      [algorithmId, request, imageIds, router],
     ),
     400,
   );
@@ -75,6 +83,7 @@ const New = ({ params }: { params: NewParams }) => {
       dropdownItems={dropdownItems}
       request={request}
       onChangeRequest={handleChangeRequest}
+      onChangeImageIds={handleChangeImageIds}
       action={handleAddBoard}
     />
   );

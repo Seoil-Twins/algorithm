@@ -391,11 +391,19 @@ public class AlgorithmService {
                 .build();
         Board savedBoard = boardRepository.save(board);
 
+        List<BoardImage> addImages = new ArrayList<>();
         for(DummyImage image : dummyImages){
-            BoardImage boardImage = new BoardImage(savedBoard, image.getImagePath(), image.getImageType(), image.getImageSize());
-            boardImageRepository.save(boardImage);
-            dummyImageRepository.delete(image);
+            addImages.add(BoardImage.builder()
+                    .imageId(image.getImageId())
+                    .board(savedBoard)
+                    .imageType(image.getImageType())
+                    .imageSize(image.getImageSize())
+                    .imagePath(image.getImagePath())
+                    .build());
         }
+
+        boardImageRepository.saveAll(addImages);
+        dummyImageRepository.deleteAll(dummyImages);
 
         List<String> tagNames = boardPostDto.getTags();
 

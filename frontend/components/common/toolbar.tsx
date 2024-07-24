@@ -264,7 +264,10 @@ const Toolbar = ({ editor, onChangeImage }: ToolbarProps) => {
         const response = await BoardAPI.addDummyImage(formData);
         const data: DummyImage = await response.json();
 
-        editor.commands.setImage({ src: IMAGE_URL + data.path });
+        editor.commands.setImage({
+          src: IMAGE_URL + data.path,
+          alt: String(data.imageId),
+        });
         onChangeImage?.(data.imageId);
       } catch (error: any) {
         toast.error("이미지 업로드에 실패하였습니다.");

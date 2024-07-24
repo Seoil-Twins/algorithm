@@ -17,6 +17,7 @@ type BoardFormProps = {
   dropdownItems: DropdownItem[];
   action: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onChangeRequest: (request: RequestAlgorithmBoard) => void;
+  onChangeImageIds: (imageIds: number) => void;
 };
 
 const BoardForm = ({
@@ -24,6 +25,7 @@ const BoardForm = ({
   dropdownItems,
   action,
   onChangeRequest,
+  onChangeImageIds,
 }: BoardFormProps) => {
   const router = useRouter();
 
@@ -64,21 +66,6 @@ const BoardForm = ({
       const newRequest = {
         ...request,
         content: value,
-      };
-
-      onChangeRequest(newRequest);
-    },
-    [request, onChangeRequest],
-  );
-
-  const handleImageIds = useCallback(
-    (imageId: number) => {
-      const imageIds = request.imageIds;
-      imageIds?.push(imageId);
-
-      const newRequest = {
-        ...request,
-        imageIds,
       };
 
       onChangeRequest(newRequest);
@@ -135,7 +122,7 @@ const BoardForm = ({
         <Editor
           value={request.content}
           onChange={handleEditor}
-          onChangeImage={handleImageIds}
+          onChangeImage={onChangeImageIds}
           className={styles.editor}
         />
       </div>

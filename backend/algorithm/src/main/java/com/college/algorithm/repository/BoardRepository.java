@@ -24,7 +24,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             value = "board.getBoard",
             attributePaths = { "user" }
     )
-    Page<Board> findAllByBoardType_TypeIdInAndTitleContainingOrderByCreatedTimeDesc(Pageable pageable, List<Character> typeIds, String keyword);
-    Page<Board> findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdOrderByCreatedTimeDesc(Pageable pageable, List<Character> typeIds, String keyword, Long algorithmId);
+    Page<Board> findAllByBoardType_TypeIdInAndTitleContainingAndDeletedIsFalseOrderByCreatedTimeDesc(Pageable pageable, List<Character> typeIds, String keyword);
+    Page<Board> findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdAndDeletedIsFalseOrderByCreatedTimeDesc(Pageable pageable, List<Character> typeIds, String keyword, Long algorithmId);
     Optional<Board> findByBoardId(Long boardId);
 }
