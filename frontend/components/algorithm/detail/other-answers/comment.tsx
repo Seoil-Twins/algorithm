@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
+import { IMAGE_URL } from "@/api";
 import { SummaryComment } from "@/types2/code";
 
-import { IMAGE_URL } from "@/app/actions";
 import { deleteComment, patchComment } from "@/app/actions/comment";
 
 import { useAuth } from "@/providers/authProvider";
@@ -81,7 +81,7 @@ const Comment = ({ comment }: CommentProps) => {
     <div className={styles.comment}>
       <Link href={`/user/${comment.user.userId}/question`}>
         <Image
-          src={`${IMAGE_URL}/${comment.user.profile}`}
+          src={`${IMAGE_URL}${comment.user.profile}`}
           alt="유저 아이콘"
           width={32}
           height={32}

@@ -13,3 +13,12 @@ export type CommentList = {
   comments: CommentListItem[];
   total: number;
 };
+
+export type CommentListItemWithoutIsRecommend = Exclude<
+  CommentListItem,
+  "isRecommend"
+>;
+export type CommentListWithoutIsRecommend = {
+  comments: CommentListItemWithoutIsRecommend[];
+  total: number;
+};

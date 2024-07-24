@@ -2,7 +2,6 @@
 
 import {
   CODE_TYPE_OPTIONS_ARRAY,
-  CodeTitle,
   CodeType,
   Language,
   checkMyType,
@@ -24,10 +23,6 @@ const CodeTypeContext = createContext<CodeTypeProviderContext>({
   type: Language.PYTHON,
   setType: () => {},
 });
-
-export const findMyTitle = (value: CodeType) => {
-  return CodeTitle[value];
-};
 
 export const CodeTypeProvider = ({ children }: { children: ReactNode }) => {
   const [type, setStateType] = useState<CodeType>(Language.PYTHON);

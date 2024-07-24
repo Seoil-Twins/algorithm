@@ -10,12 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AlgorithmRepository extends JpaRepository<Algorithm, Long>, JpaSpecificationExecutor<Algorithm> {
 
     Page<Algorithm> findAll(Pageable pageable);
 
-    Algorithm findAlgorithmByAlgorithmId(Long algorithmId);
+    Optional<Algorithm> findAlgorithmByAlgorithmId(Long algorithmId);
 
     @Query(value = "SELECT COUNT(*)" +
             " FROM try " +

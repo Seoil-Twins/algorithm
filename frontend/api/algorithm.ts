@@ -1,5 +1,6 @@
 import { AlgorithmOptions } from "@/types/algorithm";
 import { API_INSTANCE, Body } from ".";
+import { PageOptions } from "@/types";
 
 const API_URL = "/algorithm";
 
@@ -21,6 +22,20 @@ export const AlgorithmAPI = {
   },
   getAlgorithm: async (algorithmId: number) => {
     return await API_INSTANCE.GET(`${API_URL}/${algorithmId}`);
+  },
+  getAlgorithmCorrects: async (
+    algorithmId: number,
+    options: { language: string } & PageOptions,
+  ) => {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(options).forEach(([key, value]) => {
+      value && searchParams.append(key, String(value));
+    });
+
+    return await API_INSTANCE.GET(
+      `${API_URL}/${algorithmId}/correct?${searchParams.toString()}`,
+    );
   },
   submitAlgorithm: async (algorithmId: number, body: Body) => {
     return await API_INSTANCE.POST(`${API_URL}/${algorithmId}`, body);

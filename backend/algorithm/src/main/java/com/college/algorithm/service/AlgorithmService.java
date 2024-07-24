@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -159,11 +156,9 @@ public class AlgorithmService {
         return response;
     }
     public AlgorithmDetailDto getAlgorithmDetail(Long algorithmId, Long loginUserId){
-        Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        AlgorithmImage algorithmImage = algorithmImageRepository.findFirstByAlgorithmOrderByCreatedTimeAsc(algorithmEntity);
-
-        if(algorithmEntity == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
+        AlgorithmImage algorithmImage = algorithmImageRepository.findFirstByAlgorithmOrderByCreatedTimeAsc(algorithm);
 
         // algorithmId로 testcase 찾아와서 node 생성
         List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmId);
@@ -180,20 +175,19 @@ public class AlgorithmService {
         }
 
         // algorithmId 및 loginUserId로 추천 점검
-        boolean isRecommend = recommendRepository.existsByAlgorithmAndUser_UserId(algorithmEntity, loginUserId);
-        return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithmEntity, algorithmImage, isRecommend, testcases);
+        boolean isRecommend = recommendRepository.existsByAlgorithmAndUser_UserId(algorithm, loginUserId);
+        return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithm, algorithmImage, isRecommend, testcases);
     }
     public ExplanationResponseDto getExplanation(Long algorithmId){
 
-        Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        if(algorithmEntity == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
         Explanation explanation = explanationRepository.findExplanationByAlgorithm_AlgorithmId(algorithmId);
         if(explanation == null)
             throw new CustomException(ErrorCode.NOT_FOUND_EXPLANATION);
 
-        return AlgorithmMapper.INSTANCE.toExplanationResponseDto(algorithmEntity,explanation);
+        return AlgorithmMapper.INSTANCE.toExplanationResponseDto(algorithm,explanation);
     }
     public ResponseAlgorithmKindDto getKinds(){
 
@@ -211,28 +205,26 @@ public class AlgorithmService {
 
         return response;
     }
-    public ResponseCorrectDto getCorrects(Long algorithmId, int page, int count){
+    public ResponseCorrectDto getCorrects(Long algorithmId, int page, int count, String codeType){
         Pageable pageable = PageRequest.of(page-1, count, Sort.by("createdTime").descending());
-        int total = 0;
 
-        if(algorithmRepository.findAlgorithmByAlgorithmId(algorithmId) == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
-        Page<AlgorithmCorrect> corrects = correctRepository.findAllByAlgorithm_AlgorithmId(pageable, algorithmId);
+        Page<AlgorithmCorrect> corrects = correctRepository.findAllByAlgorithmAndCodeType_TypeIdOrderByCreatedTimeDesc(pageable, algorithm, codeType);
 
         List<AlgorithmCorrectDto> dtos = new ArrayList<>();
+        long total = corrects.getTotalElements();
 
         for(AlgorithmCorrect correct : corrects) {
             ResponseAlgorithmUserDto user = UserMapper.INSTANCE.toResponseAlgorithmUserDto(correct.getUser());
-            dtos.add(AlgorithmMapper.INSTANCE.toAlgorithmCorrectDto(correct,user));
-            total++;
+            dtos.add(AlgorithmMapper.INSTANCE.toAlgorithmCorrectDto(correct, user));
         }
 
-        return new ResponseCorrectDto(dtos,total);
+        return new ResponseCorrectDto(dtos, total);
     }
     public ResponseCorrectCommentDto getCorrectComments(Long correctId, int page, int count){
         Pageable pageable = PageRequest.of(page-1, count, Sort.by("createdTime").ascending());
-        int total = 0;
 
         if(correctRepository.findByCorrectId(correctId) == null)
             throw new CustomException(ErrorCode.NOT_FOUND_CORRECT);
@@ -241,22 +233,21 @@ public class AlgorithmService {
 
         List<CorrectCommentDto> dtos = new ArrayList<>();
 
+        long total = comments.getTotalElements();
         for(Comment comment : comments) {
             ResponseAlgorithmUserDto user = UserMapper.INSTANCE.toResponseAlgorithmUserDto(comment.getUser());
             dtos.add(AlgorithmMapper.INSTANCE.toCorrectCommentDto(comment,user));
-            total++;
         }
 
-        return new ResponseCorrectCommentDto(dtos,total);
+        return new ResponseCorrectCommentDto(dtos, total);
     }
     public ResponsePostCodeDto postCode(RequestCodeDto codeDto, Long algorithmId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        if(algorithmEntity == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
         CodeRunner codeRunner = new CodeRunner(testcaseRepository);
         ResponseCodeDto codeResponseDTO = null;
@@ -277,20 +268,20 @@ public class AlgorithmService {
             throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
         }
 
-        Boolean solved = codeResponseDTO.getSolved() && (Double.parseDouble(algorithmEntity.getLimitTime()) > codeResponseDTO.getExcuteTime());
+        Boolean solved = codeResponseDTO.getSolved() && (Double.parseDouble(algorithm.getLimitTime()) > codeResponseDTO.getExcuteTime());
 
         AlgorithmCorrect postCode = new AlgorithmCorrect();
         postCode.setUser(user);
-        postCode.setAlgorithm(algorithmEntity);
+        postCode.setAlgorithm(algorithm);
         postCode.setCodeType(codeTypeRepository.findCodeTypeByTypeId(codeDto.getType()));
         postCode.setCode(codeDto.getCode());
 
         if(solved){
             algorithmCorrectRepository.save(postCode);
-            Try codeTry = new Try(user,algorithmEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
+            Try codeTry = new Try(user,algorithm,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
             tryRepository.save(codeTry);
         } else{
-            Try codeTry = new Try(user,algorithmEntity,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
+            Try codeTry = new Try(user,algorithm,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
             tryRepository.save(codeTry);
         }
 
@@ -346,9 +337,8 @@ public class AlgorithmService {
         AppUser user = userRepository.findByUserId(loginUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        if(algorithm == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
         if(algorithmRecommendRepository.countByAlgorithm_AlgorithmIdAndUserUserId(algorithmId, loginUserId) >= 1)
             throw new CustomException(ErrorCode.DUPLICATE_RECOMMEND);
@@ -368,9 +358,8 @@ public class AlgorithmService {
         AppUser user = userRepository.findByUserId(loginUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        if(algorithm == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
         List<Long> dummyImageIds = boardPostDto.getImageIds();
         List<DummyImage> dummyImages = new ArrayList<>();
@@ -449,9 +438,8 @@ public class AlgorithmService {
         AppUser user = userRepository.findByUserId(loginUserId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId);
-        if(algorithm == null)
-            throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
+        Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
         AlgorithmRecommend recommend = algorithmRecommendRepository.findByAlgorithm_AlgorithmIdAndUser_UserId(algorithmId, user.getUserId());
 

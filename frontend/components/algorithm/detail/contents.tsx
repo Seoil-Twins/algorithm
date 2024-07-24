@@ -25,7 +25,6 @@ import { useCodeType } from "@/providers/codeTypeProvider";
 import Modal from "@/components/common/modal";
 import EditorViewer from "@/components/common/editorViewer";
 import { AlgorithmAPI } from "@/api/algorithm";
-import { CustomException } from "@/app/api";
 
 type DetailProps = {
   algorithm: Algorithm;
@@ -113,10 +112,7 @@ const Contents = ({ algorithm }: DetailProps) => {
     try {
       const response = await AlgorithmAPI.submitAlgorithm(
         algorithm.algorithmId,
-        {
-          code,
-          type: CodeValue[type],
-        },
+        options,
       );
 
       console.log(await response.json());

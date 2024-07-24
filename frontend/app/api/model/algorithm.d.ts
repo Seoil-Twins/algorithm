@@ -1,4 +1,5 @@
 import { TestCase } from "./testcase";
+import { RequireUser } from "./user";
 
 export type RecommendAlgorithmItem = {
   algorithmId: number;
@@ -43,5 +44,18 @@ type AlgorithmsItem = {
 
 export type Algorithms = {
   algorithms: AlgorithmsItem[];
+  total: number;
+};
+
+export type CorrectItem = {
+  correctId: number;
+  codeType: string;
+  user: RequireUser;
+  code: string;
+  recommendCount: number;
+};
+
+export type Corrects = {
+  corrects: CorrectItem[];
   total: number;
 };

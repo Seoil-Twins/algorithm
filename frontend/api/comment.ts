@@ -20,6 +20,21 @@ export const CommentAPI = {
       )}?${searchParams.toString()}`,
     );
   },
+  getAnswerComments: async (
+    algorithmId: number,
+    correctId: number,
+    options: PageOptions,
+  ) => {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(options).forEach(([key, value]) => {
+      value && searchParams.append(key, String(value));
+    });
+
+    return await API_INSTANCE.GET(
+      `/algorithm/${algorithmId}/correct/${correctId}/comment?${searchParams.toString()}`,
+    );
+  },
   addSolveComment: async (boardId: number | string, commentId: number) => {
     return await API_INSTANCE.POST(
       `${API_URL_WITH_BOARD.replace(
@@ -31,6 +46,16 @@ export const CommentAPI = {
   addComment: async (boardId: number | string, body: Body) => {
     return await API_INSTANCE.POST(
       `${API_URL_WITH_BOARD.replace(boardIdParam, String(boardId))}`,
+      body,
+    );
+  },
+  addCodeComment: async (
+    algorithmId: number,
+    correctId: number,
+    body: Body,
+  ) => {
+    return await API_INSTANCE.POST(
+      `/algorithm/${algorithmId}/correct/${correctId}/comment`,
       body,
     );
   },

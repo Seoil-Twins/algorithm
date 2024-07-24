@@ -1,6 +1,5 @@
 package com.college.algorithm.dto;
 
-import com.college.algorithm.entity.AppUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -103,8 +103,9 @@ public class AlgorithmController {
     @GetMapping("/algorithm/{algorithm_id}/correct")
     public ResponseEntity<?> getAlgorithmCorrect(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                                  @RequestParam(required = false, defaultValue = "10", value = "count") int count,
+                                                 @RequestParam(required = false, defaultValue = "10", value = "language") String language,
                                                  @PathVariable(value = "algorithm_id") Long algorithm_id) {
-        ResponseCorrectDto response = algorithmService.getCorrects(algorithm_id,page,count);
+        ResponseCorrectDto response = algorithmService.getCorrects(algorithm_id, page, count, language);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

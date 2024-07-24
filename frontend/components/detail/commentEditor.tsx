@@ -4,26 +4,26 @@ import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useFormState } from "react-dom";
-
-import { postComment } from "@/app/actions/comment";
 
 import { useAuth } from "@/providers/authProvider";
 
 import Editor from "../common/editor";
 import styles from "./commentEditor.module.scss";
 import SubmitButton from "../common/submitButton";
+
 import { IMAGE_URL } from "@/api";
 import { CommentAPI } from "@/api/comment";
 
 type CommentEditorProps = {
   requestId: string;
+  algorithmId?: string;
   type?: "comment" | "code";
   isVisibleToolbar?: boolean;
 };
 
 const CommentEditor = ({
   requestId,
+  algorithmId,
   type = "comment",
   isVisibleToolbar = true,
 }: CommentEditorProps) => {
@@ -40,9 +40,22 @@ const CommentEditor = ({
 
       try {
         setIsPending(true);
-        await CommentAPI.addComment(requestId, {
-          content: value,
-        });
+
+        if (type === "comment") {
+          await CommentAPI.addComment(requestId, {
+            content: value,
+          });
+        } else {
+          if (!algorithmId) return;
+
+          await CommentAPI.addCodeComment(
+            Number(algorithmId),
+            Number(requestId),
+            {
+              content: value,
+            },
+          );
+        }
 
         setInit(true);
         toast.success("댓글이 작성되었습니다.");
@@ -63,7 +76,7 @@ const CommentEditor = ({
         setIsPending(false);
       }
     },
-    [requestId, type, router, value],
+    [type, router, requestId, value, algorithmId],
   );
 
   const handleChange = useCallback((newVal: string) => {

@@ -35,10 +35,17 @@ export type CodeTypeInfo = {
   [K in (typeof CODE_TYPE_OPTIONS_ARRAY)[number]]: string;
 };
 
-export const CodeTitle: CodeTypeInfo = {
-  cpp: "cpp",
-  j: "java",
-  p: "python",
+export type CODE_LANGUAGE_TYPE =
+  (typeof CodeLanguage)[keyof typeof CodeLanguage];
+
+export type InvertedCodeLanguage = {
+  -readonly [K in keyof typeof CodeLanguage as (typeof CodeLanguage)[K]]: K;
+};
+
+export const CodeLanguage = {
+  CPP: 3001,
+  PYTHON: 3002,
+  JAVA: 3003,
 } as const;
 
 export const CodeValue = {
@@ -47,8 +54,13 @@ export const CodeValue = {
   j: "3003",
 } as const;
 
-export const getTitleByCode = (code: CodeType) => {
-  return CodeTitle[code];
+const CodeTitle = Object.entries(CodeLanguage).reduce((acc, [key, value]) => {
+  (acc as any)[value] = key;
+  return acc;
+}, {} as InvertedCodeLanguage);
+
+export const getTitleByCodeType = (type: keyof InvertedCodeLanguage) => {
+  return CodeTitle[type].toLowerCase();
 };
 
 export const SnsKind = {
