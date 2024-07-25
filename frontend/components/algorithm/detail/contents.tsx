@@ -15,7 +15,11 @@ import { useRouter } from "next/navigation";
 import { CodeType, CodeValue } from "@/types/constants";
 import { RequestAlgorithm } from "@/types/algorithm";
 
-import { Algorithm } from "@/app/api/model/algorithm";
+import {
+  Algorithm,
+  AlgorithmResult,
+  AlgorithmResultItem,
+} from "@/app/api/model/algorithm";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
@@ -71,6 +75,7 @@ const Contents = ({ algorithm }: DetailProps) => {
   const [isVisibleTestcase, setIsVisibleTestcase] = useState<boolean>(false);
   const [isVisibleResetModal, setIsVisibleResetModal] =
     useState<boolean>(false);
+  const [results, setResults] = useState<AlgorithmResult>();
 
   const handleChangeCode = useCallback((val: string) => {
     setCode(val);
@@ -114,10 +119,15 @@ const Contents = ({ algorithm }: DetailProps) => {
         algorithm.algorithmId,
         options,
       );
+      // results 배열에 담기면 AlgorithmResult을 쓸 것.
+      const result: AlgorithmResultItem = await response.json();
+      toast.success("정답입니다 !!");
 
-      console.log(await response.json());
+      setResults({
+        results: [result],
+      });
+      router.refresh();
     } catch (error: any) {
-      console.log(error);
       if (error.status === 401) {
         toast.error("로그인이 필요한 서비스입니다.");
         router.push(
@@ -235,7 +245,27 @@ const Contents = ({ algorithm }: DetailProps) => {
                     <span>메모리 제한 {algorithm.limitMemory}MB</span>
                   </div>
                 </div>
-                <div className={styles.testcase}>asd</div>
+                <div className={styles.testcase}>
+                  {results?.results.map((result, idx) => (
+                    <div key={idx} className={styles.resultItem}>
+                      <div
+                        className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                      >
+                        {result.isSuccess
+                          ? idx + 1 + "차 성공"
+                          : idx + 1 + "차 실패"}
+                      </div>
+                      <div className={styles.m5}>-</div>
+                      <div> {result.useTime}ms</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </>
@@ -297,7 +327,27 @@ const Contents = ({ algorithm }: DetailProps) => {
                         <span>메모리 제한 {algorithm.limitMemory}MB</span>
                       </div>
                     </div>
-                    <div className={styles.testcase}>asd</div>
+                    <div className={styles.testcase}>
+                      {results?.results.map((result, idx) => (
+                        <div key={idx} className={styles.resultItem}>
+                          <div
+                            className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                          >
+                            {result.isSuccess
+                              ? idx + 1 + "차 성공"
+                              : idx + 1 + "차 실패"}
+                          </div>
+                          <div className={styles.m5}>-</div>
+                          <div> {result.useTime}ms</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               ) : (
@@ -328,7 +378,27 @@ const Contents = ({ algorithm }: DetailProps) => {
                         <span>메모리 제한 {algorithm.limitMemory}MB</span>
                       </div>
                     </div>
-                    <div className={styles.testcase}>asd</div>
+                    <div className={styles.testcase}>
+                      {results?.results.map((result, idx) => (
+                        <div key={idx} className={styles.resultItem}>
+                          <div
+                            className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                          >
+                            {result.isSuccess
+                              ? idx + 1 + "차 성공"
+                              : idx + 1 + "차 실패"}
+                          </div>
+                          <div className={styles.m5}>-</div>
+                          <div> {result.useTime}ms</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}

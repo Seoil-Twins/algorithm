@@ -7,9 +7,9 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 import { IMAGE_URL } from "@/api";
-import { SummaryComment } from "@/types2/code";
+import { CommentAPI } from "@/api/comment";
 
-import { deleteComment, patchComment } from "@/app/actions/comment";
+import { CommentListItem } from "@/app/api/model/comment";
 
 import { useAuth } from "@/providers/authProvider";
 
@@ -21,7 +21,7 @@ import CommentUpdateEditor from "@/components/detail/commentUpdateEditor";
 import Modal from "@/components/common/modal";
 
 type CommentProps = {
-  comment: SummaryComment;
+  comment: CommentListItem;
 };
 
 const Comment = ({ comment }: CommentProps) => {
@@ -42,26 +42,27 @@ const Comment = ({ comment }: CommentProps) => {
 
   const handleCommentUpdate = useCallback(
     async (value: string) => {
-      const response = await patchComment(comment.commentId, value);
+      try {
+        await CommentAPI.updateComment(comment.commentId, {
+          content: value,
+        });
 
-      if (response.status === 200) {
         router.refresh();
         setIsVisibleEditor(false);
-      } else {
-        toast.error("수정에 실패했습니다.");
+      } catch (error) {
+        toast.error("댓글 수정에 실패하였습니다.");
       }
     },
     [comment.commentId, router],
   );
 
   const handleCommentDelete = useCallback(async () => {
-    const response = await deleteComment(comment.commentId);
-
-    if (response.status === 200) {
+    try {
+      await CommentAPI.deleteComment(comment.commentId);
       router.refresh();
       setIsVisibleModal(false);
-    } else {
-      toast.error("삭제에 실패했습니다.");
+    } catch (error) {
+      toast.error("댓글 삭제에 실패하였습니다.");
     }
   }, [comment.commentId, router]);
 

@@ -16,7 +16,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     }, type = EntityGraph.EntityGraphType.LOAD)
     Page<Comment> findAllByUserAndBoardDeletedIsFalseOrderByCreatedTimeDesc(AppUser user, Pageable pageable);
   
-    Page<Comment> findAllByCorrectCorrectId(Pageable pageable, Long correctId);
+    Page<Comment> findAllByCorrectCorrectIdOrderByCreatedTimeDesc(Pageable pageable, Long correctId);
   
     Page<Comment> findAllByBoardBoardId(Pageable pageable, Long boardId);
 

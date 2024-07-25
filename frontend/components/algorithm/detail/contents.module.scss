@@ -81,7 +81,32 @@
       }
 
       .testcase {
+        display: flex;
+        flex-direction: column;
         padding: 10px 20px;
+        font-size: 0.875rem;
+
+        .resultItem {
+          display: flex;
+          align-items: center;
+          margin: 5px 0px;
+
+          .text {
+            color: $white;
+          }
+
+          .m5 {
+            margin: 0px 5px;
+          }
+
+          .success {
+            color: #05ff00;
+          }
+
+          .failed {
+            color: #ff0000;
+          }
+        }
       }
     }
   }
@@ -220,6 +245,8 @@
     grid-template-rows: 1fr 1fr;
 
     .btn {
+      width: 100%;
+      height: 100%;
       padding: 10px 5px;
     }
   }
@@ -233,6 +260,8 @@
     grid-template-rows: 1fr 1fr 1fr;
 
     .btn {
+      width: 100%;
+      height: 100%;
       padding: 5px;
     }
   }

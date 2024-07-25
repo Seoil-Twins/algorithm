@@ -42,6 +42,15 @@ type AlgorithmsItem = {
   solved: boolean;
 };
 
+export type AlgorithmResultItem = {
+  isSuccess: boolean;
+  useTime: string;
+};
+
+export type AlgorithmResult = {
+  results: AlgorithmResultItem[];
+};
+
 export type Algorithms = {
   algorithms: AlgorithmsItem[];
   total: number;

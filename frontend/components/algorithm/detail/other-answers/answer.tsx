@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -18,6 +18,7 @@ import { IMAGE_URL } from "@/api";
 import { CommentAPI } from "@/api/comment";
 
 import { CorrectItem } from "@/app/api/model/algorithm";
+import { useDebouncedCallback } from "use-debounce";
 
 type AnswerProps = {
   algorithmId: number;
@@ -25,8 +26,8 @@ type AnswerProps = {
 };
 
 const Answer = ({ algorithmId, answer }: AnswerProps) => {
+  const count = useRef<number>(5);
   const [page, setPage] = useState<number>(1);
-  const [count, setCount] = useState<number>(5);
 
   const [comment, setComment] = useState<CommentListWithoutIsRecommend>();
 
@@ -37,19 +38,33 @@ const Answer = ({ algorithmId, answer }: AnswerProps) => {
         answer.correctId,
         {
           page,
-          count,
+          count: count.current,
         },
       );
+      const result: CommentListWithoutIsRecommend = await response.json();
 
-      setComment(await response.json());
+      setComment((prev) => {
+        const newComments = [...(prev?.comments || []), ...result.comments];
+        return {
+          comments: newComments,
+          total: result.total,
+        };
+      });
     } catch (error) {
       toast.error("댓글을 불러오지 못했습니다.");
     }
-  }, [algorithmId, answer, count, page]);
+  }, [algorithmId, answer.correctId, page]);
+
+  const handleMore = useDebouncedCallback(
+    useCallback(() => {
+      setPage((prev) => prev + 1);
+    }, []),
+    400,
+  );
 
   useEffect(() => {
     getComments();
-  }, [getComments]);
+  }, [count, getComments]);
 
   return (
     <div className={styles.answer}>
@@ -90,6 +105,20 @@ const Answer = ({ algorithmId, answer }: AnswerProps) => {
           <Comment key={idx} comment={comment} />
         ))}
       </div>
+      {comment &&
+        comment.total > count.current &&
+        comment.total > page * count.current && (
+          <div className={styles.pagination}>
+            <button onClick={handleMore}>
+              <Image
+                src="/svgs/more_dots.svg"
+                alt="더보기"
+                width={25}
+                height={25}
+              />
+            </button>
+          </div>
+        )}
       <CommentEditor
         type="code"
         algorithmId={String(algorithmId)}

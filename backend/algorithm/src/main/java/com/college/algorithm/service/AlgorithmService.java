@@ -229,7 +229,7 @@ public class AlgorithmService {
         if(correctRepository.findByCorrectId(correctId) == null)
             throw new CustomException(ErrorCode.NOT_FOUND_CORRECT);
 
-        Page<Comment> comments = commentRepository.findAllByCorrectCorrectId(pageable, correctId);
+        Page<Comment> comments = commentRepository.findAllByCorrectCorrectIdOrderByCreatedTimeDesc(pageable, correctId);
 
         List<CorrectCommentDto> dtos = new ArrayList<>();
 

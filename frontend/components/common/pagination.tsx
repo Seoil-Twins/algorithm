@@ -14,6 +14,7 @@ type PaginationProps = {
   current: number;
   marginTop: number;
   useScrollTop?: boolean;
+  onChangePage?: (current: number) => void;
 };
 
 function getClosestGreaterNumbers(arr: number[], target: number): number[] {
