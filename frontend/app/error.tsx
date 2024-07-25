@@ -1,14 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import ErrorType from "next/error";
+import { useEffect, useState } from "react";
 
 import styles from "./error.module.scss";
-import { useEffect } from "react";
 
-const Error = ({ error, reset }: { error: ErrorType; reset: () => void }) => {
+const Error = ({ error, reset }: { error: any; reset: () => void }) => {
+  const [message, setMessage] = useState<string | undefined>(undefined);
+
   useEffect(() => {
-    console.error(error);
+    if (error.message) {
+      setMessage(error.message);
+      return;
+    }
+
+    setMessage(undefined);
   }, [error]);
 
   return (
@@ -20,7 +26,7 @@ const Error = ({ error, reset }: { error: ErrorType; reset: () => void }) => {
         height={0}
         className={styles.dynamicImg}
       />
-      <p>서버에서 알 수 없는 오류가 발생하였습니다.</p>
+      <p>{message || "서버에서 알 수 없는 오류가 발생하였습니다."}</p>
       <button type="button" onClick={reset} className={styles.retry}>
         다시 시도
       </button>

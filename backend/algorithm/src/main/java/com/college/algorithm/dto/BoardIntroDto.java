@@ -9,6 +9,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BoardIntroDto {
     private final long boardId;
+    private final Character boardType;
     private final String title;
     private final String content;
     private final int likeCount;

@@ -1,72 +1,75 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { User } from "@/types2/user";
-import { CommentResponse } from "@/types2/comment";
-
-import { getComments } from "@/app/actions/comment";
-import { IMAGE_URL } from "@/app/actions";
-import { getUser } from "@/app/actions/user";
-import { getBoardDetail } from "@/app/actions/baord";
-
 import styles from "./boardDetail.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
+import { BoardTypeId } from "@/types/constants";
+
+import { User } from "@/app/api/model/user";
+import { Board } from "@/app/api/model/board";
+import { CommentList, CommentListItem } from "@/app/api/model/comment";
+
+import { IMAGE_URL } from "@/api";
+import { UserAPI } from "@/api/user";
+import { BoardAPI } from "@/api/board";
+import { CommentAPI } from "@/api/comment";
+
 import DetailNav from "./detailNav";
 import EditorViewer from "../common/editorViewer";
-import RecommendPost from "./recommendPost";
+import RecommendPost from "./recommendButton";
 import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
-import { BOARD_TYPE } from "@/types2/constants";
 import FeedbackSolve from "./feedbackSolve";
 
 type BoardDetailProps = {
   boardId: number;
+  page: number;
+  count: number;
 };
 
-const BoardDetail = async ({
-  boardId,
-  searchParams,
-}: {
-  boardId: BoardDetailProps["boardId"];
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) => {
-  const userResponse = await getUser();
-  let user;
-  if (userResponse.status === 200) {
-    user = userResponse.data as User;
-  } else {
-    user = undefined;
+const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
+  const user: User = await (await UserAPI.getUser()).json();
+
+  let board: Board;
+  try {
+    board = await (await BoardAPI.getBoard(boardId)).json();
+  } catch (error: any) {
+    if (error.status === 404) {
+      return (
+        <NotFound
+          title="게시글이 존재하지 않습니다."
+          description="URL을 다시 확인해주세요."
+        />
+      );
+    } else {
+      throw error;
+    }
   }
 
-  const boardResponse = await getBoardDetail(boardId);
-  if (typeof boardResponse.data === "string") {
-    return (
-      <NotFound
-        title="게시글이 존재하지 않습니다."
-        description="URL을 다시 확인해주세요."
-      />
-    );
-  }
-  const board = boardResponse.data;
+  const comment: CommentList = await (
+    await CommentAPI.getComments(boardId, {
+      count,
+      page,
+    })
+  ).json();
 
-  const count = Number(searchParams?.count) || 10;
-  const page = Number(searchParams?.page) || 1;
-  const commentsResponse = await getComments(boardId, { count, page });
-
-  let comments: CommentResponse = {
-    total: 0,
-    comments: [],
-  };
-  if (commentsResponse.status === 200) {
-    comments = commentsResponse.data as CommentResponse;
+  try {
+    if (!board.isView) {
+      await BoardAPI.addView(boardId);
+    }
+  } catch (error) {
+    /* empty */
   }
 
   return (
     <div>
-      <DetailNav isEditable={user?.userId === board.user.userId} />
+      <DetailNav
+        isEditable={user?.userId === board.user.userId && !board.solved}
+        isDeletable={user?.userId === board.user.userId}
+      />
       <div className={styles.contentBox}>
         <div className={styles.user}>
           <Link
@@ -74,7 +77,7 @@ const BoardDetail = async ({
             className={styles.flex}
           >
             <Image
-              src={`${IMAGE_URL}/${board.user.profile}`}
+              src={`${IMAGE_URL}${board.user.profile}`}
               alt="프로필 사진"
               width={38}
               height={38}
@@ -87,7 +90,7 @@ const BoardDetail = async ({
               <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
           </Link>
-          {board.boardType === BOARD_TYPE.ALGORITHM_FEEDBACK &&
+          {board.boardType === String(BoardTypeId.ALGORITHM_FEEDBACK) &&
             (board.solved ? (
               <Image
                 src="/svgs/valid_check.svg"
@@ -118,32 +121,32 @@ const BoardDetail = async ({
             ))}
           </div>
           <RecommendPost
-            apiUrl={`/recommend/board/${board.boardId}`}
+            type="board"
+            requestId={board.boardId}
             isRecommend={board.isRecommend}
             recommendCount={Number(board.recommendCount)}
-            userId={user?.userId}
-            requestId={board.boardId}
           />
         </div>
         <hr className={styles.line} />
         <div className={styles.commentTotal}>{board.commentCount}개의 답변</div>
         <CommentEditor requestId={String(board.boardId)} />
-        {comments.total > 0 && (
+        {comment.total > 0 && (
           <div className={styles.commentBox}>
-            {comments.comments.map((comment) => (
+            {comment.comments.map((comment: CommentListItem) => (
               <Comment
                 key={comment.commentId}
                 comment={comment}
                 userId={board.user.userId}
                 boardTypeId={board.boardType}
-                solved={Number(board.solved)}
+                solved={board.solved}
               />
             ))}
             <Pagination
               current={page}
               count={count}
-              total={comments.total}
+              total={comment.total}
               marginTop={25}
+              useScrollTop={false}
             />
           </div>
         )}

@@ -1,27 +1,14 @@
-import { AxiosError } from "axios";
-import { redirect } from "next/navigation";
-
-import { User } from "@/types2/user";
-
-import { getUser, getUserSNSInfo } from "@/app/actions/user";
-
 import SnsAccount from "@/components/mypage/account/snsAccount";
 import UserProfileForm from "@/components/mypage/account/userProfileForm";
 import Withdrawal from "@/components/mypage/account/withdrawal";
 import Content from "@/components/mypage/content";
 
-const Account = async () => {
-  const responseUser = await getUser();
-  if (responseUser.status !== 200) {
-    redirect("/login");
-  }
-  const user = responseUser.data as User;
+import { UserAPI } from "@/api/user";
+import { SnsInfo, User } from "@/app/api/model/user";
 
-  const responseSnsInfo = await getUserSNSInfo(user.userId);
-  if (responseSnsInfo.status !== 200) {
-    redirect("/login");
-  }
-  const snsInfo = responseSnsInfo.data;
+const Account = async () => {
+  const user: User = await (await UserAPI.getUser()).json();
+  const snsInfo: SnsInfo = await (await UserAPI.getSnsInfo()).json();
 
   return (
     <>

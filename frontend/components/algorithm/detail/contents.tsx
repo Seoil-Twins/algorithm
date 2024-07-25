@@ -12,22 +12,23 @@ import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-import { Algorithm } from "@/types2/algorithm";
-import { RequestCode } from "@/types2/code";
+import { CodeType, CodeValue } from "@/types/constants";
+import { RequestAlgorithm } from "@/types/algorithm";
 
-import { sendCode } from "@/app/actions/code";
+import {
+  Algorithm,
+  AlgorithmResult,
+  AlgorithmResultItem,
+} from "@/app/api/model/algorithm";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./contents.module.scss";
 
-import {
-  CodeType,
-  getCodeValue,
-  useCodeType,
-} from "@/providers/codeTypeProvider";
+import { useCodeType } from "@/providers/codeTypeProvider";
 
 import Modal from "@/components/common/modal";
 import EditorViewer from "@/components/common/editorViewer";
+import { AlgorithmAPI } from "@/api/algorithm";
 
 type DetailProps = {
   algorithm: Algorithm;
@@ -52,7 +53,7 @@ const DynamicCodeMirror = dynamic(() => import("@uiw/react-codemirror"), {
 });
 
 const defaultCode = (type?: CodeType) => {
-  if (type === "c") {
+  if (type === "cpp") {
     return `int main() {\n${"  "}\n${"  "}return 0;\n}`;
   } else if (type === "j") {
     return `public class Main {\n${"  "}public static void main(String[] args) {\n${"    "}\n${"  "}}\n}`;
@@ -74,6 +75,7 @@ const Contents = ({ algorithm }: DetailProps) => {
   const [isVisibleTestcase, setIsVisibleTestcase] = useState<boolean>(false);
   const [isVisibleResetModal, setIsVisibleResetModal] =
     useState<boolean>(false);
+  const [results, setResults] = useState<AlgorithmResult>();
 
   const handleChangeCode = useCallback((val: string) => {
     setCode(val);
@@ -107,23 +109,35 @@ const Contents = ({ algorithm }: DetailProps) => {
       return;
     }
 
-    const options: RequestCode = {
-      algorithmId: algorithm.algorithmId,
+    const options: RequestAlgorithm = {
       code,
-      type: getCodeValue(type),
+      type: CodeValue[type],
     };
 
-    const response = await sendCode(options);
-
-    if (response.status === 200) {
-      console.log(response.status, response.data);
-    } else if (response.status === 401) {
-      toast.error("로그인이 필요한 서비스입니다.");
-      router.push(
-        `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
+    try {
+      const response = await AlgorithmAPI.submitAlgorithm(
+        algorithm.algorithmId,
+        options,
       );
-    } else {
-      toast.error("서버와의 통신 중 오류가 발생하였습니다.");
+      // results 배열에 담기면 AlgorithmResult을 쓸 것.
+      const result: AlgorithmResultItem = await response.json();
+      toast.success("정답입니다 !!");
+
+      setResults({
+        results: [result],
+      });
+      router.refresh();
+    } catch (error: any) {
+      if (error.status === 401) {
+        toast.error("로그인이 필요한 서비스입니다.");
+        router.push(
+          `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
+        );
+      } else {
+        toast.error(
+          "예상치 못한 오류가 발생하였습니다.\n나중에 다시 시도해주세요.",
+        );
+      }
     }
   }, [algorithm.algorithmId, code, router, type]);
 
@@ -133,7 +147,7 @@ const Contents = ({ algorithm }: DetailProps) => {
 
     if (type === "p") {
       setLanguage(python);
-    } else if (type === "c") {
+    } else if (type === "cpp") {
       setLanguage(cpp);
     } else if (type === "j") {
       setLanguage(java);
@@ -228,10 +242,30 @@ const Contents = ({ algorithm }: DetailProps) => {
                     <span className={styles.mr15}>
                       제한시간 {algorithm.limitTime}초
                     </span>
-                    <span>메모리 제한 {algorithm.limitMem}MB</span>
+                    <span>메모리 제한 {algorithm.limitMemory}MB</span>
                   </div>
                 </div>
-                <div className={styles.testcase}>asd</div>
+                <div className={styles.testcase}>
+                  {results?.results.map((result, idx) => (
+                    <div key={idx} className={styles.resultItem}>
+                      <div
+                        className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                      >
+                        {result.isSuccess
+                          ? idx + 1 + "차 성공"
+                          : idx + 1 + "차 실패"}
+                      </div>
+                      <div className={styles.m5}>-</div>
+                      <div> {result.useTime}ms</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </>
@@ -290,10 +324,30 @@ const Contents = ({ algorithm }: DetailProps) => {
                         <span className={styles.mr15}>
                           제한시간 {algorithm.limitTime}초
                         </span>
-                        <span>메모리 제한 {algorithm.limitMem}MB</span>
+                        <span>메모리 제한 {algorithm.limitMemory}MB</span>
                       </div>
                     </div>
-                    <div className={styles.testcase}>asd</div>
+                    <div className={styles.testcase}>
+                      {results?.results.map((result, idx) => (
+                        <div key={idx} className={styles.resultItem}>
+                          <div
+                            className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                          >
+                            {result.isSuccess
+                              ? idx + 1 + "차 성공"
+                              : idx + 1 + "차 실패"}
+                          </div>
+                          <div className={styles.m5}>-</div>
+                          <div> {result.useTime}ms</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               ) : (
@@ -321,10 +375,30 @@ const Contents = ({ algorithm }: DetailProps) => {
                         <span className={styles.mr15}>
                           제한시간 {algorithm.limitTime}초
                         </span>
-                        <span>메모리 제한 {algorithm.limitMem}MB</span>
+                        <span>메모리 제한 {algorithm.limitMemory}MB</span>
                       </div>
                     </div>
-                    <div className={styles.testcase}>asd</div>
+                    <div className={styles.testcase}>
+                      {results?.results.map((result, idx) => (
+                        <div key={idx} className={styles.resultItem}>
+                          <div
+                            className={`${styles.text} ${notosansBold.className}
+                              ${
+                                result.isSuccess
+                                  ? styles.success
+                                  : styles.failed
+                              }
+                            `}
+                          >
+                            {result.isSuccess
+                              ? idx + 1 + "차 성공"
+                              : idx + 1 + "차 실패"}
+                          </div>
+                          <div className={styles.m5}>-</div>
+                          <div> {result.useTime}ms</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
@@ -341,9 +415,7 @@ const Contents = ({ algorithm }: DetailProps) => {
         </Link>
         <div className={styles.blank}></div>
         <Link
-          href={`/algorithm/${
-            algorithm.algorithmId
-          }/other-answers?language=${getCodeValue(type)}`}
+          href={`/algorithm/${algorithm.algorithmId}/other-answers?language=${CodeValue[type]}`}
         >
           <button className={styles.btn}>다른 사람 풀이 보기</button>
         </Link>
@@ -369,12 +441,13 @@ const Contents = ({ algorithm }: DetailProps) => {
         <div className={styles.table}>
           <div className={`${styles.th} ${styles.padding}`}>입력</div>
           <div className={`${styles.th} ${styles.padding}`}>출력</div>
-          {algorithm.testcase.map((value) => (
-            <React.Fragment key={value.testcaseId}>
-              <div className={styles.padding}>{value.input}</div>
-              <div className={styles.padding}>{value.output}</div>
-            </React.Fragment>
-          ))}
+          {algorithm.testcases &&
+            algorithm.testcases.map((value, idx) => (
+              <React.Fragment key={idx}>
+                <div className={styles.padding}>{value.input}</div>
+                <div className={styles.padding}>{value.output}</div>
+              </React.Fragment>
+            ))}
         </div>
       </Modal>
       <Modal

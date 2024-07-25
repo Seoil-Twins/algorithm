@@ -94,31 +94,26 @@ const Signup = () => {
           email: signupInfo.email.value,
         });
 
-        if (response.ok) {
-          const {
-            ["email"]: emailField,
-            ["verifyCode"]: verifyCodeField,
-            ...prev
-          } = signupInfo;
+        const {
+          ["email"]: emailField,
+          ["verifyCode"]: verifyCodeField,
+          ...prev
+        } = signupInfo;
 
-          setSignupInfo({
-            ...prev,
-            email: {
-              ...emailField,
-              disabled: true,
-            },
-            verifyCode: {
-              ...verifyCodeField,
-              disabled: false,
-            },
-          });
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        setSignupInfo({
+          ...prev,
+          email: {
+            ...emailField,
+            disabled: true,
+          },
+          verifyCode: {
+            ...verifyCodeField,
+            disabled: false,
+          },
+        });
       } catch (error) {
-        toast.error("나중에 다시 시도해주세요.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       } finally {
         setIsSending(false);
       }
@@ -136,24 +131,19 @@ const Signup = () => {
           verifyCode: signupInfo.verifyCode.value,
         });
 
-        if (response.ok) {
-          setIsVerified(true);
-          const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
+        setIsVerified(true);
+        const { ["verifyCode"]: verifyCodeField, ...prev } = signupInfo;
 
-          setSignupInfo({
-            ...prev,
-            verifyCode: {
-              ...verifyCodeField,
-              disabled: true,
-            },
-          });
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        setSignupInfo({
+          ...prev,
+          verifyCode: {
+            ...verifyCodeField,
+            disabled: true,
+          },
+        });
       } catch (error) {
-        toast.error("서버와의 통신 중 오류가 발생하였습니다.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       }
     }, [isVerified, signupInfo]),
     500,
@@ -162,38 +152,39 @@ const Signup = () => {
   const handleSignup = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      setIsFinish(true);
+
+      if (!isCheck) {
+        toast.error("약관에 등의해주세요.");
+        return;
+      }
+      if (!isVerified) {
+        toast.error("이메일 인증을 진행해주세요.");
+        return;
+      }
+      if (signupInfo.password.value !== signupInfo.confirmPassword.value) {
+        toast.error("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      const validatedNickname = validationNickname(signupInfo.nickname.value);
+      const validatedEmail = validationEmail(signupInfo.email.value);
+      const validatedPassword = validationPassword(signupInfo.password.value);
+
+      if (validatedNickname.isError) {
+        toast.error(validatedNickname.errMsg);
+        return;
+      }
+      if (validatedEmail.isError) {
+        toast.error(validatedEmail.errMsg);
+        return;
+      }
+      if (validatedPassword.isError) {
+        toast.error(validatedPassword.errMsg);
+        return;
+      }
 
       try {
-        if (!isCheck) {
-          toast.error("약관에 등의해주세요.");
-          return;
-        }
-        if (!isVerified) {
-          toast.error("이메일 인증을 진행해주세요.");
-          return;
-        }
-        if (signupInfo.password.value !== signupInfo.confirmPassword.value) {
-          toast.error("비밀번호가 일치하지 않습니다.");
-          return;
-        }
-
-        const validatedNickname = validationNickname(signupInfo.nickname.value);
-        const validatedEmail = validationEmail(signupInfo.email.value);
-        const validatedPassword = validationPassword(signupInfo.password.value);
-
-        if (validatedNickname.isError) {
-          toast.error(validatedNickname.errMsg);
-          return;
-        }
-        if (validatedEmail.isError) {
-          toast.error(validatedEmail.errMsg);
-          return;
-        }
-        if (validatedPassword.isError) {
-          toast.error(validatedPassword.errMsg);
-          return;
-        }
+        setIsFinish(true);
 
         const response = await UserAPI.signup({
           email: signupInfo.email.value,
@@ -201,16 +192,11 @@ const Signup = () => {
           nickname: signupInfo.nickname.value,
         });
 
-        if (response.ok) {
-          toast.success("회원가입에 성공하였습니다.");
-          router.replace("/login");
-        } else {
-          const error: CustomException =
-            (await response.json()) as CustomException;
-          toast.error(error.message);
-        }
+        toast.success("회원가입에 성공하였습니다.");
+        router.replace("/login");
       } catch (error) {
-        toast.error("서버에 오류가 발생하였습니다.");
+        const exception: CustomException = error as CustomException;
+        toast.error(exception.message);
       } finally {
         setIsFinish(false);
       }
@@ -251,7 +237,7 @@ const Signup = () => {
               handleSignupInfo(changedValue, "nickname")
             }
             minLength={2}
-            maxLength={16}
+            maxLength={10}
             required
           />
         </div>

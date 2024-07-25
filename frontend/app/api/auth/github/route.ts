@@ -1,9 +1,10 @@
-import { AxiosError, AxiosResponse } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-import { axiosInstance } from "@/api/index2";
+import { API_INSTANCE, handleUnAuthorization } from "../..";
 
-import { User } from "@/types2/user";
+import { SnsKind } from "@/types/constants";
+
+const API_URL = "/user/link";
 
 export const GET = async (req: NextRequest) => {
   const { nextUrl } = req;
@@ -113,22 +114,19 @@ export const GET = async (req: NextRequest) => {
    }
    */
   const linkingData = {
-    linkKind: "1001",
-    id: userData.id,
+    linkKind: SnsKind.GITHUB,
     domain: userData.html_url,
   };
 
-  // linking API 호출
   try {
-    const user: AxiosResponse<User> = await axiosInstance.get("/user/me");
-    await axiosInstance.post(`/user/link/${user.data.userId}`, linkingData);
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      return NextResponse.redirect(
-        `${cloneUrl}?errorCode=${error.response?.data.errorCode}&message=${error.response?.data.message}`,
-      );
-    }
+    req.headers.set("Content-Type", "application/json");
+    await API_INSTANCE.POST(API_URL, req.headers, linkingData);
+    return NextResponse.redirect(cloneUrl);
+  } catch (error: any) {
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.redirect(
+      `${cloneUrl}?errorCode=${error.errorCode}&message=${error.message}`,
+      { headers },
+    );
   }
-
-  return NextResponse.redirect(cloneUrl);
 };

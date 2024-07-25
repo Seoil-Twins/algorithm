@@ -13,6 +13,7 @@ public interface UserMapper {
 
     @Mapping(source = "user.userId", target = "userId")
     @Mapping(source = "user.nickname", target = "nickname")
+    @Mapping(source = "user.email", target = "email")
     @Mapping(source = "user.profilePath", target = "profile")
     @Mapping(source = "user.tried", target = "tried")
     @Mapping(source = "user.solved", target = "solved")

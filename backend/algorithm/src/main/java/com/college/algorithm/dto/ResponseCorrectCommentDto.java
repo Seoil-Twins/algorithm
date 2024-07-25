@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ResponseCorrectCommentDto {
-    private List<CorrectCommentDto> corrects;
-    private Integer total;
+    private List<CorrectCommentDto> comments;
+    private Long total;
 }

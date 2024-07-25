@@ -13,6 +13,8 @@ type PaginationProps = {
   total: number;
   current: number;
   marginTop: number;
+  useScrollTop?: boolean;
+  onChangePage?: (current: number) => void;
 };
 
 function getClosestGreaterNumbers(arr: number[], target: number): number[] {
@@ -67,6 +69,7 @@ const Pagination = ({
   count,
   current = 1,
   marginTop = 25,
+  useScrollTop = true,
 }: PaginationProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -93,37 +96,46 @@ const Pagination = ({
     delete prevSearchParams["count"];
     delete prevSearchParams["page"];
 
-    router.push(
+    router.replace(
       `${pathname}?page=${current - 1}&count=${count}&${new URLSearchParams(
         prevSearchParams,
       ).toString()}`,
+      {
+        scroll: useScrollTop,
+      },
     );
-  }, [count, current, pathname, prevSearchParams, router]);
+  }, [count, current, useScrollTop, pathname, prevSearchParams, router]);
 
   const handleChange = useCallback(
     (num: number) => {
       delete prevSearchParams["count"];
       delete prevSearchParams["page"];
 
-      router.push(
+      router.replace(
         `${pathname}?page=${num}&count=${count}&${new URLSearchParams(
           prevSearchParams,
         ).toString()}`,
+        {
+          scroll: useScrollTop,
+        },
       );
     },
-    [count, pathname, prevSearchParams, router],
+    [count, useScrollTop, pathname, prevSearchParams, router],
   );
 
   const handleNext = useCallback(() => {
     delete prevSearchParams["count"];
     delete prevSearchParams["page"];
 
-    router.push(
+    router.replace(
       `${pathname}?page=${current + 1}&count=${count}&${new URLSearchParams(
         prevSearchParams,
       ).toString()}`,
+      {
+        scroll: useScrollTop,
+      },
     );
-  }, [count, current, pathname, prevSearchParams, router]);
+  }, [count, current, useScrollTop, pathname, prevSearchParams, router]);
 
   useEffect(() => {
     const isMobile = /iphone|ipad|ipod|android/i.test(

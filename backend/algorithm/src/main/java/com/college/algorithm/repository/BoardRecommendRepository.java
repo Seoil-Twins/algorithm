@@ -14,8 +14,8 @@ public interface BoardRecommendRepository extends JpaRepository<BoardRecommend, 
             attributePaths = { "board" }
     )
     Page<BoardRecommend> findAllByUserAndBoardDeletedIsFalseOrderByCreatedTimeDesc(AppUser user, Pageable pageable);
-  
-    int countByBoard_BoardIdAndUserUserId(Long board_boardId, Long user_userId);
+
+    boolean existsByBoard_BoardIdAndUserUserId(Long board_boardId, Long user_userId);
   
     BoardRecommend findByBoard_BoardIdAndUser_UserId(Long board_boardId, Long user_userId);
   

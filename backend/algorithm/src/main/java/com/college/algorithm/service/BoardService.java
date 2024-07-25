@@ -8,6 +8,7 @@ import com.college.algorithm.mapper.BoardMapper;
 import com.college.algorithm.mapper.UserMapper;
 import com.college.algorithm.repository.*;
 import com.college.algorithm.util.FileStore;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,68 +32,75 @@ public class BoardService {
 
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final CommentRecommendRepository commentRecommendRepository;
     private final TagRepository tagRepository;
 
     private final FileStore fileStore;
     private final DummyImageRepository dummyImageRepository;
     private final BoardImageRepository boardImageRepository;
 
-    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId){
+    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId, Long algorithmId){
         Pageable pageable = PageRequest.of(page-1, count);
         Page<Board> boards = null;
-        BoardType searchType1,searchType2;
-        switch (searchType){
-            case "p":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 질문");
-                searchType2 = kindRepository.findBoardTypeByTypeName("일반 자유");
-                boards = boardRepository.findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),searchType2.getTypeId(),keyword);
-                break;
-            case "pq":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 질문");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "pf":
-                searchType1 = kindRepository.findBoardTypeByTypeName("일반 자유");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "a":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 질문");
-                searchType2 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
-                boards = boardRepository.findAllByBoardType_TypeIdOrBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),searchType2.getTypeId(),keyword);
-                break;
-            case "aq":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 질문");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
-            case "af":
-                searchType1 = kindRepository.findBoardTypeByTypeName("알고리즘 피드백");
-                boards = boardRepository.findAllByBoardType_TypeIdAndTitleContaining(pageable,searchType1.getTypeId(),keyword);
-                break;
+        Map<String, String[]> searchTypeMappings = Map.of(
+                "p", new String[] {"일반 질문", "일반 자유"},
+                "pq", new String[] {"일반 질문"},
+                "pf", new String[] {"일반 자유"},
+                "a", new String[] {"알고리즘 질문", "알고리즘 피드백"},
+                "aq", new String[] {"알고리즘 질문"},
+                "af", new String[] {"알고리즘 피드백"}
+        );
+        List<BoardType> boardTypes = new ArrayList<>();
+        String[] typeNames = searchTypeMappings.get(searchType);
+
+        if (typeNames != null) {
+            for (String typeName : typeNames) {
+                boardTypes.add(kindRepository.findBoardTypeByTypeName(typeName));
+            }
+        }
+
+        List<Character> typeIds = boardTypes.stream()
+                .map(BoardType::getTypeId)
+                .toList();
+
+        if (searchType.equals("a") || searchType.equals("aq") || searchType.equals("af")) {
+            if (algorithmId == null) {
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword);
+            } else {
+                boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndAlgorithm_AlgorithmIdAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword, algorithmId);
+            }
+        } else {
+            boards = boardRepository.findAllByBoardType_TypeIdInAndTitleContainingAndDeletedIsFalseOrderByCreatedTimeDesc(pageable, typeIds, keyword);
         }
 
         List<BoardDto> dtos = new ArrayList<>();
-        int total = 0;
+        List<Tag> tags = tagRepository.findAllByBoardIn(boards.getContent().stream().toList());
+        long total = boards.getTotalElements();
+
         for(Board board : boards){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-            Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
+            Boolean isSolved = loginUserId != null && board.getIsSolved();
 
-            Boolean isRecommend = null;
-            if(loginUserId != null)
-                isRecommend = recommendRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
+            Boolean isRecommend = loginUserId != null && board.getRecommendCount() > 0 && (
+                    recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+            );
 
-            List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
+            List<Tag> boardTags = tags.stream()
+                    .filter(tag -> tag.getBoard().getBoardId().equals(board.getBoardId()))
+                    .toList();
             List<String> tagNames = new ArrayList<>();
-            for(Tag tag : tags)
+
+            for(Tag tag : boardTags)
                 tagNames.add(tag.getContent());
+
             if(tagNames.isEmpty())
                 tagNames = null;
 
-            dtos.add(BoardMapper.INSTANCE.toBoardDto(board,user,tagNames,isSolved,isRecommend));
-            total++;
+            dtos.add(BoardMapper.INSTANCE.toBoardDto(board, user, tagNames, isSolved, isRecommend));
         }
 
-        return new ResponseBoardsDto(dtos,total);
+        return new ResponseBoardsDto(dtos, total);
     }
     public ResponseBoardTypeDto getKinds(){
 
@@ -115,15 +122,15 @@ public class BoardService {
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
-        Boolean isSolved = loginUserId != null ? board.getAdopt().getCommentId() != null : null;
-
-        Boolean isView = null;
+        boolean isView = loginUserId != null && (
+                boardViewRepository.existsByBoardAndUserUserId(board, loginUserId)
+        );
         if(loginUserId != null)
             isView = boardViewRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
 
-        Boolean isRecommend = null;
-        if(loginUserId != null)
-            isRecommend = recommendRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
+        Boolean isRecommend = loginUserId != null && (
+                recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+        );
 
         List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
         List<String> tagNames = new ArrayList<>();
@@ -133,14 +140,31 @@ public class BoardService {
             tagNames = null;
 
 
-        return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isSolved,isView,isRecommend);
+        return BoardMapper.INSTANCE.toResponseBoardDetailDto(board,user,tagNames,isView,isRecommend);
     }
+
+    public ResponseUpdateBoardDetail getUpdateBoardDetail(Long boardId, Long userId) {
+        Board board = boardRepository.findByBoardId(boardId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
+
+        if (!board.getUser().getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.NOT_MATCHED_USER);
+        }
+        if (board.getIsSolved()) {
+            throw new CustomException(ErrorCode.ALREADY_SOLVED);
+        }
+
+        List<BoardImage> images = boardImageRepository.findAllByBoard(board);
+        List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
+
+        List<Long> imageIds = images.stream().map(BoardImage::getImageId).toList();
+        List<String> tagContents = tags.stream().map(Tag::getContent).toList();
+
+        return BoardMapper.INSTANCE.toUpdateBoardDetail(board, imageIds, tagContents);
+    }
+
     public ResponseBoardSuggestDto getSuggestBoards(){
-        List<BoardSuggest> boards = suggestRepository.findAll();
-
-        if(boards.isEmpty())
-            throw new CustomException(ErrorCode.NOT_FOUND_SUGGEST);
-
+        List<BoardSuggest> boards = suggestRepository.findAllByOrderByCreatedTimeDesc();
         List<BoardSuggestDto> dtos = new ArrayList<>();
 
         for(BoardSuggest boardSuggest : boards) {
@@ -152,29 +176,35 @@ public class BoardService {
             if(tagNames.isEmpty())
                 tagNames = null;
 
-            dtos.add(BoardMapper.INSTANCE.toBoardSuggestDto(boardSuggest.getBoard(),user,tagNames));
+            BoardImage image = boardImageRepository.findByBoardOrderByCreatedTimeAsc(boardSuggest.getBoard());
+            dtos.add(BoardMapper.INSTANCE.toBoardSuggestDto(boardSuggest.getBoard(), image, user, tagNames));
         }
 
 
         return new ResponseBoardSuggestDto(dtos);
     }
-    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId){
-
+    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId, Long userId){
         if(boardRepository.findByBoardId(boardId).isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_BOARD);
 
         Pageable pageable = PageRequest.of(page-1, count);
         Page<Comment> comments = commentRepository.findAllByBoardBoardId(pageable, boardId);
+
+        List<Long> commentIds = comments.stream().map(Comment::getCommentId).collect(Collectors.toList());
+
+        List<CommentRecommend> recommends = commentRecommendRepository.findAllByUserUserIdAndCommentCommentIdIn(userId, commentIds);
+        Set<Long> recommendedCommentIds = recommends.stream().map(cr -> cr.getComment().getCommentId()).collect(Collectors.toSet());
+
         List<BoardCommentDto> dtos = new ArrayList<>();
-        int total = 0;
+        long total = comments.getTotalElements();
+
         for(Comment comment : comments){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(comment.getUser());
-
-            dtos.add(BoardMapper.INSTANCE.toBoardCommentDto(comment,user));
-            total++;
+            boolean isRecommend = recommendedCommentIds.contains(comment.getCommentId());
+            dtos.add(BoardMapper.INSTANCE.toBoardCommentDto(comment, user, isRecommend));
         }
 
-        return new ResponseBoardCommentDto(dtos,total);
+        return new ResponseBoardCommentDto(dtos, total);
     }
 
     public ResponseBoardImageDto postBoardImage(RequestBoardImageDto dto, Long loginUserId){
@@ -196,6 +226,7 @@ public class BoardService {
         return new ResponseBoardImageDto(savedImage.getImageId(),savedImage.getImagePath());
     }
 
+    @Transactional
     public HttpStatus postBoard(RequestBoardPostDto boardPostDto, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -212,17 +243,27 @@ public class BoardService {
                 throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
         }
 
-        Board board = new Board();
-        board.setTitle(boardPostDto.getTitle());
-        board.setContent(boardPostDto.getContent());
-        board.setBoardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)));
+        Board board = Board.builder()
+                .user(user)
+                .title(boardPostDto.getTitle())
+                .content(boardPostDto.getContent())
+                .boardType(kindRepository.findBoardTypeByTypeId(Character.forDigit(boardPostDto.getBoardType(),10)))
+                .build();
         Board savedBoard = boardRepository.save(board);
 
+        List<BoardImage> addImages = new ArrayList<>();
         for(DummyImage image : dummyImages){
-            BoardImage boardImage = new BoardImage(savedBoard, image.getImagePath(), image.getImageType(), image.getImageSize());
-            boardImageRepository.save(boardImage);
-            dummyImageRepository.delete(image);
+            addImages.add(BoardImage.builder()
+                            .imageId(image.getImageId())
+                            .board(savedBoard)
+                            .imageType(image.getImageType())
+                            .imageSize(image.getImageSize())
+                            .imagePath(image.getImagePath())
+                    .build());
         }
+
+        boardImageRepository.saveAll(addImages);
+        dummyImageRepository.deleteAll(dummyImages);
 
         List<Tag> tags = new ArrayList<>();
         List<String> tagNames = boardPostDto.getTags();
@@ -236,6 +277,7 @@ public class BoardService {
         return HttpStatus.OK;
     }
 
+    @Transactional
     public HttpStatus postBoardRecommend(Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -294,13 +336,13 @@ public class BoardService {
         if(board.getDeleted())
             throw new CustomException(ErrorCode.DELETED_BOARD);
 
-        if(board.getAdopt().getCommentId() != null)
+        if(board.getIsSolved())
             throw new CustomException(ErrorCode.DUPLICATE_ADOPT);
 
         if(!comment.getBoard().getBoardId().equals(board.getBoardId()))
             throw new CustomException(ErrorCode.NOT_MATCHED_BOARD);
 
-        board.setAdopt(comment);
+        board.setAdoptId(comment.getCommentId());
         boardRepository.save(board);
 
 
@@ -330,6 +372,8 @@ public class BoardService {
 
         return HttpStatus.CREATED;
     }
+
+    @Transactional
     public HttpStatus patchBoard(RequestBoardUpdateDto boardUpdateDto,Long boardId, Long loginUserId){
 
         AppUser user = userRepository.findByUserId(loginUserId)
@@ -355,24 +399,55 @@ public class BoardService {
 
 
         List<Tag> existingTags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
-
         List<String> newTags = boardUpdateDto.getTags();
 
+        List<Tag> deleteTags = new ArrayList<>();
         for (Tag tag : existingTags) {
             if (!newTags.contains(tag.getContent())) {
-                tagRepository.delete(tag);
+                deleteTags.add(tag);
             } else {
                 newTags.remove(tag.getContent());
             }
         }
+        tagRepository.deleteAll(deleteTags);
 
+        List<Tag> addTags = new ArrayList<>();
         // 새로운 태그 추가
         if (newTags != null) {
             for (String content : newTags) {
-                Tag tag = new Tag(board, content);
-                tagRepository.save(tag);
+                addTags.add(new Tag(board, content));
             }
         }
+        tagRepository.saveAll(addTags);
+
+        List<BoardImage> boardImages = boardImageRepository.findAllByBoard(board);
+        List<BoardImage> deleteImages = boardImages.stream().filter((image -> !boardUpdateDto.getImageIds().contains(image.getImageId()))).toList();
+        boardImageRepository.deleteAll(deleteImages);
+
+        for (BoardImage image : deleteImages) {
+            fileStore.deleteFile(image.getImagePath());
+        }
+
+        List<Long> existingImageIds = boardImages.stream()
+                .map(BoardImage::getImageId)
+                .toList();
+        List<Long> newImageIds = boardUpdateDto.getImageIds().stream()
+                .filter(imageId -> !existingImageIds.contains(imageId))
+                .toList();
+        List<DummyImage> dummyImages = dummyImageRepository.findAllByImageIdIn(newImageIds);
+
+        List<BoardImage> addImages = new ArrayList<>();
+        for (DummyImage image : dummyImages) {
+            addImages.add(BoardImage.builder()
+                            .imageId(image.getImageId())
+                            .board(board)
+                            .imagePath(image.getImagePath())
+                            .imageSize(image.getImageSize())
+                            .imageType(image.getImageType())
+                    .build());
+        }
+        boardImageRepository.saveAll(addImages);
+        dummyImageRepository.deleteAll(dummyImages);
 
         board.setTitle(boardUpdateDto.getTitle());
         board.setContent(boardUpdateDto.getContent());

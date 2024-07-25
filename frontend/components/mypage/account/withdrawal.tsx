@@ -1,48 +1,46 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 import styles from "./withdrawal.module.scss";
 import { notosansBold, notosansMedium } from "@/styles/_font";
 
-import { useAuth } from "@/providers/authProvider";
-import { useFormState } from "react-dom";
-import { deleteUser } from "@/app/actions/user";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { useUser } from "@/hooks/useUser";
+
+import { UserAPI } from "@/api/user";
+import { CustomException } from "@/app/api";
 
 const Withdrawal = () => {
-  const { user, logout } = useAuth();
-  const router = useRouter();
+  const { removeUser } = useUser();
 
   const [isCheck, setIsCheck] = useState<boolean>(false);
-  const [state, formAction] = useFormState(async () => {
-    if (!user?.userId) return;
-
-    return await deleteUser(isCheck, user.userId);
-  }, null);
 
   const handleIsCheck = useCallback(() => {
     setIsCheck((prev) => !prev);
   }, []);
 
-  useEffect(() => {
-    if (!state) return;
-
-    if (state.status === 200) {
-      logout();
-      router.replace("/");
-    } else {
-      toast.error(state.data, {
-        position: "top-center",
-        duration: 3000,
-      });
+  const deleteUser = async () => {
+    if (!isCheck) {
+      toast.error("회원 탈퇴에 동의해주세요.");
+      return;
     }
-  }, [router, state, logout]);
+
+    try {
+      await UserAPI.deleteUser();
+
+      removeUser();
+      toast.success("회원 탈퇴에 성공하였습니다.");
+      location.replace("/");
+    } catch (error) {
+      const exception: CustomException = error as CustomException;
+      toast.error(exception.message);
+    }
+  };
 
   return (
-    <form className={styles.form} action={formAction}>
+    <div className={styles.form}>
       <p>
         회원 탈퇴일부터 계정 정보(아이디/이메일/닉네임)는 <br />
         <Link
@@ -67,11 +65,12 @@ const Withdrawal = () => {
         <button
           type="submit"
           className={`${styles.delete} ${notosansBold.className}`}
+          onClick={deleteUser}
         >
           계정 삭제
         </button>
       </div>
-    </form>
+    </div>
   );
 };
 

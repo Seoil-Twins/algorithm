@@ -95,6 +95,7 @@ public class CodeRunner {
 
     public ResponseCodeDto runPython(RequestCodeDto requestCodeDto, Long algorithmId){
         List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmId);
+        System.out.println(testcaseEntities.get(0).getInput() + " " + testcaseEntities.get(0).getOutput());
         // Java에서 python 코드 실행
         try {
             Boolean flag = true;
@@ -160,7 +161,7 @@ public class CodeRunner {
                 writer.write(requestCodeDto.getCode());
                 System.out.println(requestCodeDto.getCode());
                 writer.close();
-                System.out.println("11111");
+
                 // javac로 컴파일
                 ProcessBuilder pbCompile = new ProcessBuilder("javac", "Main.java");
                 Process processCompile = pbCompile.start();

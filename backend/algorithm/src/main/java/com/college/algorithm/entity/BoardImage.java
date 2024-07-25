@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BoardImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
     private Long imageId;
 
@@ -41,7 +40,8 @@ public class BoardImage {
     private LocalDateTime createdTime;
 
     @Builder
-    public BoardImage(Board board, String imagePath, String imageType, Long imageSize) {
+    public BoardImage(Long imageId, Board board, String imagePath, String imageType, Long imageSize) {
+        this.imageId = imageId;
         this.board = board;
         this.imagePath = imagePath;
         this.imageType = imageType;

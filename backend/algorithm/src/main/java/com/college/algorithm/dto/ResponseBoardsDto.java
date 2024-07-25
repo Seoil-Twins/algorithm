@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseBoardsDto {
     private List<BoardDto> boards;
-    private Integer total;
+    private Long total;
 }

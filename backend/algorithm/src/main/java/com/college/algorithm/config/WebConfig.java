@@ -52,7 +52,29 @@ public class WebConfig implements WebMvcConfigurer {
                 .includePathPattern("/user/nickname", PathMethod.PATCH)
                 .includePathPattern("/user/profile", PathMethod.PATCH)
                 .includePathPattern("/user/notification", PathMethod.PUT)
-                .includePathPattern("/user", PathMethod.DELETE);
+                .includePathPattern("/user", PathMethod.DELETE)
+
+                .includePathPattern("/algorithm/{_:[0-9]}/", PathMethod.POST)
+                .includePathPattern("/algorithm/{_:[0-9]}/board", PathMethod.POST)
+                .includePathPattern("/algorithm/{_:[0-9]}/correct/{_:[0-9]}/comment", PathMethod.POST)
+                .includePathPattern("/algorithm/{_:[0-9]}/correct/{_:[0-9]}/recommend", PathMethod.POST)
+                .includePathPattern("/algorithm/{_:[0-9]}/correct/{_:[0-9]}/recommend", PathMethod.DELETE)
+                .includePathPattern("/algorithm/{_:[0-9]}/recommend", PathMethod.POST)
+                .includePathPattern("/algorithm/{_:[0-9]}/recommend", PathMethod.DELETE)
+
+                .includePathPattern("/comment/{_:[0-9]}/recommend", PathMethod.POST)
+                .includePathPattern("/comment/{_:[0-9]}", PathMethod.PATCH)
+                .includePathPattern("/comment/{_:[0-9]}/recommend", PathMethod.DELETE)
+                .includePathPattern("/comment/{_:[0-9]}", PathMethod.DELETE)
+
+                .includePathPattern("/board/image/", PathMethod.POST)
+                .includePathPattern("/board", PathMethod.POST)
+                .includePathPattern("/board/{_:[0-9]}/recommend", PathMethod.POST)
+                .includePathPattern("/board/{_:[0-9]}/comment", PathMethod.POST)
+                .includePathPattern("/board/{_:[0-9]}", PathMethod.PATCH)
+                .includePathPattern("/board/{_:[0-9]}/recommend", PathMethod.DELETE)
+                .includePathPattern("/board/{_:[0-9]}", PathMethod.DELETE)
+                .includePathPattern("/board/{_:[0-9]}/comment/{_:[0-9]}/adopt", PathMethod.POST);
     }
 
     // Proxy 패턴을 사용하여 Path 및 Method를 체크하는 역할의 대리자(PathMatcher)를 생성

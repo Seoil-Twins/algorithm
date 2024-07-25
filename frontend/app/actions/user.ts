@@ -1,7 +1,7 @@
 "use server";
 
 import { AxiosError } from "axios";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import cookie from "cookie";
 import { redirect } from "next/navigation";
@@ -447,22 +447,8 @@ export const updateProfileUser = async (
   }
 };
 
-export const updateProfileImg = async (
-  userId: number | string,
-  data: { image: File },
-) => {
-  try {
-    const response = await axiosInstance.patchForm(
-      `/user/profile/${userId}`,
-      data,
-    );
-    return {
-      status: response.status,
-      data: response.data,
-    };
-  } catch (error) {
-    return errorHandler(error);
-  }
+export const updateProfileImg = async () => {
+  revalidatePath("/account", "layout");
 };
 
 export const deleteUser = async (

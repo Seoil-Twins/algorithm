@@ -4,20 +4,20 @@ import { useCallback, useState } from "react";
 import { useRouter, useParams, usePathname } from "next/navigation";
 import { AxiosError } from "axios";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 import styles from "./detailNav.module.scss";
 
 import Modal from "../common/modal";
-import { deleteBoard } from "@/app/actions/baord";
-import toast from "react-hot-toast";
+import { BoardAPI } from "@/api/board";
 
 type DetailNavProps = {
   isEditable: boolean;
+  isDeletable: boolean;
 };
 
-const DetailNav = ({ isEditable }: DetailNavProps) => {
+const DetailNav = ({ isEditable, isDeletable }: DetailNavProps) => {
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams();
   const boardId = Number(params.boardId);
 
@@ -33,42 +33,37 @@ const DetailNav = ({ isEditable }: DetailNavProps) => {
 
   const handleDelete = useCallback(async () => {
     try {
-      const response = await deleteBoard(boardId);
-      if (response.status !== 200) {
-        toast.error("글 삭제에 실패했습니다.");
-      }
-
+      await BoardAPI.deleteBoard(boardId);
       toast.success("글이 삭제되었습니다.");
       router.back();
-    } catch (error) {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        router.push(`/login?error=unauthorized&redirect=${pathname}`);
-      } else {
-        alert("글 삭제에 실패했습니다.");
-      }
+      router.refresh();
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setIsVisible(false);
     }
-  }, [boardId, pathname, router]);
+  }, [boardId, router]);
 
   return (
     <nav className={styles.detailNav}>
       <button className={styles.back} onClick={handleBack}>
         뒤로 가기
       </button>
-      {isEditable && (
-        <div className={styles.editable}>
+      <div className={styles.editable}>
+        {isEditable && (
           <Link
             href={`/forum/${params.boardId}/update`}
             className={`${styles.update}`}
           >
             글 수정
           </Link>
+        )}
+        {isDeletable && (
           <button className={`${styles.delete}`} onClick={handleVisible}>
             글 삭제
           </button>
-        </div>
-      )}
+        )}
+      </div>
       <Modal
         isVisible={isVisible}
         title="정말 삭제하겠습니까?"

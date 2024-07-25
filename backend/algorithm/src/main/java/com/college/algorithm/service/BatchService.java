@@ -89,10 +89,8 @@ public class BatchService {
 
         // 새로운 랭킹 데이터 삽입
         for (Object[] algorithm : algorithms) {
-            Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(((Number) algorithm[0]).longValue());
-            if(algorithmEntity == null){
-                throw new CustomException(ErrorCode.NOT_FOUND_ALGORITHM);
-            }
+            Algorithm algorithmEntity = algorithmRepository.findAlgorithmByAlgorithmId(((Number) algorithm[0]).longValue())
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
 
             AlgorithmSuggest newAlgorithmSuggest = new AlgorithmSuggest();
             newAlgorithmSuggest.setAlgorithm(algorithmEntity);

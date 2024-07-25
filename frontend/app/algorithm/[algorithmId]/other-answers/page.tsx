@@ -1,15 +1,13 @@
-import { AnswerResponse } from "@/types2/code";
-
-import { getTitleByCode } from "@/types2/constants";
-
-import { getAnswer } from "@/app/actions/code";
-
 import styles from "./otherAnswers.module.scss";
 
 import DetailNav from "@/components/detail/detailNav";
 import Answer from "@/components/algorithm/detail/other-answers/answer";
 import Pagination from "@/components/common/pagination";
 import NotFound from "@/components/common/notFound";
+
+import { AlgorithmAPI } from "@/api/algorithm";
+import { Corrects } from "@/app/api/model/algorithm";
+import { CodeLanguage, getTitleByCodeType } from "@/types/constants";
 
 const OtherAnswers = async ({
   params,
@@ -19,29 +17,24 @@ const OtherAnswers = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
   const algorithmId = params.algorithmId;
-  const language = Number(searchParams.language) || 3001;
+  const language = searchParams.language || String(CodeLanguage.PYTHON);
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
 
-  const answersResponse = await getAnswer(algorithmId, {
-    count,
-    page,
-    language,
+  const answers: Corrects = await (
+    await AlgorithmAPI.getAlgorithmCorrects(algorithmId, {
+      count,
+      page,
+      language,
+    })
+  ).json();
+
+  answers.corrects = answers.corrects.map((code) => {
+    const newCode = `<pre><code class="language-${getTitleByCodeType(
+      (language as any) || CodeLanguage.PYTHON,
+    )} hljs">${code.code}</code></pre>`;
+    return { ...code, code: newCode };
   });
-  let answers;
-
-  if (answersResponse.status === 200) {
-    answers = { ...(answersResponse.data as AnswerResponse), total: 3 };
-
-    answers.codes = answers.codes.map((code) => {
-      const newCode = `<pre><code class="language-${getTitleByCode(
-        language,
-      )} hljs">${code.code}</code></pre>`;
-      return { ...code, code: newCode };
-    });
-  } else {
-    answers = { total: 0, codes: [] };
-  }
 
   if (answers.total <= 0)
     return (
@@ -54,12 +47,15 @@ const OtherAnswers = async ({
   return (
     <div className={styles.otherAnswers}>
       <div className={styles.mb35}>
-        <DetailNav isEditable={false} />
+        <DetailNav isEditable={false} isDeletable={false} />
       </div>
       <div className={styles.answers}>
-        {answers.codes.map((answer) => (
-          // comments 붙여지면 answer만 넘기면 됨
-          <Answer key={answer.codeId} answer={{ ...answer, comments: [] }} />
+        {answers.corrects.map((answer) => (
+          <Answer
+            key={answer.correctId}
+            algorithmId={algorithmId}
+            answer={answer}
+          />
         ))}
       </div>
       <Pagination

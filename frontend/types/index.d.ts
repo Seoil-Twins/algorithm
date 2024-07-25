@@ -1,3 +1,5 @@
+import { CodeLanguage } from "./constants";
+
 export type PageOptions = {
   page: number;
   count: number;
@@ -23,7 +25,7 @@ export type REQUEST_BOARD_TYPE = Exclude<
 export const AlgorithmBoardType = {
   ALGORITHM_ALL: "a",
   ALGORITHM_QUESTION: "aq",
-  ALGORITHM_FEEDBACK: "aaf",
+  ALGORITHM_FEEDBACK: "af",
 } as const;
 export type ALGORITHM_BOARD_TYPE =
   (typeof AlgorithmBoardType)[keyof typeof AlgorithmBoardType];
@@ -34,11 +36,3 @@ export type REQUEST_ALGORITHM_TYPE = Exclude<
 
 export const AllBoardType = CommonBoardType & (AlgorithmBoardType as const);
 export type ALL_BOARD_TYPE = (typeof AllBoardType)[keyof typeof AllBoardType];
-
-export const CodeLanguage = {
-  CPP: 3001,
-  PYTHON: 3002,
-  JAVA: 3003,
-} as const;
-export type CODE_LANGUAGE_TYPE =
-  (typeof CodeLanguage)[keyof typeof CodeLanguage];

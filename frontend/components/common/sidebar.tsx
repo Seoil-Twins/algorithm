@@ -18,11 +18,11 @@ import { useAuth } from "@/providers/authProvider";
 import { MenuItems } from "./navigation";
 
 import { NotificationItem } from "@/app/api/model/user";
+import { NotificationAPI } from "@/api/notification";
 
 import ThemeImage from "./themeImage";
 import ThemeSwitch from "./themeSwitch";
 import Alram from "./alram";
-import { UserAPI } from "@/api/user";
 
 type SidebarProps = {
   menuItems: MenuItems[];
@@ -84,11 +84,12 @@ const Sidebar = ({ menuItems }: SidebarProps) => {
   }, [onAlramClick]);
 
   const getNotifications = useCallback(async () => {
-    const response = await UserAPI.getNotifications();
-
-    if (response.ok) {
+    try {
+      const response = await NotificationAPI.getNotifications();
       const newAlrams = await response.json();
       setAlrams(newAlrams.notifications);
+    } catch (error) {
+      setAlrams([]);
     }
   }, []);
 

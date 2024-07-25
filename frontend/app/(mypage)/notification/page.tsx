@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import useSWR, { useSWRConfig } from "swr";
+import toast from "react-hot-toast";
 
-import { ResponseNotification } from "@/types2/user";
+import { NotificationSetting } from "@/app/api/model/user";
 
 import { useAuth } from "@/providers/authProvider";
 
@@ -13,14 +14,16 @@ import styles from "./notification.module.scss";
 import Content from "@/components/mypage/content";
 import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
-import { SWRKeys } from "@/types2/constants";
-import { getNotifications, updateNotifications } from "@/app/actions/user";
-import toast from "react-hot-toast";
+
+import { SWRKeys } from "@/types/constants";
+import { updateNotifications } from "@/app/actions/user";
+import { UserAPI } from "@/api/user";
+import { CustomException } from "@/app/api";
 
 type NotificationSettings = {
   title: string;
   contents: string;
-  paramKey: keyof ResponseNotification;
+  paramKey: keyof NotificationSetting;
   value: boolean;
 };
 
@@ -28,13 +31,7 @@ const defaultNotifications: NotificationSettings[] = [
   {
     title: "공지사항 알림",
     contents: "공지사항 알림을 받겠습니다.",
-    paramKey: "annoNofi",
-    value: false,
-  },
-  {
-    title: "소스 코드 알림",
-    contents: "다른 사람이 내 소스 코드를 읽었을 때 알림이 발생합니다.",
-    paramKey: "postNofi",
+    paramKey: "primaryNofi",
     value: false,
   },
   {
@@ -69,9 +66,17 @@ const defaultNotifications: NotificationSettings[] = [
 const Notification = () => {
   const { user } = useAuth();
   const { mutate } = useSWRConfig();
-  const { data: notificationsWithAPI, isLoading: notificationLoading } = useSWR(
+  const { data: notification, isLoading } = useSWR(
     SWRKeys.getNotification,
-    getNotifications,
+    async () => {
+      try {
+        return (await (
+          await UserAPI.getNotification()
+        ).json()) as NotificationSetting;
+      } catch (error: any) {
+        toast.error((error as CustomException).message);
+      }
+    },
   );
 
   const [notifications, setNotifications] =
@@ -86,24 +91,21 @@ const Notification = () => {
         // 이전 값 deep copy
         prevNotifications.current = JSON.parse(JSON.stringify(notifications));
 
-        const notificationSettings: ResponseNotification = request.reduce(
+        const notificationSettings: NotificationSetting = request.reduce(
           (result, { paramKey, value }) => {
             result[paramKey] = value;
             return result;
           },
-          {} as ResponseNotification,
+          {} as NotificationSetting,
         );
 
-        const response = await updateNotifications(
-          user.userId,
-          notificationSettings,
-        );
-        if (response.status === 200) {
+        try {
+          await UserAPI.updateNotification(notificationSettings);
           mutate(SWRKeys.getNotification);
           toast.success("알림 설정을 변경하였습니다.");
-        } else {
-          setNotifications(prevNotifications.current!);
-          toast.error("알림 설정을 변경하는데 실패했습니다.");
+        } catch (error) {
+          const exception: CustomException = error as CustomException;
+          toast.error(exception.message);
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,7 +116,7 @@ const Notification = () => {
 
   const handleChange = useCallback(
     (idx: number, value: boolean) => {
-      setNotifications((prev) => {
+      setNotifications(() => {
         const newNotification = JSON.parse(JSON.stringify(notifications));
         newNotification[idx].value = value;
 
@@ -126,19 +128,19 @@ const Notification = () => {
   );
 
   const callFetchNotification = useCallback(async () => {
-    if (!notificationsWithAPI) return;
+    if (!notification) return;
 
-    if (notificationsWithAPI.data) {
+    if (notification) {
       setNotifications((prev) => {
         prevNotifications.current = prev;
 
-        return prev.map((notification: NotificationSettings) => ({
-          ...notification,
-          value: notificationsWithAPI.data[notification.paramKey],
+        return prev.map((item: NotificationSettings) => ({
+          ...item,
+          value: notification[item.paramKey],
         }));
       });
     }
-  }, [notificationsWithAPI]);
+  }, [notification]);
 
   useEffect(() => {
     callFetchNotification();
@@ -147,7 +149,7 @@ const Notification = () => {
   return (
     <Content title="알림">
       <div className={styles.container}>
-        {!notificationLoading && (
+        {!isLoading && (
           <>
             {notifications.map((notification, idx) => (
               <div className={styles.item} key={notification.paramKey}>
@@ -163,7 +165,7 @@ const Notification = () => {
             ))}
           </>
         )}
-        <Spinner isVisible={notificationLoading} />
+        <Spinner isVisible={isLoading} />
       </div>
     </Content>
   );

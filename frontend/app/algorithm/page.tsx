@@ -3,19 +3,24 @@ import Image from "next/image";
 
 import {
   AlgorithmOptions,
-  Algorithm as AlgorithmType,
   RateOptions,
   SolvedOptions,
   SortOptions,
-} from "@/types2/algorithm";
+} from "@/types/algorithm";
+
 import {
   RATE_OPTIONS_ARRAY,
   SOLVED_OPTIONS_ARRAY,
   SORT_OPTIONS_ARRAY,
   checkMyType,
-} from "@/types2/constants";
+} from "@/types/constants";
 
-import { getAlgorithmKinds, getAlgorithms } from "../actions/algorithm";
+import { AlgorithmAPI } from "@/api/algorithm";
+import {
+  AlgorithmKindItem,
+  Algorithms,
+  AlgorithmsItem,
+} from "../api/model/algorithm";
 
 import Navigation from "@/components/algorithm/navigation";
 import Table, { TableData } from "@/components/algorithm/table";
@@ -56,11 +61,15 @@ const Algorithm = async ({
     keyword: (searchParams?.keyword as string) || undefined,
   };
 
-  const algorithm = (await getAlgorithms(sortOptions)).data;
-  const algorithmKinds = (await getAlgorithmKinds()).data;
+  const algorithm: Algorithms = await (
+    await AlgorithmAPI.getAlgorithms(sortOptions)
+  ).json();
+  const algorithmKinds: AlgorithmKindItem[] = (
+    await (await AlgorithmAPI.getAlgorithmKinds()).json()
+  ).kinds;
 
   const tableDatas: TableData[] = algorithm.algorithms.map(
-    (algorithm: AlgorithmType) => {
+    (algorithm: AlgorithmsItem) => {
       return {
         datas: [
           <Image
@@ -77,7 +86,7 @@ const Algorithm = async ({
           <span className={`level${algorithm.level} ${notosansBold.className}`}>
             Level. {algorithm.level}
           </span>,
-          <span>{algorithm.kinds}</span>,
+          <span>{algorithm.kind}</span>,
           <span>{algorithm.correctRate}%</span>,
         ],
         link: `/algorithm/${algorithm.algorithmId}`,

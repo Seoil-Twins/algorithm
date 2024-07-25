@@ -19,7 +19,7 @@ public class ResponseBoardDetailDto {
     private Integer recommendCount;
     private Long commentCount;
     private List<String> tags;
-    private Boolean isSolved;
+    private Long solved;
     private Boolean isView; // new!
     private Boolean isRecommend;
     private String createdTime;

@@ -26,9 +26,9 @@ const BoardNavigation = ({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const prevParams = Object.fromEntries(Array.from(searchParams.entries()));
-
-  const [keyword, setKeyword] = useState<string>(prevParams.keyword);
+  const [keyword, setKeyword] = useState<string>(
+    searchParams.get("keyword") || "",
+  );
 
   const handleKeyword = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,16 +40,10 @@ const BoardNavigation = ({
   const handleEnter = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
-        delete prevParams["keyword"];
-
-        router.replace(
-          `${pathname}?keyword=${keyword}&${new URLSearchParams(
-            prevParams,
-          ).toString()}`,
-        );
+        router.replace(`${pathname}?keyword=${keyword}`);
       }
     },
-    [keyword, prevParams, router, pathname],
+    [keyword, router, pathname],
   );
 
   return (
@@ -59,7 +53,6 @@ const BoardNavigation = ({
           <Link
             href={{
               pathname: item.link,
-              query: { ...prevParams },
             }}
             key={idx}
             className={`${styles.btn} ${
@@ -81,7 +74,7 @@ const BoardNavigation = ({
           />
           <Link
             href={{
-              query: { ...prevParams, keyword },
+              query: { keyword },
             }}
           >
             <ThemeImage

@@ -1,5 +1,7 @@
-import { getBoardTypes } from "@/app/actions/baord";
-import { getMyComments } from "@/app/actions/user";
+import { BoardAPI } from "@/api/board";
+import { UserAPI } from "@/api/user";
+import { BoardType, BoardTypeItem, MyBoardIntro } from "@/app/api/model/board";
+import { User } from "@/app/api/model/user";
 
 import Pagination from "@/components/common/pagination";
 import Table from "@/components/mypage/activity/table";
@@ -11,28 +13,26 @@ const Comment = async ({
 }) => {
   const count = Number(searchParams?.count) || 5;
   const page = Number(searchParams?.page) || 1;
-  const boardTypes = await getBoardTypes();
-  let comments;
-  try {
-    const responseComment = await getMyComments({ page, count });
-    comments = responseComment.data;
-  } catch (error) {
-    comments = {
-      results: [],
-      totals: 0,
-    };
-  }
+
+  const user: User = (await (await UserAPI.getUser()).json()) as User;
+  const boardTypes: BoardTypeItem[] = (
+    (await (await BoardAPI.getBoardTypes()).json()) as BoardType
+  ).types;
+  const comment: MyBoardIntro = (await (
+    await UserAPI.getMyComment(user.userId.toString(), page, count)
+  ).json()) as MyBoardIntro;
 
   return (
     <>
       <Table
-        items={comments.results}
         boardTypes={boardTypes}
+        items={comment.comments}
+        total={comment.total}
         errorTitle="작성하신 댓글이 없습니다."
       />
       <Pagination
         count={count}
-        total={comments.totals}
+        total={comment.total}
         current={page}
         marginTop={25}
       />

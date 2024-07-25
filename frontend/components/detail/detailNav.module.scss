@@ -40,7 +40,7 @@
     .editable {
       column-gap: 10px;
       grid-template-rows: 1fr;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
     }
   }
 }
@@ -64,7 +64,7 @@
 
     .editable {
       row-gap: 10px;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: 1fr auto;
       grid-template-columns: 1fr;
     }
   }

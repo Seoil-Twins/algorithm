@@ -1,35 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BACKEND_API_URL, CustomException, createNextApiError } from "..";
+import { API_INSTANCE, getPagination, handleUnAuthorization } from "..";
 
-const url = BACKEND_API_URL + "/notification";
+const API_URL = "/notification";
 
 export const GET = async (req: NextRequest) => {
-  const urlSearchParams = new URLSearchParams(req.nextUrl.search);
-  const params = Object.fromEntries(urlSearchParams.entries());
-  const page = params.page ? params.page : 1;
-  const count = params.count ? params.count : 10;
-  const pageOptions = {
-    page: String(page),
-    count: String(count),
-  };
-
-  const searchParams = new URLSearchParams(pageOptions).toString();
+  const searchParams = getPagination(req.nextUrl.search);
 
   try {
-    const response = await fetch(`${url}?${searchParams}`, {
-      method: "GET",
-      headers: req.headers,
-    });
+    const { data, headers } = await API_INSTANCE.GET(
+      `${API_URL}?${searchParams}`,
+      req.headers,
+    );
 
-    if (response.ok) {
-      const notifications = await response.json();
-      return NextResponse.json(notifications, { status: 200 });
-    } else {
-      const error = (await response.json()) as CustomException;
-      return NextResponse.json(error, { status: error.status });
-    }
+    return NextResponse.json(data, {
+      status: 200,
+      headers,
+    });
   } catch (error: any) {
-    const response: CustomException = createNextApiError(error.message);
-    return NextResponse.json(response, { status: response.status });
+    const headers: Headers = handleUnAuthorization(error, req.headers);
+    return NextResponse.json(error, { status: error.status, headers });
   }
 };

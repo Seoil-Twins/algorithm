@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-import { AUTH_PATHS, NO_AUTH_PATHS } from "./types2/constants";
+import { AUTH_PATHS, NO_AUTH_PATHS } from "./types/constants";
 
 export default async function middrleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -24,7 +24,7 @@ export default async function middrleware(req: NextRequest) {
     NO_AUTH_PATHS.some((noAuthPath) => {
       const regex = new RegExp(noAuthPath);
       return regex.test(pathname);
-    }) && sessionId;
+    }) && Boolean(sessionId);
   const noSessionButAuthPath =
     AUTH_PATHS.some((authPath) => {
       const regex = new RegExp(authPath);

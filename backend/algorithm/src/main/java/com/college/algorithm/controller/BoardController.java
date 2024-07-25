@@ -25,7 +25,7 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getBoards(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                        @RequestParam(required = false, defaultValue = "10", value = "count") int count,
                                        @RequestParam(required = false, value = "boardType") String boardType, /* p : 일반 전체
@@ -35,19 +35,19 @@ public class BoardController {
                                                                                                                aq : 알고리즘 질문
                                                                                                                af : 알고리즘 피드백*/
                                        @RequestParam(required = false, value = "keyword") String keyword,
+                                       @RequestParam(required = false, value = "algorithmId") Long algorithmId,
                                        HttpServletRequest request){
         boolean paramFlag = Arrays.stream(BoardTypeWithSearchParam.values())
                 .anyMatch(type -> boardType.equals(type.getSearchParam()));
         if(!paramFlag)
             throw new CustomException(ErrorCode.BAD_REQUEST_SEARCH);
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+
         if(keyword==null)
             keyword="";
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoards(page,count,boardType,keyword,loginUserId));
+        String userId = request.getSession().getAttribute("userId").toString();
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoards(page, count, boardType, keyword, Long.parseLong(userId), algorithmId));
     }
 
     @GetMapping("/kind")
@@ -59,12 +59,15 @@ public class BoardController {
     public ResponseEntity<?> getBoardDetail(@PathVariable(value = "board_id") Long boardId,
                                        HttpServletRequest request){
 
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId, Long.parseLong(userId)));
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId,loginUserId));
+    @GetMapping("/{board_id}/update")
+    public ResponseEntity<?> getUpdateBoardDetail(@PathVariable(value = "board_id") Long boardId,
+                                        HttpServletRequest request) {
+        String userId = request.getSession().getAttribute("userId").toString();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getUpdateBoardDetail(boardId, Long.parseLong(userId)));
     }
 
     @GetMapping("/recommend")
@@ -75,111 +78,94 @@ public class BoardController {
     @GetMapping("/{board_id}/comment")
     public ResponseEntity<?> getBoardComments(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                               @RequestParam(required = false, defaultValue = "10", value = "count") int count,
-                                              @PathVariable(value = "board_id") Long boardId){
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardComments(page,count,boardId));
+                                              @PathVariable(value = "board_id") Long boardId,
+                                              HttpServletRequest request){
+        String userId = request.getSession().getAttribute("userId").toString();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardComments(page, count, boardId, Long.parseLong(userId)));
     }
 
     @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> postBoardImage(@Valid @ModelAttribute RequestBoardImageDto dto,
                                             HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.ok().body(boardService.postBoardImage(dto,loginUserId));
+        return ResponseEntity.ok().body(boardService.postBoardImage(dto, Long.parseLong(userId)));
     }
     @PostMapping("/")
     public ResponseEntity<?> postBoard(@Valid @RequestBody(required = false) RequestBoardPostDto dto,
                                         HttpServletRequest request){
 
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.postBoard(dto,loginUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.postBoard(dto, Long.parseLong(userId)));
     }
 
     @PostMapping("/{board_id}/recommend")
     public ResponseEntity<?> postBoardRecommend(@PathVariable(value = "board_id") Long board_id,
                                                            HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.postBoardRecommend(board_id,loginUserId)).build();
+        return ResponseEntity.status(boardService.postBoardRecommend(board_id, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/{board_id}/comment")
     public ResponseEntity<?> postBoardComment(@Valid @RequestBody(required = false) RequestBoardComment requestBoardComment,
                                                          @PathVariable(value = "board_id") Long board_id,
                                                          HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.postBoardComment(board_id,requestBoardComment,loginUserId)).build();
+        return ResponseEntity.status(boardService.postBoardComment(board_id,requestBoardComment, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/{board_id}/comment/{comment_id}/adopt")
     public ResponseEntity<?> postAdopt(@PathVariable(value = "board_id") Long board_id,
                                        @PathVariable(value = "comment_id") Long comment_id,
                                               HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.postBoardAdopt(board_id,comment_id,loginUserId)).build();
+        return ResponseEntity.status(boardService.postBoardAdopt(board_id,comment_id, Long.parseLong(userId))).build();
     }
 
     @PostMapping("/{board_id}/view")
     public ResponseEntity<?> postView(@PathVariable(value = "board_id") Long board_id,
                                        HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.postBoardView(board_id,loginUserId)).build();
+        return ResponseEntity.status(boardService.postBoardView(board_id, Long.parseLong(userId))).build();
     }
 
     @PatchMapping("/{board_id}")
     public ResponseEntity<?> patchBoard(@Valid @RequestBody(required = false) RequestBoardUpdateDto boardUpdateDto,
                                         @PathVariable(value = "board_id") Long boardId,
                                             HttpServletRequest request){
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
-
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.patchBoard(boardUpdateDto,boardId,loginUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.patchBoard(boardUpdateDto, boardId, Long.parseLong(userId)));
     }
 
     @DeleteMapping("/{board_id}/recommend")
     public ResponseEntity<?> deleteBoardRecommend(@PathVariable(value = "board_id") Long board_id,
                                                            HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.deleteBoardRecommend(board_id,loginUserId)).build();
+        return ResponseEntity.status(boardService.deleteBoardRecommend(board_id, Long.parseLong(userId))).build();
     }
 
     @DeleteMapping("/{board_id}")
     public ResponseEntity<?> deleteBoard(@PathVariable(value = "board_id") Long board_id,
                                                   HttpServletRequest request) {
-//        Long loginUserId = (Long) request.getAttribute("로그인 키키키키키");
-        Long loginUserId = 1L;
-        if(loginUserId == null)
-            throw new CustomException(ErrorCode.INVALID_COOKIE);
+        String userId = request.getSession().getAttribute("userId").toString();
+        if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(boardService.deleteBoard(board_id,loginUserId)).build();
+        return ResponseEntity.status(boardService.deleteBoard(board_id, Long.parseLong(userId))).build();
     }
 
 }

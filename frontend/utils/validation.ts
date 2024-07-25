@@ -17,15 +17,15 @@ const notError: ValidationError = {
 };
 
 export const validationNickname = (nickname?: string) => {
-  if (!nickname || nickname.length <= 1)
+  if (!nickname || nickname.length < 2)
     return {
       isError: true,
       errMsg: "2글자 이상 입력해주세요.",
     };
-  else if (nickname.length > 16) {
+  else if (nickname.length > 10) {
     return {
       isError: true,
-      errMsg: "16글자 이하 입력해주세요.",
+      errMsg: "10글자 이하 입력해주세요.",
     };
   }
 

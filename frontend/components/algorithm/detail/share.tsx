@@ -8,7 +8,7 @@ type ShareProps = {
   algorithmId: number;
   title: string;
   description: string;
-  thumbnail?: string;
+  thumbnail?: string | null;
 };
 
 const Share = ({ algorithmId, title, description, thumbnail }: ShareProps) => {

@@ -1,31 +1,30 @@
-import { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import { notosansBold, notosansMedium } from "@/styles/_font";
 import styles from "./table.module.scss";
 
-import { BoardType } from "@/types2/boardType";
-
 import { getTimeAgo } from "@/utils/day";
 
 import ThemeImage from "@/components/common/themeImage";
-
-import { Board } from "@/types2/board";
 import NotFound from "@/components/common/notFound";
 
+import { BoardTypeItem, MyBoardIntroItem } from "@/app/api/model/board";
+import { useCallback } from "react";
+
 type TableProps = {
-  boardTypes: BoardType[];
-  items: Board[];
+  boardTypes: BoardTypeItem[];
+  items: MyBoardIntroItem[];
+  total: number;
   errorTitle: string;
 };
 
-const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
+const Table = ({ boardTypes, items, total, errorTitle }: TableProps) => {
   const getTitleById = useCallback(
     (type: number | string) => {
       for (const boardType of boardTypes) {
-        if (boardType.boardTypeId === Number(type)) {
-          return boardType.title;
+        if (boardType.typeId === Number(type)) {
+          return boardType.typeName;
         }
       }
 
@@ -36,24 +35,24 @@ const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
 
   return (
     <div className={styles.table}>
-      {items.length <= 0 && (
+      {total <= 0 && (
         <NotFound title={errorTitle} description={""} size={70} marginTop={0} />
       )}
-      {items.map((item: Board) => (
-        <Link href={`/forum/${item.board_id}`} key={item.boardId}>
+      {items.map((item, idx) => (
+        <Link href={`/forum/${item.boardId}`} key={idx}>
           <div className={styles.container}>
             <div className={`${styles.kind} ${notosansBold.className}`}>
-              {getTitleById(item.board_type)}
+              {getTitleById(item.boardType)}
             </div>
             <div
               className={`${styles.title} ${notosansMedium.className} ${
-                item.solved && styles.solved
+                item.isSolved && styles.isSolved
               }`}
             >
               {item.title}
             </div>
             <div className={styles.imgBox}>
-              {item.solved !== undefined && item.solved && (
+              {item.isSolved !== undefined && item.isSolved && (
                 <Image
                   src="/svgs/selection_active.svg"
                   alt="해결완료 아이콘"
@@ -62,7 +61,7 @@ const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
                   className={styles.mr10}
                 />
               )}
-              {item.solved !== undefined && item.solved === null && (
+              {item.isSolved !== undefined && item.isSolved === null && (
                 <ThemeImage
                   lightSrc="/svgs/selection_black.svg"
                   darkSrc="/svgs/selection_white.svg"
@@ -79,7 +78,7 @@ const Table = ({ boardTypes, items, errorTitle }: TableProps) => {
                 width={18}
                 height={18}
               />
-              <span className={styles.mr10}>{item.recommendCount}</span>
+              <span className={styles.mr10}>{item.likeCount}</span>
               {item.commentCount !== undefined && (
                 <>
                   <ThemeImage

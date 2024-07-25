@@ -7,6 +7,8 @@ import SubNavigation, {
 } from "@/components/mypage/activity/subNavigation";
 import Content from "@/components/mypage/content";
 import Solved from "@/components/mypage/activity/solved";
+import { HistoryAlgorithm } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
 const navItems: NavItem[] = [
   {
@@ -36,19 +38,14 @@ const navItems: NavItem[] = [
 ];
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-  const response = await getUserSolved();
-  if (response.status !== 200) {
-    response.data = {
-      solved: 0,
-      tried: 0,
-      favorite: 0,
-    };
-  }
+  const history: HistoryAlgorithm = (await (
+    await UserAPI.getHistoryAlgirhtm()
+  ).json()) as HistoryAlgorithm;
 
   return (
     <div>
       <Content title="문제">
-        <Solved info={response.data} />
+        <Solved history={history} />
       </Content>
       <Content title="내 활동 내역">
         <SubNavigation items={navItems} />

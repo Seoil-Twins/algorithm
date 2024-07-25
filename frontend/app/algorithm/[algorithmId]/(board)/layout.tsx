@@ -1,7 +1,9 @@
 import React from "react";
 
 import BoardNavigation, { NavItem } from "@/components/common/boardNavigation";
-import { getUser } from "@/app/actions/user";
+
+import { User } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
 type BoardParams = {
   algorithmId: number;
@@ -14,13 +16,7 @@ const Board = async ({
   params: BoardParams;
   children: React.ReactNode;
 }) => {
-  let user;
-
-  try {
-    user = (await getUser()).data;
-  } catch (error) {
-    user = undefined;
-  }
+  const user: User = await (await UserAPI.getUser()).json();
   const algorithmId = params?.algorithmId;
 
   const navItems: NavItem[] = [

@@ -12,5 +12,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseCorrectDto {
     private List<AlgorithmCorrectDto> corrects;
-    private Integer total;
+    private Long total;
 }
