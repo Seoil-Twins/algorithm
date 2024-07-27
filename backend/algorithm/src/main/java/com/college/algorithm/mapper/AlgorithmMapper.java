@@ -31,6 +31,7 @@ public interface AlgorithmMapper {
     @Mapping(source = "algorithm.title", target = "title")
     @Mapping(source = "algorithm.kind.kindName", target = "kind")
     @Mapping(source = "algorithm.content", target = "content")
+    @Mapping(source = "algorithm.level", target = "level")
     @Mapping(source = "algorithm.limitTime", target = "limitTime")
     @Mapping(source = "algorithm.limitMemory", target = "limitMemory")
     @Mapping(source = "algorithmImage.imagePath", target = "thumbnail")

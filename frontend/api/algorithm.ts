@@ -37,6 +37,9 @@ export const AlgorithmAPI = {
       `${API_URL}/${algorithmId}/correct?${searchParams.toString()}`,
     );
   },
+  getAlgorithmExplanation: async (algorithmId: number) => {
+    return await API_INSTANCE.GET(`${API_URL}/${algorithmId}/explanation`);
+  },
   submitAlgorithm: async (algorithmId: number, body: Body) => {
     return await API_INSTANCE.POST(`${API_URL}/${algorithmId}`, body);
   },

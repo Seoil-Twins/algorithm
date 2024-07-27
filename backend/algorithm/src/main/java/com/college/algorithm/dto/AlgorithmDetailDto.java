@@ -16,6 +16,7 @@ public class AlgorithmDetailDto {
     private String title;
     private String kind;
     private String content;
+    private String level;
     private String limitTime;
     private String limitMemory;
     private String thumbnail;
