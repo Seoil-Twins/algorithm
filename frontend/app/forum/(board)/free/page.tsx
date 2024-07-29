@@ -1,6 +1,7 @@
-import { BOARD_TYPE } from "@/types/constants";
+import { BoardType } from "@/types/constants";
 
-import { getBoards } from "@/app/actions/baord";
+import { BoardAPI } from "@/api/board";
+import { BoardList } from "@/app/api/model/board";
 
 import NotFound from "@/components/common/notFound";
 import Pagination from "@/components/common/pagination";
@@ -15,19 +16,31 @@ const Free = async ({
   const count = Number(searchParams?.count) || 10;
   const keyword = searchParams?.keyword;
 
-  const boardResponse = await getBoards({
-    count,
-    page,
-    kind: BOARD_TYPE.PUBLIC_FREE,
-    keyword,
-  });
-  const boards = boardResponse.data;
+  let boards: BoardList;
 
-  if (typeof boards === "string") {
+  try {
+    boards = await (
+      await BoardAPI.getBoards({
+        count,
+        page,
+        keyword,
+        boardType: BoardType.PUBLIC_FREE,
+      })
+    ).json();
+
+    if (boards.total <= 0) {
+      return (
+        <NotFound
+          title="아직 게시된 게시물이 없습니다."
+          description="새로운 게시물의 주인공이 되어보세요 !"
+        />
+      );
+    }
+  } catch (error) {
     return (
       <NotFound
-        title="서버와의 통신 중 에러가 발생하였습니다."
-        description="나중에 다시 시도해주세요."
+        title="서버와의 통신 중 오류가 발생하였습니다."
+        description="잠시 후 다시 시도해주세요."
       />
     );
   }

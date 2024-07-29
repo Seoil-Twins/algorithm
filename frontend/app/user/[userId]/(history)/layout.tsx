@@ -1,10 +1,6 @@
 import React from "react";
 import Image from "next/image";
 
-import { User } from "@/types2/user";
-
-import { IMAGE_URL } from "@/api/index2";
-
 import styles from "./user.module.scss";
 import { notosansBold } from "@/styles/_font";
 
@@ -14,37 +10,29 @@ import SubNavigation, {
 import Content from "@/components/mypage/content";
 import Solved from "@/components/mypage/activity/solved";
 
-const getUser = () => {
-  const user: User = {
-    userId: 34,
-    email: "updateTest1@naver.com",
-    nickname: "난업데이터수정5",
-    anno_nofi: true,
-    post_nofi: true,
-    comment_nofi: true,
-    like_nofi: true,
-    answer_nofi: true,
-    event_nofi: true,
-    tried: 1,
-    solved: 1,
-    createdTime: "2024-02-11 23:50:10.0",
-  };
+import { IMAGE_URL } from "@/api";
+import { HistoryAlgorithm, OtherUser } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
-  return user;
+type PageParams = {
+  userId: number;
 };
 
-const getSolved = () => {
-  return {
-    tried: 100,
-    solved: 56,
-    favorite: 21,
+const layout = async ({
+  params,
+  children,
+}: {
+  params: PageParams;
+  children: React.ReactNode;
+}) => {
+  const user: OtherUser = await (
+    await UserAPI.getOtherUser(params.userId)
+  ).json();
+  const history: HistoryAlgorithm = {
+    solved: user.solved,
+    tried: user.tried,
+    favorite: user.favorite,
   };
-};
-
-const layout = async ({ children }: { children: React.ReactNode }) => {
-  const user: User | undefined = await getUser();
-  const solved = await getSolved();
-
   const navItems: NavItem[] = [
     {
       title: "질문",
@@ -77,7 +65,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       <Content title="">
         <div className={styles.profile}>
           <Image
-            src={`${IMAGE_URL}/${user.profile}`}
+            src={`${IMAGE_URL}${user.profile}`}
             alt="프로필 사진"
             width={38}
             height={38}
@@ -89,7 +77,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         </div>
       </Content>
       <Content title="문제">
-        <Solved info={solved} />
+        <Solved history={history} />
       </Content>
       <Content title="활동 내역">
         <SubNavigation items={navItems} />

@@ -11,5 +11,5 @@ import java.util.List;
 @NoArgsConstructor
 public class ResponseRankingDto {
     private List<RankingDto> rankings;
-    private int total;
+    private Long total;
 }

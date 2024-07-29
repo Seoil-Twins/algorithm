@@ -277,6 +277,11 @@ public class AlgorithmService {
         postCode.setCode(codeDto.getCode());
 
         if(solved){
+            List<AlgorithmCorrect> algorithmCorrect = algorithmCorrectRepository.findAllByAlgorithmAndUser(algorithm, user);
+            if (algorithmCorrect == null || algorithmCorrect.isEmpty()) {
+                user.setSolved(user.getSolved() + 1);
+            }
+
             algorithmCorrectRepository.save(postCode);
             Try codeTry = new Try(user,algorithm,solved,String.valueOf(codeResponseDTO.getExcuteTime()),"0");
             tryRepository.save(codeTry);
@@ -285,12 +290,14 @@ public class AlgorithmService {
             tryRepository.save(codeTry);
         }
 
+        user.setTried(user.getTried() + 1);
 
         ResponsePostCodeDto response = new ResponsePostCodeDto();
         response.setIsSuccess(solved);
         response.setUseTime(String.valueOf(codeResponseDTO.getExcuteTime()));
         response.setUseMemory("test128");
 
+        userRepository.save(user);
 
         // codeResponseDTO
         return response;
@@ -363,12 +370,15 @@ public class AlgorithmService {
 
         List<Long> dummyImageIds = boardPostDto.getImageIds();
         List<DummyImage> dummyImages = new ArrayList<>();
-        for(Long imageId : dummyImageIds){
-            DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
-            if(image != null)
-                dummyImages.add(image);
-            else
-                throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+
+        if (dummyImageIds != null) {
+            for(Long imageId : dummyImageIds){
+                DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
+                if(image != null)
+                    dummyImages.add(image);
+                else
+                    throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+            }
         }
 
         Board board = Board.builder()

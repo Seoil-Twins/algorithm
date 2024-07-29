@@ -1,15 +1,16 @@
 import React from "react";
 
 import BoardNavigation, { NavItem } from "@/components/common/boardNavigation";
-import { getUser } from "@/app/actions/user";
+
+import { User } from "@/app/api/model/user";
+import { UserAPI } from "@/api/user";
 
 const Forum = async ({ children }: { children: React.ReactNode }) => {
-  const userResponse = await getUser();
+  let user: User | undefined = undefined;
 
-  let user;
-  if (userResponse.status === 200) {
-    user = userResponse.data;
-  } else {
+  try {
+    user = await (await UserAPI.getUser()).json();
+  } catch (error) {
     user = undefined;
   }
 

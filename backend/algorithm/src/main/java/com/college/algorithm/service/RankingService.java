@@ -29,19 +29,22 @@ public class RankingService {
 
     public ResponseRankingDto getRankings(int page, int count) {
         Pageable pageable = PageRequest.of(page-1,count);
-        Page<Ranking> rankings = rankingRepository.findAll(pageable);
+        System.out.println("hi");
+        Page<Ranking> rankings = rankingRepository.findAllByOrderBySolveCountDesc(pageable);
 
         ResponseRankingDto responseRankingDto = new ResponseRankingDto();
-        int total = 0;
+
         List<RankingDto> rankingDtos = new ArrayList<>();
         for(Ranking ranking : rankings.getContent()){
+            System.out.println(ranking.getRankingId());
             RankingDto rankingDto = new RankingDto();
             rankingDto.setUser(UserMapper.INSTANCE.toResponseRankingUserDto(ranking.getUser()));
             rankingDto.setSolved(ranking.getSolveCount());
             rankingDto.setTried(tryRepository.countByUser_UserId(ranking.getUser().getUserId()));
             rankingDtos.add(rankingDto);
-            total++;
         }
+
+        long total = rankings.getTotalElements();
 
         responseRankingDto.setRankings(rankingDtos);
         responseRankingDto.setTotal(total);

@@ -59,8 +59,8 @@ const New = ({ params }: { params: NewParams }) => {
             imageIds,
           });
           toast.success("게시글이 작성되었습니다.");
-          router.refresh();
           router.replace(`/algorithm/${algorithmId}/all`);
+          router.refresh();
         } catch (error: any) {
           if (error.status === 401) {
             router.replace(

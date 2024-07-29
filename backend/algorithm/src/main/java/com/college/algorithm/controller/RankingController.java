@@ -14,7 +14,7 @@ public class RankingController {
 
     private final RankingService rankingService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<?> getRankings(@RequestParam(required = false, defaultValue = "1", value = "page") int page,
                                        @RequestParam(required = false, defaultValue = "10", value = "count") int count){
 

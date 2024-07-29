@@ -33,7 +33,7 @@ public interface BoardMapper {
     @Mapping(source = "board.createdTime", target = "createdTime", qualifiedBy = { CustomTimestampTranslator.class, MapCreatedTime.class })
     BoardIntroDto toResponseBoardIntroWithoutSolvedDto(Board board);
 
-    @Mapping(source = "board.boardType.typeName", target = "boardType")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "user", target = "user")
     @Mapping(source = "board.title", target = "title")
     @Mapping(source = "board.viewCount", target = "viewCount")
@@ -46,7 +46,7 @@ public interface BoardMapper {
     BoardDto toBoardDto(Board board, ResponseBoardUserDto user, List<String> tags, Boolean isSolved, Boolean isRecommend);
 
     @Mapping(source = "board.boardId", target = "boardId")
-    @Mapping(source = "board.boardType.typeName", target = "boardType")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "user", target = "user")
     @Mapping(source = "board.title", target = "title")
     @Mapping(source = "board.content", target = "content")
@@ -61,7 +61,7 @@ public interface BoardMapper {
     ResponseBoardDetailDto toResponseBoardDetailDto(Board board, ResponseBoardUserDto user, List<String> tags, Boolean isView, Boolean isRecommend);
 
     @Mapping(source = "board.boardId", target = "boardId")
-    @Mapping(source = "board.boardType.typeName", target = "boardType")
+    @Mapping(source = "board.boardType.typeId", target = "boardType")
     @Mapping(source = "user", target = "user")
     @Mapping(source = "board.title", target = "title")
     @Mapping(source = "tags", target = "tags")
