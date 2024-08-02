@@ -2,21 +2,15 @@ package com.college.algorithm.util;
 
 import com.college.algorithm.dto.RequestCodeDto;
 import com.college.algorithm.dto.ResponseCodeDto;
-import com.college.algorithm.dto.ResponsePostCodeDto;
 import com.college.algorithm.exception.CustomException;
 import com.college.algorithm.exception.ErrorCode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.college.algorithm.entity.AlgorithmTestcase;
 import com.college.algorithm.repository.AlgorithmTestcaseRepository;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CodeRunner {
 
@@ -39,10 +33,9 @@ public class CodeRunner {
                 String[] expectedOutput = testcase.getOutput().split(",");
 
                 // 외부 프로세스로 코드를 컴파일하고 실행
-
                 Process compileProcess = Runtime.getRuntime().exec("g++ -o program -x c++ -");
                 if(!compileProcess.isAlive()){
-                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
+                    throw new CustomException(ErrorCode.ERROR_PREV_PROCESS_ALIVE); // 50041
                 }
                 compileProcess.getOutputStream().write(requestCodeDto.getCode().getBytes());
                 compileProcess.getOutputStream().close();
@@ -50,7 +43,7 @@ public class CodeRunner {
                 // 컴파일 결과 확인
                 int compileResult = compileProcess.waitFor();
                 if (compileResult != 0) {
-                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
+                    throw new CustomException(ErrorCode.ERROR_EXTERN_COMPILE); // 컴파일이 오류
                 }
 
                 // 생성된 실행 파일 실행하여 결과값 확인
@@ -75,13 +68,6 @@ public class CodeRunner {
                     results.add(line);
                 }
 
-                // 에러 출력
-//                BufferedReader errorReader = new BufferedReader(new InputStreamReader(executeProcess.getErrorStream()));
-//                System.out.println("에러:");
-//                while ((line = errorReader.readLine()) != null) {
-//                    System.out.println(line);
-//                }
-
                 // 결과값 비교
                 if (!results.equals(Arrays.asList(expectedOutput)))
                     flag = false;
@@ -89,13 +75,12 @@ public class CodeRunner {
                 return new ResponseCodeDto(flag, excuteTime);
 
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
+            throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
         }
     }
 
     public ResponseCodeDto runPython(RequestCodeDto requestCodeDto, Long algorithmId){
         List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmId);
-        System.out.println(testcaseEntities.get(0).getInput() + " " + testcaseEntities.get(0).getOutput());
         // Java에서 python 코드 실행
         try {
             Boolean flag = true;
@@ -128,7 +113,7 @@ public class CodeRunner {
                 }
 
                 if(results.size() <= 0){
-                    throw new CustomException(ErrorCode.ERROR_CODE_RUNNER);
+                    throw new CustomException(ErrorCode.ERROR_EMPTY_RESULT);
                 }
 
                 // 결과값 비교
@@ -136,7 +121,6 @@ public class CodeRunner {
                     flag = false;
                 // 프로세스가 종료될 때까지 대기
                 int exitCode = process.waitFor();
-                System.out.println("Python 프로세스 종료 코드: " + exitCode);
             }
                 return new ResponseCodeDto(flag, excuteTime);
         }catch(Exception e) {
@@ -159,17 +143,12 @@ public class CodeRunner {
                 File sourceFile = new File("Main.java");
                 FileWriter writer = new FileWriter(sourceFile);
                 writer.write(requestCodeDto.getCode());
-                System.out.println(requestCodeDto.getCode());
                 writer.close();
 
                 // javac로 컴파일
                 ProcessBuilder pbCompile = new ProcessBuilder("javac", "Main.java");
                 Process processCompile = pbCompile.start();
                 processCompile.waitFor();
-//                if (processCompile.waitFor() != 0) {
-//                    throw new CustomException(ErrorCode.SQL_EXCEPTION); // 따로 코드 실행 에러를 만들어야합니다. 임시 SQL 에러입니다.
-//                }
-                System.out.println("22222");
 
                 // java로 실행
                 ProcessBuilder pbRun = new ProcessBuilder("java", "Main");
@@ -178,7 +157,6 @@ public class CodeRunner {
                 double startTime = System.currentTimeMillis();
                 Process processRun = pbRun.start();
 
-                System.out.println("3333");
 
                 // 입력값 제공
                 BufferedWriter inputWriter = new BufferedWriter(new OutputStreamWriter(processRun.getOutputStream()));
@@ -195,11 +173,10 @@ public class CodeRunner {
                 String line;
                 List<String> results = new ArrayList<>();
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(line);
                     results.add(line);
                 }
 
-                // 임시 파일 삭제해야함. 같은 자바 파일이라 여기 서버에서 만들고 실핸한거라ㅓㄱ ㅇㅇ
+                // 임시 파일 삭제
                 sourceFile.delete();
                 new File("Main.class").delete();
 

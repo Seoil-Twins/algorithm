@@ -83,7 +83,7 @@ public class AlgorithmService {
                 List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithm.getAlgorithmId());
                 ArrayNode testcaseArrayNode = objectMapper.createArrayNode();
                 if (testcaseEntities == null)
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No Data");
+                    throw new CustomException(ErrorCode.NOT_FOUND_TESTCASE);
                 for (AlgorithmTestcase testcaseEntity : testcaseEntities) {
                     AlgorithmTestcaseDto testcaseDTO = AlgorithmMapper.INSTANCE.toAlgorithmTestcaseDto(testcaseEntity);
 
@@ -164,7 +164,7 @@ public class AlgorithmService {
         List<AlgorithmTestcase> testcaseEntities = testcaseRepository.findTestcaseEntitiesByAlgorithmAlgorithmId(algorithmId);
         List<AlgorithmDetailTestcaseDto> testcases = new ArrayList<>();
         if (testcaseEntities == null)
-            throw new CustomException(ErrorCode.SQL_EXCEPTION);
+            throw new CustomException(ErrorCode.NOT_FOUND_TESTCASE);
 
         for (AlgorithmTestcase testcaseEntitiy : testcaseEntities) {
             AlgorithmTestcaseDto testcaseDTO = AlgorithmMapper.INSTANCE.toAlgorithmTestcaseDto(testcaseEntitiy);
@@ -289,7 +289,6 @@ public class AlgorithmService {
         ResponsePostCodeDto response = new ResponsePostCodeDto();
         response.setIsSuccess(solved);
         response.setUseTime(String.valueOf(codeResponseDTO.getExcuteTime()));
-        response.setUseMemory("test128");
 
 
         // codeResponseDTO
