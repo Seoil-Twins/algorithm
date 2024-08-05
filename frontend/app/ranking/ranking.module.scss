@@ -1,0 +1,13 @@
+.ranking {
+  .nickname {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+
+    .profileImg {
+      margin-right: 15px;
+      border-radius: 100px;
+    }
+  }
+}

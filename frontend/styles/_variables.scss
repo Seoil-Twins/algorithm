@@ -1,6 +1,7 @@
+/* Color */
 $primaryColor: #ff9500;
-$textBlack: #222222;
-$grayText: #656567;
+$darkPrimaryColor: #cc7803;
+$white: #ffffff;
 $blueDark: #0047ff;
 $blueLight: #477bff;
 $red: #ff6969;
@@ -11,4 +12,13 @@ $gold: $primaryColor;
 $platinum: #00cbb3;
 $diamond: #0075ff;
 $master: #b821ff;
-$blueBorder: #cacad6;
+
+/* Width, Height */
+$headerHeight: 84px;
+
+// Breakpoints
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1200px;
+
+$padding-mobile: 10px;
+$padding-tablet: 30px;

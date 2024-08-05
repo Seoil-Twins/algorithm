@@ -1,0 +1,64 @@
+.comment {
+  display: flex;
+  align-items: flex-start;
+
+  .contentBox {
+    width: 100%;
+
+    .top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .recommend {
+      display: flex;
+      align-items: center;
+
+      img {
+        display: block;
+      }
+
+      .recommendBtnBox {
+        position: relative;
+        top: -4px;
+        display: flex;
+        align-items: center;
+      }
+
+      .solved {
+        margin-right: 10px;
+      }
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+
+      .profileImg {
+        border-radius: 100px;
+        margin-right: 10px;
+      }
+    }
+
+    .fs14 {
+      font-size: 0.875rem;
+    }
+
+    .createdTime {
+      margin-right: 10px;
+      color: var(--color-primary-gray-text);
+      font-size: 0.875rem;
+    }
+
+    .blue {
+      color: $blueLight;
+    }
+
+    .red {
+      color: $red;
+    }
+  }
+}

@@ -1,0 +1,160 @@
+.centerBox {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .headerItem {
+    display: flex;
+    align-items: center;
+
+    .theme:has(~ .profileBox) {
+      margin-right: 30px;
+    }
+
+    .logoImg {
+      height: 40px;
+      margin-right: 30px;
+    }
+
+    .alramImgBox {
+      margin-right: 30px;
+      cursor: pointer;
+    }
+
+    .profileBox {
+      cursor: pointer;
+
+      & > img {
+        border-radius: 100px;
+        box-shadow: 1px 1px 4px var(--color-border);
+      }
+    }
+
+    .menuItemBox {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 8px;
+
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
+    }
+
+    .active {
+      background-color: var(--color-deep-background);
+      color: $primaryColor;
+    }
+
+    .none {
+      background-color: transparent;
+      color: var(--color-primary-text);
+    }
+
+    .loginBtn {
+      background-color: $primaryColor;
+      color: $white;
+    }
+  }
+}
+
+.profileModalBox {
+  position: absolute;
+  top: 75px;
+  right: 0;
+  padding: 15px 20px 0px 20px;
+  border-radius: 8px;
+  box-shadow: 1px 2px 4px rgba(#222222, 0.2);
+  background-color: var(--color-modal-background);
+
+  .topBox {
+    margin-bottom: 15px;
+
+    .title {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .imgBox {
+      margin-right: 25px;
+      margin-bottom: 5px;
+
+      & > img {
+        border-radius: 100px;
+        box-shadow: 1px 1px 2px var(--color-border);
+      }
+    }
+
+    .infoBox {
+      .nickname {
+        margin-bottom: 15px;
+      }
+
+      .algorithmBox {
+        display: flex;
+        align-items: flex-end;
+        font-size: 14px;
+
+        .algorithmItem {
+          &:not(:last-child)::after {
+            content: "|";
+            margin: 0 10px;
+            font-size: 16px;
+            color: var(--color-border);
+          }
+
+          .correct {
+            color: $blueLight;
+          }
+          .wrong {
+            color: $red;
+          }
+          .try {
+            color: var(--color-primary-gray-text);
+          }
+        }
+      }
+    }
+  }
+
+  .btnBox {
+    .btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 50px;
+      border-top: 1px solid var(--color-border);
+      cursor: pointer;
+
+      .img {
+        margin-right: 15px;
+      }
+    }
+  }
+}
+
+[data-theme="dark"] {
+  .profileModalBox {
+    box-shadow: 1px 2px 4px rgba(#b8b8b8, 0.2);
+  }
+}
+
+@include tablet {
+  .centerBox {
+    @include tablet-padding;
+  }
+}
+
+@include mobile {
+  .centerBox {
+    @include mobile-padding;
+  }
+}

@@ -1,0 +1,86 @@
+.answer {
+  .user {
+    display: flex;
+    margin-bottom: 25px;
+
+    .title {
+      display: flex;
+      align-items: center;
+      margin-right: 5px;
+
+      .flex {
+        display: flex;
+        align-items: center;
+      }
+
+      .profileImg {
+        margin-right: 10px;
+        border-radius: 100px;
+      }
+    }
+
+    .recommend {
+      display: flex;
+      align-items: center;
+      user-select: none;
+
+      .count {
+        margin: 0 10px;
+      }
+
+      .btn {
+        padding: 10px;
+
+        &:first-child {
+          border-right: 1px solid var(--color-border);
+        }
+
+        &:last-child {
+          border-left: 1px solid var(--color-border);
+        }
+      }
+    }
+  }
+
+  .codeBox {
+    margin-bottom: 20px;
+
+    .editor {
+      pre {
+        margin: 0;
+      }
+    }
+  }
+
+  .comment {
+    display: grid;
+    row-gap: 20px;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(auto-fill, minmax(44px, auto));
+    margin-bottom: 20px;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0px 20px 0px;
+  }
+}
+
+@media (min-width: 401px) {
+  .user {
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .user {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .recommend {
+    margin-top: 10px;
+  }
+}

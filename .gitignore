@@ -35,3 +35,62 @@
 # typescript
 /frontend/*.tsbuildinfo
 /frontend/next-env.d.ts
+
+
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/gradle/
+
+### STS ###
+/backend/algorithm/.apt_generated
+/backend/algorithm/.classpath
+/backend/algorithm/.factorypath
+/backend/algorithm/.project
+/backend/algorithm/.settings
+/backend/algorithm/.springBeans
+/backend/algorithm/.sts4-cache
+/backend/algorithm/bin/
+/backend/algorithm/!**/src/main/**/bin/
+/backend/algorithm/!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+/backend/algorithm/.idea
+/backend/algorithm/*.iws
+/backend/algorithm/*.iml
+/backend/algorithm/*.ipr
+/backend/algorithm/out/
+/backend/algorithm/!**/src/main/**/out/
+/backend/algorithm/!**/src/test/**/out/
+
+### NetBeans ###
+/backend/algorithm//nbproject/private/
+/backend/algorithm//nbbuild/
+/backend/algorithm//dist/
+/backend/algorithm//nbdist/
+/backend/algorithm//.nb-gradle/
+
+### VS Code ###
+/backend/algorithm/.vscode/
+
+### yml ###
+/backend/algorithm/src/main/resources/application.yml
+
+### properties ###
+/backend/algorithm/src/main/resources/application.properties
+
+### images ###
+/backend/algorithm/src/images/**
+
+### another ###
+/backend/algorithm/program.exe
+
+/backend/algorithm/gradlew
+/backend/algorithm/gradlew.bat
+/backend/algorithm/.gradle
+/backend/algorithm/gradle/*
+/backend/algorithm/build/*
+/backend/algorithm/upload/*

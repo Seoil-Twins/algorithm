@@ -1,0 +1,268 @@
+.content {
+  overflow: auto hidden;
+  flex: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-bottom: 2px solid var(--color-deep-background);
+
+  .description {
+    overflow: hidden auto;
+    height: 100%;
+    padding: 10px 20px;
+
+    .title {
+      margin-bottom: 15px;
+    }
+
+    .viewer {
+      color: #5c5c5c;
+
+      img {
+        width: 100% !important;
+      }
+    }
+  }
+
+  .rightLine {
+    width: 2px !important;
+    bottom: 0px !important;
+    right: 0px !important;
+    background-color: #d1d1d1;
+  }
+
+  .bottomLine {
+    position: absolute;
+    width: 100% !important;
+    height: 2px !important;
+    bottom: 0 !important;
+    background-color: #d1d1d1;
+  }
+
+  .right {
+    width: 100%;
+    padding: 10px 0;
+
+    .codeBox {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 0 20px;
+
+      .title {
+        margin-bottom: 15px;
+      }
+
+      .code {
+        flex: 1;
+        overflow: hidden auto;
+        margin-bottom: 20px;
+        font-size: 16px;
+        letter-spacing: 1.5px;
+      }
+    }
+
+    .run {
+      .runTitle {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        border-bottom: 2px solid #d1d1d1;
+
+        .limit {
+          font-size: 0.875rem;
+
+          .mr15 {
+            margin-right: 15px;
+          }
+        }
+      }
+
+      .testcase {
+        display: flex;
+        flex-direction: column;
+        padding: 10px 20px;
+        font-size: 0.875rem;
+
+        .resultItem {
+          display: flex;
+          align-items: center;
+          margin: 5px 0px;
+
+          .text {
+            color: $white;
+          }
+
+          .m5 {
+            margin: 0px 5px;
+          }
+
+          .success {
+            color: #05ff00;
+          }
+
+          .failed {
+            color: #ff0000;
+          }
+        }
+      }
+    }
+  }
+}
+
+.table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #cacad6;
+  border-left: 1px solid #cacad6;
+  background-color: #f5f5f5;
+
+  & > div {
+    border-right: 1px solid #cacad6;
+    border-bottom: 1px solid #cacad6;
+  }
+
+  .th {
+    background-color: var(--color-deep-background);
+  }
+
+  .padding {
+    padding: 10px 12px;
+  }
+}
+
+[data-theme="dark"] {
+  .viewer {
+    color: #d5d8df !important;
+  }
+
+  .rightLine {
+    background-color: #090e1b;
+  }
+
+  .bottomLine {
+    background-color: #090e1b;
+  }
+
+  .runTitle {
+    border-bottom: 2px solid #090e1b !important;
+  }
+
+  .table {
+    border-top: 1px solid #090e1b;
+    border-left: 1px solid #090e1b;
+    background-color: #32394f;
+
+    & > div {
+      border-right: 1px solid #090e1b;
+      border-bottom: 1px solid #090e1b;
+    }
+  }
+}
+
+.footer {
+  display: grid;
+  column-gap: 10px;
+  min-height: 44px;
+  padding: 10px 20px;
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: var(--color-primary-text);
+    background-color: #e7e7e7;
+  }
+
+  .submit {
+    color: $white;
+    background-color: $primaryColor;
+  }
+}
+
+[data-theme="dark"] {
+  .btn {
+    background-color: #32394f !important;
+  }
+}
+
+.description::-webkit-scrollbar {
+  width: 0px;
+}
+
+.code::-webkit-scrollbar {
+  width: 8px;
+}
+
+.code::-webkit-scrollbar-thumb {
+  border-radius: 12px;
+  background-color: var(--color-scroller);
+}
+
+@mixin desktopAndTablet {
+  .footer {
+    grid-template-columns: auto auto 1fr auto auto auto auto;
+    grid-template-rows: auto;
+  }
+}
+
+@include desktop {
+  @include desktopAndTablet();
+}
+
+@include tablet {
+  @include desktopAndTablet();
+}
+
+@mixin mobileAndSmallMobile {
+  .content {
+    overflow: auto !important;
+    display: block !important;
+    height: auto !important;
+  }
+
+  .footer {
+    row-gap: 10px;
+
+    .blank {
+      display: none;
+    }
+  }
+}
+
+@include mobile {
+  @include mobileAndSmallMobile();
+
+  .content {
+    overflow: auto !important;
+    display: block !important;
+    height: auto !important;
+  }
+
+  .footer {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+
+    .btn {
+      width: 100%;
+      height: 100%;
+      padding: 10px 5px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  @include mobileAndSmallMobile();
+
+  .footer {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+
+    .btn {
+      width: 100%;
+      height: 100%;
+      padding: 5px;
+    }
+  }
+}

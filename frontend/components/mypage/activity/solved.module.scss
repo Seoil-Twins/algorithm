@@ -1,0 +1,59 @@
+.algorithmCount {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .number {
+      font-size: 2rem;
+    }
+
+    .correct {
+      color: $blueLight;
+    }
+
+    .incorrect {
+      color: $red;
+    }
+
+    .bookmark {
+      color: $puple;
+    }
+  }
+
+  .line {
+    width: 1px;
+    height: 65px;
+    background-color: var(--color-border);
+  }
+}
+
+@include desktop {
+  .line {
+    margin: 0 5.9375rem;
+  }
+}
+
+@include tablet {
+  .line {
+    margin: 0 5rem;
+  }
+}
+
+@include mobile {
+  .algorithmCount {
+    flex-direction: column;
+
+    .item:not(:first-child) {
+      margin-top: 1.5rem;
+    }
+
+    .line {
+      display: none;
+    }
+  }
+}

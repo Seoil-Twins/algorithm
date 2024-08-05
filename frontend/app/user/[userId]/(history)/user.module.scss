@@ -1,0 +1,19 @@
+.user {
+  // Delete margin for title box of Content Component
+  & > div:first-child > div:first-child {
+    margin: 0;
+  }
+
+  .profile {
+    display: flex;
+    align-items: center;
+
+    .profileImg {
+      margin-right: 25px;
+    }
+
+    .nickname {
+      font-size: 1.5rem;
+    }
+  }
+}

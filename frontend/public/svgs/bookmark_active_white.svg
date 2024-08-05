@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<svg width="32" height="33" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g class="layer">
+  <title>Layer 1</title>
+  <g id="heroicons-outline/bookmark">
+   <path d="m23.46,4.93c1.47,0.17 2.54,1.44 2.54,2.91l0,20.66l-10,-5l-10,5l0,-20.66c0,-1.47 1.07,-2.74 2.54,-2.91c2.45,-0.28 4.94,-0.43 7.46,-0.43c2.52,0 5.01,0.15 7.46,0.43z" fill="#ffffff" id="Intersect" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+  </g>
+ </g>
+</svg>

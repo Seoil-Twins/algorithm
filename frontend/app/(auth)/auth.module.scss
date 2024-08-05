@@ -1,0 +1,27 @@
+.authBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 100%;
+
+  .introBox {
+    width: 31.25rem;
+
+    & > img {
+      @include dynamicImg;
+    }
+
+    .title {
+      margin-bottom: 5rem;
+      font-size: 1.75rem;
+    }
+  }
+}
+
+@include tablet {
+  .authBox {
+    flex-direction: column;
+    justify-content: center;
+  }
+}

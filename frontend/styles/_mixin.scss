@@ -1,0 +1,67 @@
+@import "./variables";
+
+@mixin dynamicImg {
+  width: 100%;
+  height: auto;
+}
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-tablet - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-tablet}) and (max-width: #{$breakpoint-desktop - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-desktop}) {
+    @content;
+  }
+}
+
+@mixin mobile-padding {
+  padding: 0 $padding-mobile;
+}
+
+@mixin tablet-padding {
+  padding: 0 $padding-tablet;
+}
+
+@mixin btn($paddingWidth, $paddingHeight) {
+  padding: $paddingHeight $paddingWidth;
+  border-radius: 8px;
+}
+
+@mixin loading($height) {
+  min-height: $height;
+}
+
+@mixin activeBtn($paddingWidth: 20px, $paddingHeight: 10px) {
+  @include btn($paddingWidth, $paddingHeight);
+  border: 1px solid $primaryColor;
+  color: $primaryColor;
+  cursor: pointer;
+}
+
+@mixin disabledBtn($paddingWidth: 20px, $paddingHeight: 10px) {
+  @include btn($paddingWidth, $paddingHeight);
+  border: 1px solid var(--color-primary-gray-text);
+  color: var(--color-primary-gray-text);
+  cursor: default;
+}
+
+@mixin warningBtn($paddingWidth: 20px, $paddingHeight: 10px) {
+  @include btn($paddingWidth, $paddingHeight);
+  background-color: $red;
+  color: $white;
+}
+
+@mixin checkBox($checkBoxSize, $checkImgSize) {
+  width: $checkBoxSize;
+  height: $checkBoxSize;
+  background-size: $checkImgSize;
+}
