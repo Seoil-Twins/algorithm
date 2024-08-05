@@ -92,7 +92,7 @@ public class BoardController {
 
         return ResponseEntity.ok().body(boardService.postBoardImage(dto, Long.parseLong(userId)));
     }
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> postBoard(@Valid @RequestBody(required = false) RequestBoardPostDto dto,
                                         HttpServletRequest request){
 

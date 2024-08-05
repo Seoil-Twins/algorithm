@@ -31,6 +31,7 @@ public enum ErrorCode {
     NOT_FOUND_BOARD_TYPE(HttpStatus.NOT_FOUND, "게시판 유형이 존재하지 않습니다.", 40470),
     NOT_FOUND_EMAIL_VERIFIED(HttpStatus.NOT_FOUND, "인증을 요청한 이메일이 존재하지 않습니다.", 40480),
     NOT_FOUND_ALGORITHM(HttpStatus.NOT_FOUND, "알고리즘이 존재하지 않습니다.", 40420),
+    NOT_FOUND_TESTCASE(HttpStatus.NOT_FOUND, "테스트케이스가 존재하지 않습니다.", 40421),
     NOT_FOUND_EXPLANATION(HttpStatus.NOT_FOUND, "풀이가 존재하지 않습니다.", 40430),
     NOT_FOUND_CORRECT(HttpStatus.NOT_FOUND, "해당 정답 코드는 존재하지 않습니다.", 40450),
     NOT_FOUND_RECOMMEND(HttpStatus.NOT_FOUND, "해당 추천이 존재하지 않습니다.", 40460),
@@ -50,6 +51,9 @@ public enum ErrorCode {
     ERROR_EMAIL_SENDER(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패하였습니다.", 50020),
     ERROR_IMAGE_UPLOAD(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 저장에 실패하였습니다.", 50030),
     ERROR_CODE_RUNNER(HttpStatus.INTERNAL_SERVER_ERROR, "코드 외부 실행 중 오류가 발생했습니다.", 50040),
+    ERROR_PREV_PROCESS_ALIVE(HttpStatus.INTERNAL_SERVER_ERROR, "이전 프로세스가 살아있습니다..", 50041),
+    ERROR_EXTERN_COMPILE(HttpStatus.INTERNAL_SERVER_ERROR, "외부 코드 컴파일 오류가 발생했습니다.", 50042),
+    ERROR_EMPTY_RESULT(HttpStatus.INTERNAL_SERVER_ERROR, "결과값이 존재하지 않습니다..", 50043),
     ;
 
     private final HttpStatus httpStatus;

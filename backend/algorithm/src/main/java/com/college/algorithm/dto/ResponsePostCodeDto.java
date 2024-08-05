@@ -12,5 +12,4 @@ import lombok.Setter;
 public class ResponsePostCodeDto {
     private Boolean isSuccess;
     private String useTime;
-    private String useMemory;
 }
