@@ -39,7 +39,7 @@ public class BoardService {
     private final DummyImageRepository dummyImageRepository;
     private final BoardImageRepository boardImageRepository;
 
-    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Long loginUserId, Long algorithmId){
+    public ResponseBoardsDto getBoards(int page, int count, String searchType, String keyword, Object loginUserId, Long algorithmId){
         Pageable pageable = PageRequest.of(page-1, count);
         Page<Board> boards = null;
         Map<String, String[]> searchTypeMappings = Map.of(
@@ -83,7 +83,7 @@ public class BoardService {
             Boolean isSolved = loginUserId != null && board.getIsSolved();
 
             Boolean isRecommend = loginUserId != null && board.getRecommendCount() > 0 && (
-                    recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+                    recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), Long.parseLong(loginUserId.toString()))
             );
 
             List<Tag> boardTags = tags.stream()
@@ -116,20 +116,20 @@ public class BoardService {
 
         return response;
     }
-    public ResponseBoardDetailDto getBoardDetail(Long boardId, Long loginUserId){
+    public ResponseBoardDetailDto getBoardDetail(Long boardId, Object loginUserId){
         Board board = boardRepository.findByBoardId(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_BOARD));
 
         ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(board.getUser());
 
         boolean isView = loginUserId != null && (
-                boardViewRepository.existsByBoardAndUserUserId(board, loginUserId)
+                boardViewRepository.existsByBoardAndUserUserId(board, Long.parseLong(loginUserId.toString()))
         );
         if(loginUserId != null)
-            isView = boardViewRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId) >= 1;
+            isView = boardViewRepository.countByBoard_BoardIdAndUserUserId(board.getBoardId(), Long.parseLong(loginUserId.toString())) >= 1;
 
         Boolean isRecommend = loginUserId != null && (
-                recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), loginUserId)
+                recommendRepository.existsByBoard_BoardIdAndUserUserId(board.getBoardId(), Long.parseLong(loginUserId.toString()))
         );
 
         List<Tag> tags = tagRepository.findAllByBoard_BoardId(board.getBoardId());
@@ -183,7 +183,7 @@ public class BoardService {
 
         return new ResponseBoardSuggestDto(dtos);
     }
-    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId, Long userId){
+    public ResponseBoardCommentDto getBoardComments(int page, int count, Long boardId, Object userId){
         if(boardRepository.findByBoardId(boardId).isEmpty())
             throw new CustomException(ErrorCode.NOT_FOUND_BOARD);
 
@@ -191,16 +191,19 @@ public class BoardService {
         Page<Comment> comments = commentRepository.findAllByBoardBoardId(pageable, boardId);
 
         List<Long> commentIds = comments.stream().map(Comment::getCommentId).collect(Collectors.toList());
+        Set<Long> recommendedCommentIds = null;
 
-        List<CommentRecommend> recommends = commentRecommendRepository.findAllByUserUserIdAndCommentCommentIdIn(userId, commentIds);
-        Set<Long> recommendedCommentIds = recommends.stream().map(cr -> cr.getComment().getCommentId()).collect(Collectors.toSet());
+        if (userId != null) {
+            List<CommentRecommend> recommends = commentRecommendRepository.findAllByUserUserIdAndCommentCommentIdIn(Long.parseLong(userId.toString()), commentIds);
+            recommendedCommentIds = recommends.stream().map(cr -> cr.getComment().getCommentId()).collect(Collectors.toSet());
+        }
 
         List<BoardCommentDto> dtos = new ArrayList<>();
         long total = comments.getTotalElements();
 
         for(Comment comment : comments){
             ResponseBoardUserDto user = UserMapper.INSTANCE.toResponseBoardUserDto(comment.getUser());
-            boolean isRecommend = recommendedCommentIds.contains(comment.getCommentId());
+            boolean isRecommend = recommendedCommentIds != null && recommendedCommentIds.contains(comment.getCommentId());
             dtos.add(BoardMapper.INSTANCE.toBoardCommentDto(comment, user, isRecommend));
         }
 

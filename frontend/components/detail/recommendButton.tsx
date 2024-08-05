@@ -118,7 +118,7 @@ const RecommendPost = ({
           lightSrc={`${
             recommend
               ? "/svgs/recommend_active.svg"
-              : "/svgs/recommend_dark_none.svg"
+              : "/svgs/recommend_black_none.svg"
           }`}
           darkSrc={`${
             recommend

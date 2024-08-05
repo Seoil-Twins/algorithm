@@ -94,7 +94,9 @@ const CommentEditor = ({
       <div className={styles.editorBox}>
         <div className={styles.profileImgBox}>
           <Image
-            src={`${IMAGE_URL}${user?.profile}`}
+            src={`${
+              !user ? "/svgs/not_found.svg" : `${IMAGE_URL}${user?.profile}`
+            }`}
             alt="프로필 사진"
             width={38}
             height={38}

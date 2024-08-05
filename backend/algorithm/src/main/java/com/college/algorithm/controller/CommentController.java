@@ -22,37 +22,36 @@ public class CommentController {
     @PostMapping("/{comment_id}/recommend")
     public ResponseEntity<?> postCommentRecommend(@PathVariable(value = "comment_id") Long commentId,
                                                            HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.postCommentRecommend(commentId, Long.parseLong(userId))).build();
+        return ResponseEntity.status(commentService.postCommentRecommend(commentId, Long.parseLong(userId.toString()))).build();
     }
     @PatchMapping("/{comment_id}")
     public ResponseEntity<?> patchBoard(@Valid @RequestBody(required = false) RequestCommentUpdateDto commentUpdateDto,
                                         @PathVariable(value = "comment_id") Long commentId,
                                         HttpServletRequest request){
-
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.patchComment(commentUpdateDto, commentId, Long.parseLong(userId)));
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.patchComment(commentUpdateDto, commentId, Long.parseLong(userId.toString())));
     }
 
     @DeleteMapping("/{comment_id}/recommend")
     public ResponseEntity<?> deleteCommentRecommend(@PathVariable(value = "comment_id") Long commentId,
                                                              HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.deleteCommentRecommend(commentId, Long.parseLong(userId))).build();
+        return ResponseEntity.status(commentService.deleteCommentRecommend(commentId, Long.parseLong(userId.toString()))).build();
     }
 
     @DeleteMapping("/{comment_id}")
     public ResponseEntity<?> deleteComment(@PathVariable(value = "comment_id") Long commentId,
                                                              HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.status(commentService.deleteComment(commentId, Long.parseLong(userId))).build();
+        return ResponseEntity.status(commentService.deleteComment(commentId, Long.parseLong(userId.toString()))).build();
     }
 }

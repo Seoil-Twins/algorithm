@@ -16,7 +16,7 @@ import ToggleButton from "@/components/common/toggleButton";
 import Spinner from "@/components/common/spinner";
 
 import { SWRKeys } from "@/types/constants";
-import { updateNotifications } from "@/app/actions/user";
+
 import { UserAPI } from "@/api/user";
 import { CustomException } from "@/app/api";
 

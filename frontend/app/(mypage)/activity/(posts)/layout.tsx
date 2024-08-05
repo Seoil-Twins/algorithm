@@ -1,7 +1,5 @@
 import React from "react";
 
-import { getUserSolved } from "@/app/actions/user";
-
 import SubNavigation, {
   NavItem,
 } from "@/components/mypage/activity/subNavigation";

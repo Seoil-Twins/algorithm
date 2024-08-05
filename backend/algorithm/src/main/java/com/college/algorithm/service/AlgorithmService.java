@@ -51,7 +51,7 @@ public class AlgorithmService {
     private final TryRepository tryRepository;
     private final AlgorithmRecommendRepository algorithmRecommendRepository;
 
-    public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Long loginUserId) {
+    public ResponseAlgorithmDto getAll(AlgorithmSearchRequestDto algorithmRequestDTO, Object loginUserId) {
         try {
             Pageable pageable = null;
 
@@ -106,7 +106,7 @@ public class AlgorithmService {
 
                 Boolean solved = null;
                 if(loginUserId != null){
-                    solved = correctRepository.countByAlgorithm_AlgorithmIdAndUser_UserId(algorithm.getAlgorithmId(),loginUserId)>=1;
+                    solved = correctRepository.countByAlgorithm_AlgorithmIdAndUser_UserId(algorithm.getAlgorithmId(), Long.parseLong(loginUserId.toString()))>=1;
                 }
 
                 dtos.add(AlgorithmMapper.INSTANCE.toAlgorithmDto(algorithm,correctRate,solved));
@@ -155,7 +155,7 @@ public class AlgorithmService {
 
         return response;
     }
-    public AlgorithmDetailDto getAlgorithmDetail(Long algorithmId, Long loginUserId){
+    public AlgorithmDetailDto getAlgorithmDetail(Long algorithmId, Object loginUserId){
         Algorithm algorithm = algorithmRepository.findAlgorithmByAlgorithmId(algorithmId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ALGORITHM));
         AlgorithmImage algorithmImage = algorithmImageRepository.findFirstByAlgorithmOrderByCreatedTimeAsc(algorithm);
@@ -175,7 +175,10 @@ public class AlgorithmService {
         }
 
         // algorithmId 및 loginUserId로 추천 점검
-        boolean isRecommend = recommendRepository.existsByAlgorithmAndUser_UserId(algorithm, loginUserId);
+        boolean isRecommend = false;
+        if (loginUserId != null) {
+            isRecommend = recommendRepository.existsByAlgorithmAndUser_UserId(algorithm, Long.parseLong(loginUserId.toString()));
+        }
         return AlgorithmMapper.INSTANCE.toAlgorithmDetailDto(algorithm, algorithmImage, isRecommend, testcases);
     }
     public ExplanationResponseDto getExplanation(Long algorithmId){

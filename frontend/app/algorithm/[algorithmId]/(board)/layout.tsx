@@ -16,7 +16,13 @@ const Board = async ({
   params: BoardParams;
   children: React.ReactNode;
 }) => {
-  const user: User = await (await UserAPI.getUser()).json();
+  let user: User | null = null;
+  try {
+    user = await (await UserAPI.getUser()).json();
+  } catch (error) {
+    user = null;
+  }
+
   const algorithmId = params?.algorithmId;
 
   const navItems: NavItem[] = [
@@ -36,7 +42,7 @@ const Board = async ({
 
   return (
     <>
-      <BoardNavigation isVisiblePost={user !== undefined} items={navItems} />
+      <BoardNavigation isVisiblePost={Boolean(user)} items={navItems} />
       {children}
     </>
   );

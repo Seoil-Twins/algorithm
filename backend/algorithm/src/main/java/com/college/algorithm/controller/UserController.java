@@ -24,10 +24,10 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> getMyInfo(final HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        return ResponseEntity.ok().body(userService.getMyInfo(Long.parseLong(userId)));
+        return ResponseEntity.ok().body(userService.getMyInfo(Long.parseLong(userId.toString())));
     }
 
     @GetMapping(value = "/{userId}")
@@ -39,28 +39,28 @@ public class UserController {
 
     @GetMapping(value = "/link")
     public ResponseEntity<?> getLinks(final HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseUserLinkDto dto = userService.getLinks(Long.parseLong(userId));
+        ResponseUserLinkDto dto = userService.getLinks(Long.parseLong(userId.toString()));
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/try")
     public ResponseEntity<?> getMyAlgorithms(final HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseMyAlgorithmDto dto = userService.getMyAlgorithms(Long.parseLong(userId));
+        ResponseMyAlgorithmDto dto = userService.getMyAlgorithms(Long.parseLong(userId.toString()));
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/notification")
     public ResponseEntity<?> getNotificationSettings(final HttpServletRequest request) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseNotificationSettingsDto dto = userService.getNotificationSettings(Long.parseLong(userId));
+        ResponseNotificationSettingsDto dto = userService.getNotificationSettings(Long.parseLong(userId.toString()));
         return ResponseEntity.ok().body(dto);
     }
 
@@ -170,46 +170,46 @@ public class UserController {
 
     @PostMapping("/link")
     public ResponseEntity<?> addLink(@Valid @RequestBody RequestLinkDto dto, final HttpServletRequest request) {
-        final String userId = request.getSession().getAttribute("userId").toString();
+        final Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.addLink(Long.parseLong(userId), dto);
+        userService.addLink(Long.parseLong(userId.toString()), dto);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping
     public ResponseEntity<?> updateNickname(@Valid @RequestBody RequestUpdateProfileDto dto, final  HttpServletRequest request) {
-        final String userId = request.getSession().getAttribute("userId").toString();
+        final Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.updateProfile(Long.parseLong(userId), dto);
+        userService.updateProfile(Long.parseLong(userId.toString()), dto);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfile(@Valid @ModelAttribute RequestProfileDto dto, final  HttpServletRequest request) {
-        final String userId = request.getSession().getAttribute("userId").toString();
+        final Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.updateProfile(Long.parseLong(userId), dto);
+        userService.updateProfile(Long.parseLong(userId.toString()), dto);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/notification")
     public ResponseEntity<?> updateNotification(@Valid @RequestBody RequestNotificationDto dto, final HttpServletRequest request) {
-        final String userId = request.getSession().getAttribute("userId").toString();
+        final Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.updateNotification(Long.parseLong(userId), dto);
+        userService.updateNotification(Long.parseLong(userId.toString()), dto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteUser(final HttpServletRequest request) {
-        final String userId = request.getSession().getAttribute("userId").toString();
+        final Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        userService.deleteUser(Long.parseLong(userId));
+        userService.deleteUser(Long.parseLong(userId.toString()));
         request.getSession().invalidate();
 
         return ResponseEntity.noContent().build();

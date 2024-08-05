@@ -22,7 +22,6 @@ import CommentEditor from "./commentEditor";
 import Pagination from "../common/pagination";
 import NotFound from "../common/notFound";
 import Comment from "./comment";
-import FeedbackSolve from "./feedbackSolve";
 
 type BoardDetailProps = {
   boardId: number;
@@ -31,7 +30,13 @@ type BoardDetailProps = {
 };
 
 const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
-  const user: User = await (await UserAPI.getUser()).json();
+  let user: User | null = null;
+
+  try {
+    user = await (await UserAPI.getUser()).json();
+  } catch (error) {
+    user = null;
+  }
 
   let board: Board;
   try {
@@ -90,17 +95,6 @@ const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
               <div className={styles.createdTime}>{board.createdTime}</div>
             </div>
           </Link>
-          {board.boardType === String(BoardTypeId.ALGORITHM_FEEDBACK) &&
-            (board.solved ? (
-              <Image
-                src="/svgs/valid_check.svg"
-                alt="채택"
-                width={32}
-                height={32}
-              />
-            ) : (
-              <FeedbackSolve boardId={board.boardId} />
-            ))}
         </div>
         {board.solved && (
           <span className={`${styles.solved} ${notosansMedium.className}`}>

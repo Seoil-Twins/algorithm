@@ -8,12 +8,6 @@ import toast from "react-hot-toast";
 
 import { CommentListItem } from "@/app/api/model/comment";
 
-import {
-  deleteComment,
-  patchComment,
-  postSolvedComment,
-} from "@/app/actions/comment";
-
 import { useAuth } from "@/providers/authProvider";
 
 import styles from "./comment.module.scss";

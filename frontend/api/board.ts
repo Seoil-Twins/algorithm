@@ -22,6 +22,8 @@ export const BoardAPI = {
       value && searchParams.append(key, String(value));
     });
 
+    console.log("in");
+
     return await API_INSTANCE.GET(`${API_URL}?${searchParams.toString()}`);
   },
   getBoard: async (boardId: number) => {

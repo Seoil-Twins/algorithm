@@ -22,10 +22,10 @@ public class NotificationController {
             @RequestParam(value = "count", defaultValue = "5", required = false) int count,
             final HttpServletRequest request
     ) {
-        String userId = request.getSession().getAttribute("userId").toString();
+        Object userId = request.getSession().getAttribute("userId");
         if (userId == null) { throw new CustomException(ErrorCode.INVALID_COOKIE); }
 
-        ResponseNotificationDto dto = notificationService.getNotifications(Long.parseLong(userId), page, count);
+        ResponseNotificationDto dto = notificationService.getNotifications(Long.parseLong(userId.toString()), page, count);
         return ResponseEntity.ok().body(dto);
     }
 }
