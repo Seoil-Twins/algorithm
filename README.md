@@ -67,6 +67,7 @@
 - 강의 동영상
 - 추천 알고리즘 (일주일 안에 사람들이 많이 시도한 알고리즘)
 - 추천 게시글 (조회수, 좋아요 등을 활용해 가장 인기 있는 알고리즘)
+- 추천 알고리즘 및 게시글은 Batch를 이용하여, 매일 00시에 자동 갱신되며, 조회수와 댓글, 좋아요 등의 복합적인 요소를 가중치로 환산하여 계산합니다.
 - 유저 알림
 - 다크모드 제공
 ![image](https://github.com/user-attachments/assets/4a67d07d-ab72-4b44-a3eb-990135d1cbf2)
@@ -111,6 +112,7 @@
 - 실행 결과
 - 테스트 케이스
 - 언어는 Java, C++, Python 제공
+- 제출된 코드의 경우에는 ProcessBuilder를 통해 서버 컴퓨터에서 사용자의 코드 파일 생성 및 컴파일, 결과 반환을 수행합니다.
 ![image](https://github.com/user-attachments/assets/49f436f3-3e0d-4db0-807e-71ce3de06262)
 ![image](https://github.com/user-attachments/assets/f711855d-62a9-448b-8734-b1e2108b381b)
 ![image](https://github.com/user-attachments/assets/80d39fe9-131b-4a36-a627-7614c8553c46)
