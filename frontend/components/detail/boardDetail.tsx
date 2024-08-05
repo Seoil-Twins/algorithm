@@ -107,7 +107,8 @@ const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
             해결 완료
           </span>
         )}
-        {!board.solved && <span className={styles.notSolved}>미해결</span>}
+        {board.boardType !== String(BoardTypeId.PUBLIC_FREE) &&
+          !board.solved && <span className={styles.notSolved}>미해결</span>}
         <div className={`${styles.title} ${notosansBold.className}`}>
           {board.title}
         </div>
@@ -128,7 +129,12 @@ const BoardDetail = async ({ boardId, page, count }: BoardDetailProps) => {
           />
         </div>
         <hr className={styles.line} />
-        <div className={styles.commentTotal}>{board.commentCount}개의 답변</div>
+        <div className={styles.commentTotal}>
+          {board.commentCount}개의{" "}
+          {board.boardType !== String(BoardTypeId.PUBLIC_FREE)
+            ? "답변"
+            : "댓글"}
+        </div>
         <CommentEditor requestId={String(board.boardId)} />
         {comment.total > 0 && (
           <div className={styles.commentBox}>

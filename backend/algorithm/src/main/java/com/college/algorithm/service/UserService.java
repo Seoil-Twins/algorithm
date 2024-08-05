@@ -218,7 +218,8 @@ public class UserService {
                         return  CommentMapper.INSTANCE.toResponseCommentWithoutSolvedDto(comment.getBoard(), comment);
                     } else {
                         Board board = comment.getBoard();
-                        return CommentMapper.INSTANCE.toResponseCommentDto(board, comment, board.getAdoptId().equals(comment.getCommentId()));
+                        boolean isSolved = board.getAdoptId() != null && board.getAdoptId().equals(comment.getCommentId());
+                        return CommentMapper.INSTANCE.toResponseCommentDto(board, comment, isSolved);
                     }
                 })
                 .toList();

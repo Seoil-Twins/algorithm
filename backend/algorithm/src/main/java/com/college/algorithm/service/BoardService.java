@@ -235,12 +235,15 @@ public class BoardService {
 
         List<Long> dummyImageIds = boardPostDto.getImageIds();
         List<DummyImage> dummyImages = new ArrayList<>();
-        for(Long imageId : dummyImageIds){
-            DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
-            if(image != null)
-                dummyImages.add(image);
-            else
-                throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+
+        if (dummyImageIds != null) {
+            for(Long imageId : dummyImageIds){
+                DummyImage image = dummyImageRepository.findDummyImageByImageId(imageId);
+                if(image != null)
+                    dummyImages.add(image);
+                else
+                    throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
+            }
         }
 
         Board board = Board.builder()
@@ -265,14 +268,16 @@ public class BoardService {
         boardImageRepository.saveAll(addImages);
         dummyImageRepository.deleteAll(dummyImages);
 
-        List<Tag> tags = new ArrayList<>();
         List<String> tagNames = boardPostDto.getTags();
-        for (String tagName : tagNames) {
-            Tag tag = new Tag(savedBoard, tagName);
-            tags.add(tag);
-        }
 
-        tagRepository.saveAll(tags);
+        if (tagNames != null && !tagNames.isEmpty()) {
+            List<Tag> tags = new ArrayList<>();
+            for (String tagName : tagNames) {
+                tags.add(new Tag(savedBoard, tagName));
+            }
+
+            tagRepository.saveAll(tags);
+        }
 
         return HttpStatus.OK;
     }

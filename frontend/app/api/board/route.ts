@@ -49,6 +49,7 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
+    console.log(API_URL);
     const { headers } = await API_INSTANCE.POST(API_URL, req.headers, body);
     return new Response(null, { status: 204, headers });
   } catch (error: any) {

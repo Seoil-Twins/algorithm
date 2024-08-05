@@ -6,6 +6,9 @@ export const UserAPI = {
   getUser: async () => {
     return await API_INSTANCE.GET(API_URL);
   },
+  getOtherUser: async (userId: number) => {
+    return await API_INSTANCE.GET(`${API_URL}/${userId}`);
+  },
   getSnsInfo: async () => {
     return await API_INSTANCE.GET(`${API_URL}/link`);
   },

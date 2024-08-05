@@ -76,7 +76,7 @@ export const BoardType = {
   ALGORITHM_FEEDBACK: "af",
   PUBLIC_ALL: "p",
   PUBLIC_QUESTION: "pq",
-  PUBLIC_FEEDBACK: "pf",
+  PUBLIC_FREE: "pf",
 } as const;
 
 export const BoardTypeId = {

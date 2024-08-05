@@ -1,4 +1,7 @@
-import { AlgorithmBoardPageOptions } from "@/types/board";
+import {
+  AlgorithmBoardPageOptions,
+  PublicBoardPageOptions,
+} from "@/types/board";
 import { API_INSTANCE, Body } from ".";
 
 const API_URL = "/board";
@@ -10,7 +13,9 @@ export const BoardAPI = {
   getRecommendBoards: async () => {
     return await API_INSTANCE.GET(`${API_URL}/recommend`);
   },
-  getBoards: async (options: AlgorithmBoardPageOptions) => {
+  getBoards: async (
+    options: AlgorithmBoardPageOptions | PublicBoardPageOptions,
+  ) => {
     const searchParams = new URLSearchParams();
 
     Object.entries(options).forEach(([key, value]) => {

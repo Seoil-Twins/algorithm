@@ -26,6 +26,7 @@ export type Algorithm = {
   title: string;
   kind: string;
   content: string;
+  level: string;
   limitTime: string;
   limitMemory: string;
   isRecommend: boolean | null;
@@ -67,4 +68,11 @@ export type CorrectItem = {
 export type Corrects = {
   corrects: CorrectItem[];
   total: number;
+};
+
+export type Explanation = {
+  title: string;
+  kind: string;
+  content: string;
+  level: string;
 };

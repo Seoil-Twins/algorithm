@@ -7,6 +7,10 @@ export type User = {
   solved: number;
 };
 
+export type OtherUser = {
+  favorite: number;
+} & User;
+
 export type RequireUser = {
   userId: number;
   profile: string;

@@ -121,7 +121,12 @@ const Contents = ({ algorithm }: DetailProps) => {
       );
       // results 배열에 담기면 AlgorithmResult을 쓸 것.
       const result: AlgorithmResultItem = await response.json();
-      toast.success("정답입니다 !!");
+
+      if (result.isSuccess) {
+        toast.success("정답입니다 !!");
+      } else {
+        toast.error("정답을 맞추지 못했습니다 :(");
+      }
 
       setResults({
         results: [result],
@@ -134,9 +139,7 @@ const Contents = ({ algorithm }: DetailProps) => {
           `/login?error=unauthorized&redirect_url=/algorithm/${algorithm.algorithmId}`,
         );
       } else {
-        toast.error(
-          "예상치 못한 오류가 발생하였습니다.\n나중에 다시 시도해주세요.",
-        );
+        toast.error("정답을 맞추지 못했습니다 :(");
       }
     }
   }, [algorithm.algorithmId, code, router, type]);

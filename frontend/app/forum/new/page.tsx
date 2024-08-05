@@ -17,11 +17,11 @@ import { checkAltValue } from "@/utils/doc";
 const dropdownItems: DropdownItem[] = [
   {
     title: "질문",
-    value: BoardTypeId.ALGORITHM_QUESTION,
+    value: BoardTypeId.PUBLIC_QUESTION,
   },
   {
-    title: "피드백",
-    value: BoardTypeId.ALGORITHM_FEEDBACK,
+    title: "자유",
+    value: BoardTypeId.PUBLIC_FREE,
   },
 ];
 
@@ -32,6 +32,7 @@ const New = () => {
     boardType: BoardTypeId.PUBLIC_QUESTION,
     title: "",
     content: "",
+    imageIds: [],
   });
   const [imageIds, setImageIds] = useState<number[]>([]);
 
@@ -62,8 +63,8 @@ const New = () => {
         try {
           await BoardAPI.addPublicBoard(request);
           toast.success("게시글이 작성되었습니다.");
+          router.replace(`/forum/all`);
           router.refresh();
-          router.replace(`/forumn/all`);
         } catch (error: any) {
           if (error.status === 401) {
             router.replace(`/login?error=unauthorized&redirect_url=/forum/new`);

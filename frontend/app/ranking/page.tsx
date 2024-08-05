@@ -1,16 +1,15 @@
 import Image from "next/image";
 
-import { Ranking as RankingType } from "@/types2/ranking";
-
-import { IMAGE_URL } from "@/app/actions/.";
-import { getRankings } from "../actions/ranking";
+import { RankingList, RankingListItem } from "../api/model/ranking";
+import { RankingAPI } from "@/api/ranking";
 
 import styles from "./ranking.module.scss";
 
 import Table, { TableData } from "@/components/algorithm/table";
-import BoardNavigation, { NavItem } from "@/components/common/boardNavigation";
+import { NavItem } from "@/components/common/boardNavigation";
 import NotFound from "@/components/common/notFound";
 import Pagination from "@/components/common/pagination";
+import { IMAGE_URL } from "@/api";
 
 const navItems: NavItem[] = [
   {
@@ -34,81 +33,57 @@ const Ranking = async ({
 }) => {
   const page = Number(searchParams?.page) || 1;
   const count = Number(searchParams?.count) || 10;
-  const keyword = searchParams?.keyword;
+  let rankings: RankingList;
 
-  const rankingsResponse = await getRankings({ page, count, keyword });
-  let rankings;
-  if (rankingsResponse.status !== 200) {
+  try {
+    rankings = await (await RankingAPI.getRankings(page, count)).json();
+  } catch (error) {
     return (
       <NotFound
         title="랭킹을 표시할 수 없습니다."
         description="매일 오전 12시 기준으로 랭킹에 업데이트 됩니다."
       />
     );
-  } else rankings = rankingsResponse.data;
+  }
 
   const includeCommaWithNumber = (num: number) => {
     return num.toLocaleString();
   };
 
   const convertFloatAtTwo = (tried: number, solved: number) => {
+    if (tried === 0 || solved === 0) {
+      return 0;
+    }
+
     return ((solved / tried) * 100).toFixed(2);
   };
 
-  const tableDatas: TableData[] = rankings.rankings.map((item: RankingType) => {
-    return {
-      datas: [
-        <span key={item.rankingId}>{item.rank}</span>,
-        <div key={item.rankingId} className={styles.nickname}>
-          <Image
-            src={`${IMAGE_URL}/${item.user.profile}`}
-            alt="프로필 사진"
-            width={38}
-            height={38}
-            className={styles.profileImg}
-          />
-          <span>{item.user.nickname}</span>
-        </div>,
-        <span key={item.rankingId}>{includeCommaWithNumber(item.tried)}</span>,
-        <span key={item.rankingId}>{includeCommaWithNumber(item.solved)}</span>,
-        <span key={item.rankingId}>
-          {convertFloatAtTwo(item.tried, item.solved)}%
-        </span>,
-      ],
-      link: `/user/${item.user.userId}/question`,
-    };
-  });
-
-  if (rankings.total <= 0 && keyword)
-    return (
-      <>
-        <BoardNavigation
-          items={navItems}
-          isVisiblePost={false}
-          placeholder="닉네임으로 검색"
-        />
-        <NotFound
-          title="사용자를 찾을 수 없습니다."
-          description="매일 오전 12시 기준으로 랭킹에 업데이트 됩니다."
-        />
-      </>
-    );
-
-  if (rankings.total <= 0)
-    return (
-      <NotFound
-        title="랭킹을 표시할 수 없습니다."
-        description="매일 오전 12시 기준으로 랭킹에 업데이트 됩니다."
-      />
-    );
+  const tableDatas: TableData[] = rankings.rankings.map(
+    (item: RankingListItem, idx: number) => {
+      return {
+        datas: [
+          <span key={idx}>{idx + 1 + page * 10}</span>,
+          <div key={idx} className={styles.nickname}>
+            <Image
+              src={`${IMAGE_URL}${item.user.profile}`}
+              alt="프로필 사진"
+              width={38}
+              height={38}
+              className={styles.profileImg}
+            />
+            <span>{item.user.nickname}</span>
+          </div>,
+          <span key={idx}>{includeCommaWithNumber(item.tried)}</span>,
+          <span key={idx}>{includeCommaWithNumber(item.solved)}</span>,
+          <span key={idx}>{convertFloatAtTwo(item.tried, item.solved)}%</span>,
+        ],
+        link: `/user/${item.user.userId}/question`,
+      };
+    },
+  );
 
   return (
     <div className={styles.ranking}>
-      <BoardNavigation
-        items={navItems}
-        isVisiblePost={false}
-        placeholder="닉네임으로 검색"
-      />
       <Table
         headers={tableHeaders}
         datas={tableDatas}
