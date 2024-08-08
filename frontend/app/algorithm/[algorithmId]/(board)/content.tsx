@@ -64,7 +64,7 @@ const Content = async ({ algorithmId, options }: ContentProps) => {
           <span>
             {
               boardType.types
-                .find((type) => type.typeName === board.boardType)
+                .find((type) => type.typeId === Number(board.boardType))
                 ?.typeName.split(" ")[1]
             }
           </span>,
