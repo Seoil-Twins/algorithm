@@ -84,7 +84,7 @@
 ![image](https://github.com/user-attachments/assets/bfea3523-5ae9-4b15-bcba-1298bb66aa1f)
 ![image](https://github.com/user-attachments/assets/f5ff0e89-cafa-464b-a2b4-8721a5d860a6)
 
-### 개정 관리
+### 계정 관리
 - 닉네임, 이메일 변경
 - 계정 연동 (Github, Google, Naver, Kakao)
 - 계정 삭제
