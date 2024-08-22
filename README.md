@@ -62,7 +62,12 @@
 - 최대한 기능 단위로 commit을 시도하고, 원격 브랜치에 push를 한다.
 - 중간 보고마다 브랜치를 develop에 merge 하고, 에러 또는 충돌을 해결한다.
 
-## 6. 페이지별 기능
+## 6. 디자인
+아래 주소를 통해 웹 디자인을 확인하실 수 있습니다.
+
+https://www.figma.com/design/gkGdTyy5p2PTH19hyEzZpL/Algorithm?node-id=0-1&m=dev
+
+## 7. 페이지별 기능
 ### 메인 화면
 - 강의 동영상
 - 추천 알고리즘 (일주일 안에 사람들이 많이 시도한 알고리즘)
@@ -152,7 +157,7 @@
 ### 랭킹
 ![image](https://github.com/user-attachments/assets/f8ae4e84-12bc-4770-9996-c55dda97dc9c)
 
-## 7. 신경 쓴 부분
+## 8. 신경 쓴 부분
 - Next JS의 14버전 사용을 적극적으로 도입하였습니다.
 - Session + Redis을 통해 유저를 관리하고, 요청마다 세션을 유효시간을 갱신하였습니다.
 - SSR을 위해 최대한 서버 컴포넌트에서 Get API을 사용하고, 작성과 같은 POST, PATCH, DELETE는 클라이언트 컴포넌트에서 사용했습니다.
